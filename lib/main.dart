@@ -39,11 +39,18 @@ class MyApp extends StatelessWidget {
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     color: Color(0xff888888)
-                ),
+                )
             ),
             iconTheme: const IconThemeData(
               size: 24,
               color: Color(0xffa0a0a0),
+            ),
+            appBarTheme: const AppBarTheme(
+              toolbarHeight: 60,
+              titleTextStyle: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500
+              )
             )
         ),
         home: const HomePage(),

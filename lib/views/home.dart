@@ -23,49 +23,134 @@ class _HomePageState extends State<HomePage> {
         return SafeArea(
           child: Scaffold(
             appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            title: const Text("H O M E P A G E")
+              elevation: 2,
+              shadowColor: Theme.of(context).colorScheme.surface,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              title: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '2024',
+
+                        ),
+                        Text(
+                          'Dec',
+                          style: TextStyle(
+                            fontSize: 25
+                          ),
+                        )
+                      ]
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Income:',
+                          
+                        ),
+                        Text(
+                          '+800.00',
+                        )
+                      ]
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Expenses:'
+                        ),
+                        Text(
+                          '-500.00',
+                        )
+                      ]
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Balance:',
+                        ),
+                        Text(
+                          '300.00',
+                        )
+                      ]
+                    ),
+                  )
+                ],
+              )
             ),
             body: Center(child: widgetOptions.elementAt(selectedIndex)),
             floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            floatingActionButtonAnimator: FloatingActionButtonAnimator.noAnimation,
             floatingActionButton: Container(
                 margin: const EdgeInsets.only(top: 10),
                 height: 65,
                 width: 65,
                 child: FloatingActionButton(
-                    elevation: 0,
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(color: Theme.of(context).colorScheme.secondary, width: 5),
-                        borderRadius: BorderRadius.circular(100)
-                    ),
-                    splashColor: Colors.transparent,
-                    child: Icon(
-                        Icons.add,
-                        color: Theme.of(context).colorScheme.onPrimary
-                    ),
-                    onPressed: () {
-                        //
-                    }
+                  elevation: 0,
+                  highlightElevation: 0,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Theme.of(context).colorScheme.secondary, width: 5),
+                      borderRadius: BorderRadius.circular(100)
+                  ),
+                  splashColor: Colors.transparent,
+                  child: Icon(
+                      Icons.add,
+                      color: Theme.of(context).colorScheme.onPrimary
+                  ),
+                  onPressed: () {
+                      //
+                  }
                 ),
             ),
-            bottomNavigationBar: BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                unselectedItemColor: Theme.of(context).colorScheme.onSecondary,
-                selectedItemColor: Theme.of(context).colorScheme.primary,
-                items: const <BottomNavigationBarItem>[
-                    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-                    BottomNavigationBarItem(icon: Icon(Icons.business), label: 'Business'),
-                    BottomNavigationBarItem(icon: Icon(Icons.school), label: 'School'),
-                    BottomNavigationBarItem(icon: Icon(Icons.school), label: 'School'),
-                ],
-                currentIndex: selectedIndex,
-                onTap: (int index) {
-                    setState(() {
-                        selectedIndex = index;
-                    });
-                },
+            bottomNavigationBar: Theme(
+              data: ThemeData(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent
+              ),
+              child: BottomNavigationBar(
+                  type: BottomNavigationBarType.fixed,
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  unselectedItemColor: Theme.of(context).colorScheme.onSecondary,
+                  selectedItemColor: Theme.of(context).colorScheme.primary,
+                  items: const <BottomNavigationBarItem>[
+                      BottomNavigationBarItem(icon: Icon(Icons.article), label: 'Records'),
+                      BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Summary'),
+                      BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: 'Calendar'),
+                      BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Setting'),
+                  ],
+                  currentIndex: selectedIndex,
+                  onTap: (int index) {
+                      setState(() {
+                          selectedIndex = index;
+                      });
+                  },
+              ),
             ),
           ),
         );
