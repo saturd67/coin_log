@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:namer_app/views/AppFrame/Home.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,7 +30,7 @@ class _HomePageState extends State<HomePage> {
               title: Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
                     decoration: BoxDecoration(),
@@ -108,15 +109,15 @@ class _HomePageState extends State<HomePage> {
             floatingActionButtonAnimator: FloatingActionButtonAnimator.noAnimation,
             floatingActionButton: Container(
                 margin: const EdgeInsets.only(top: 10),
-                height: 65,
-                width: 65,
+                height: 40,
+                width: 60,
                 child: FloatingActionButton(
                   elevation: 0,
                   highlightElevation: 0,
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Theme.of(context).colorScheme.secondary, width: 5),
-                      borderRadius: BorderRadius.circular(100)
+                      side: BorderSide(color: Theme.of(context).colorScheme.secondary, width: 3),
+                      borderRadius: BorderRadius.circular(10)
                   ),
                   splashColor: Colors.transparent,
                   child: Icon(
@@ -214,20 +215,6 @@ class _BottomNavigationBar extends StatelessWidget {
                         icon: Icon(Icons.abc)
                     )
                 ],
-            ),
-        );
-    }
-}
-
-class Home extends StatelessWidget {
-    @override
-    Widget build(BuildContext context) {
-        return Center(
-            child: ElevatedButton(
-                onPressed: () {
-                  
-                },
-                child: const Text("Go To Intro")
             ),
         );
     }

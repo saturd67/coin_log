@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namer_app/views/home.dart';
+import 'package:namer_app/views/AppFrame/AppFrame.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
             colorScheme: ColorScheme(
                 brightness: Brightness.dark,
-                primary: Color(0xffffd700),
+                primary: Color(0xff00e68e),
                 onPrimary: Color(0xffffffff),
                 secondary: Color(0xffffffff),
                 onSecondary: Color(0xffa0a0a0),
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
                 onSurface: Color(0xffffffff)
             ),
             textTheme: const TextTheme(
-                displayLarge: const TextStyle(
+                displayLarge: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.normal,
                     color: Color(0xffa8a8a8)
@@ -33,13 +33,28 @@ class MyApp extends StatelessWidget {
                 displayMedium: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.normal,
-                    color: Color.fromARGB(255, 168, 168, 168)
+                    color: Color(0xff888888)
                 ),
                 displaySmall: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     color: Color(0xff888888)
-                )
+                ),
+                bodyLarge: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xff14181b)
+                ),
+                bodyMedium: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xff14181b)
+                ),
+                bodySmall: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xff14181b)
+                ),
             ),
             iconTheme: const IconThemeData(
               size: 24,
@@ -51,6 +66,10 @@ class MyApp extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w500
               )
+            ),
+            dividerTheme: DividerThemeData(
+                thickness: 1,
+                color: Color(0xffe0e3e7),
             )
         ),
         home: const HomePage(),
