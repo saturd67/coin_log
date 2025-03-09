@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
                 error: Color(0xffff2c2c),
                 onError: Color(0xffffffff),
                 surface: Color(0xfff0f0f0),
-                onSurface: Color(0xffffffff)
+                onSurface: Color(0xffffffff),
             ),
             textTheme: const TextTheme(
                 displayLarge: TextStyle(
@@ -78,3 +78,8 @@ class MyApp extends StatelessWidget {
         });
   }
 }
+
+extension CustomColorScheme on ColorScheme {
+  Color get success => const Color(0xff249689);
+}
+
