@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:namer_app/views/AppFrame/Home.dart';
+import 'package:namer_app/views/AppFrame/Record.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class AppFramePage extends StatefulWidget {
+  const AppFramePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<AppFramePage> createState() => _AppFramePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _AppFramePageState extends State<AppFramePage> {
     int selectedIndex = 0;
     static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
     static List<Widget> widgetOptions = <Widget>[
-        Home(),
-        // Text('Index 0: Home', style: optionStyle),
+        Record(),
         Text('Index 1: Business', style: optionStyle),
         Text('Index 2: School', style: optionStyle),
         Text('Index 3: School', style: optionStyle),
@@ -27,82 +26,7 @@ class _HomePageState extends State<HomePage> {
               elevation: 2,
               shadowColor: Theme.of(context).colorScheme.surface,
               backgroundColor: Theme.of(context).colorScheme.primary,
-              title: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '2024',
-
-                        ),
-                        Text(
-                          'Dec',
-                          style: TextStyle(
-                            fontSize: 25
-                          ),
-                        )
-                      ]
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Income:',
-                          
-                        ),
-                        Text(
-                          '+800.00',
-                        )
-                      ]
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Expenses:'
-                        ),
-                        Text(
-                          '-500.00',
-                        )
-                      ]
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Balance:',
-                        ),
-                        Text(
-                          '300.00',
-                        )
-                      ]
-                    ),
-                  )
-                ],
-              )
+              title: AppBarRecordSummary()
             ),
             body: Center(child: widgetOptions.elementAt(selectedIndex)),
             floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -156,6 +80,92 @@ class _HomePageState extends State<HomePage> {
           ),
         );
     }
+}
+
+class AppBarRecordSummary extends StatelessWidget {
+  const AppBarRecordSummary({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          decoration: BoxDecoration(),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '2024',
+    
+              ),
+              Text(
+                'Dec',
+                style: TextStyle(
+                  fontSize: 25
+                ),
+              )
+            ]
+          ),
+        ),
+        Container(
+          decoration: BoxDecoration(),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Income:',
+                
+              ),
+              Text(
+                '+800.00',
+              )
+            ]
+          ),
+        ),
+        Container(
+          decoration: BoxDecoration(),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Expenses:'
+              ),
+              Text(
+                '-500.00',
+              )
+            ]
+          ),
+        ),
+        Container(
+          decoration: BoxDecoration(),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Balance:',
+              ),
+              Text(
+                '300.00',
+              )
+            ]
+          ),
+        )
+      ],
+    );
+  }
 }
 
 class _BottomNavigationBar extends StatelessWidget {

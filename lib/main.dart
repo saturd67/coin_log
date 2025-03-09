@@ -72,9 +72,9 @@ class MyApp extends StatelessWidget {
                 color: Color(0xffe0e3e7),
             )
         ),
-        home: const HomePage(),
+        home: const AppFramePage(),
         routes: {
-          '/home': (context) => const HomePage()
+          '/home': (context) => const AppFramePage()
         });
   }
 }

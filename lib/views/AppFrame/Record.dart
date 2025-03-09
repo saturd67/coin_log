@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:namer_app/main.dart';
 
-class Home extends StatelessWidget {
+class Record extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
