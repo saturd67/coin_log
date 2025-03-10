@@ -61,10 +61,12 @@ class MyApp extends StatelessWidget {
               color: Color(0xffa0a0a0),
             ),
             appBarTheme: const AppBarTheme(
+              elevation: 2,
               toolbarHeight: 60,
+              centerTitle: true,
               titleTextStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500
+                fontSize: 18,
+                fontWeight: FontWeight.bold
               )
             ),
             dividerTheme: DividerThemeData(
