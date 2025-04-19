@@ -19,6 +19,8 @@ class MyApp extends StatelessWidget {
                 onPrimary: Color(0xffffffff),
                 secondary: Color(0xffffffff),
                 onSecondary: Color(0xffa0a0a0),
+                tertiary: Color(0xffe6e6e6),
+                onTertiary: Color(0xffa0a0a0),
                 error: Color(0xffff2c2c),
                 onError: Color(0xffffffff),
                 surface: Color(0xfff0f0f0),
@@ -26,7 +28,7 @@ class MyApp extends StatelessWidget {
             ),
             textTheme: const TextTheme(
                 displayLarge: TextStyle(
-                    fontSize: 32,
+                    fontSize: 28,
                     fontWeight: FontWeight.normal,
                     color: Color(0xffa8a8a8)
                 ),
@@ -41,7 +43,7 @@ class MyApp extends StatelessWidget {
                     color: Color(0xff888888)
                 ),
                 bodyLarge: TextStyle(
-                    fontSize: 32,
+                    fontSize: 28,
                     fontWeight: FontWeight.normal,
                     color: Color(0xff14181b)
                 ),
@@ -59,6 +61,14 @@ class MyApp extends StatelessWidget {
             iconTheme: const IconThemeData(
               size: 24,
               color: Color(0xffa0a0a0),
+            ),
+            inputDecorationTheme: const InputDecorationTheme(
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+              border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Color(0xffffffff),
+              hintStyle: TextStyle(color: Color(0xff888888))
             ),
             appBarTheme: const AppBarTheme(
               elevation: 2,

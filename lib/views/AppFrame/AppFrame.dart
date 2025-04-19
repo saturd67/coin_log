@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:namer_app/views/AppFrame/Record.dart';
+import 'package:namer_app/views/AppFrame/Summary.dart';
 import 'package:namer_app/views/RecordDetails.dart';
 
 class AppFramePage extends StatefulWidget {
@@ -14,7 +15,7 @@ class _AppFramePageState extends State<AppFramePage> {
     static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
     static List<Widget> widgetOptions = <Widget>[
         Record(),
-        Text('Index 1: Business', style: optionStyle),
+        Summary(),
         Text('Index 2: School', style: optionStyle),
         Text('Index 3: School', style: optionStyle),
     ];
@@ -29,6 +30,7 @@ class _AppFramePageState extends State<AppFramePage> {
               title: AppBarRecordSummary()
             ),
             body: Center(child: widgetOptions.elementAt(selectedIndex)),
+            resizeToAvoidBottomInset: false,
             floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
             floatingActionButtonAnimator: FloatingActionButtonAnimator.noAnimation,
             floatingActionButton: Container(
@@ -199,65 +201,3 @@ Route _createRoute() {
     },
   );
 }
-
-// class _BottomNavigationBar extends StatelessWidget {
-
-//     @override
-//     Widget build(BuildContext context) {
-//         return Container(
-//             height: 58,
-//             padding: EdgeInsets.all(0),
-//                 decoration: BoxDecoration(
-//                 color: Colors.white,
-//                 boxShadow: [
-//                 BoxShadow(
-//                     color: Colors.grey.withValues(alpha: 0.5),
-//                     spreadRadius: 3,
-//                     blurRadius: 2,
-//                     offset: Offset(0, 3), // changes position of shadow
-//                 ),
-//                 ],
-//             ),
-//             child: Row(
-//                 mainAxisSize: MainAxisSize.max,
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: [
-//                     SizedBox(
-//                         height: 58,
-//                         width: 78,
-//                         child: TextButton(
-//                             style: ElevatedButton.styleFrom(
-//                                 padding: EdgeInsets.all(0),
-//                                 backgroundColor: Theme.of(context).colorScheme.secondary,
-//                                 elevation: 0,
-//                                 shape: RoundedRectangleBorder(),
-//                                 overlayColor: Colors.transparent,
-//                                 splashFactory: NoSplash.splashFactory
-//                             ),
-//                             onPressed: () {
-//                                 //
-//                             }, 
-//                             child: Column(
-//                                 mainAxisAlignment: MainAxisAlignment.center,
-//                                 children: [
-//                                     Icon(Icons.school_outlined, color: Theme.of(context).iconTheme.color, size: Theme.of(context).iconTheme.size),
-//                                     Text("Record", style: Theme.of(context).textTheme.displaySmall,)
-//                                 ],
-//                             )
-//                         ),
-//                     ),
-//                         IconButton(
-//                         style: ElevatedButton.styleFrom(
-//                             backgroundColor: Colors.transparent,
-//                             padding: EdgeInsets.all(0)
-//                         ),
-//                         onPressed: () {
-//                             //
-//                         }, 
-//                         icon: Icon(Icons.abc)
-//                     )
-//                 ],
-//             ),
-//         );
-//     }
-// }
