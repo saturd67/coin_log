@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
                     color: Color(0xff888888)
                 ),
                 bodyLarge: TextStyle(
-                    fontSize: 28,
+                    fontSize: 20,
                     fontWeight: FontWeight.normal,
                     color: Color(0xff14181b)
                 ),
@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
             ),
             inputDecorationTheme: const InputDecorationTheme(
               isDense: true,
-              contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+              contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               border: OutlineInputBorder(),
               filled: true,
               fillColor: Color(0xffffffff),

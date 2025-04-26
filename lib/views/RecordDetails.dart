@@ -51,12 +51,15 @@ class _RecordDetailsState extends State<RecordDetails> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  flex: 3,
+                  flex: 1,
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Padding(padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), child: Text("Expense: ", style: TextStyle(fontWeight: FontWeight.bold),)),
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), 
+                          child: SwitchButton()
+                        ),
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
                           child: SizedBox(
@@ -78,15 +81,17 @@ class _RecordDetailsState extends State<RecordDetails> {
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Container(
-                                          width: 50,
-                                          height: 50,
+                                          width:45,
+                                          height: 45,
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             color: Theme.of(context).colorScheme.tertiary
                                           ),
                                           child: Icon(Icons.picture_in_picture),
                                         ),
-                                        Text("Item $itemNumber")
+                                        Text("Item $itemNumber", style: TextStyle(
+                                          fontSize: 13
+                                        ),)
                                       ],
                                     );
                                   },
@@ -118,15 +123,15 @@ class _RecordDetailsState extends State<RecordDetails> {
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Container(
-                                          width: 55,
-                                          height: 55,
+                                          width: 45,
+                                          height: 45,
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             color: Theme.of(context).colorScheme.tertiary
                                           ),
                                           child: Icon(Icons.picture_in_picture),
                                         ),
-                                        Text("Item $itemNumber")
+                                        Text("Item $itemNumber", style: TextStyle(fontSize: 13),)
                                       ],
                                     );
                                   },
@@ -140,8 +145,12 @@ class _RecordDetailsState extends State<RecordDetails> {
                     ),
                   ),
                 ),
-                Expanded(
-                  flex: isKeyboardVisible ? 0 : 2,
+                // Expanded(
+                //   flex: isKeyboardVisible ? 0 : 1,
+                //   child: RecordDetailsKeyboard(isKeyboardVisible: isKeyboardVisible)
+                // ),
+                SizedBox(
+                  height: isKeyboardVisible ? 95: 270,
                   child: RecordDetailsKeyboard(isKeyboardVisible: isKeyboardVisible)
                 ),
               ],
@@ -150,6 +159,95 @@ class _RecordDetailsState extends State<RecordDetails> {
         )
       );
 
+  }
+}
+
+class SwitchButton extends StatefulWidget {
+  const SwitchButton({
+    super.key,
+  });
+
+  @override
+  State<SwitchButton> createState() => _SwitchButtonState();
+}
+
+class _SwitchButtonState extends State<SwitchButton> {
+  String focusedButton = "Expense";
+
+  Color getBackgroundColor(bool isFocus) {
+    return isFocus ? Color(0xff000000) : Color(0xffffffff);
+  }
+
+  Color getFontColor(bool isFocus) {
+    return isFocus ? Color(0xffffffff) : Color(0xff000000);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              focusedButton = "Expense";
+            });
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: getBackgroundColor(focusedButton == "Expense"),
+              border: Border.all(
+                color: Color(0xff000000), 
+                width: 1.0
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(6),
+                bottomLeft: Radius.circular(6)
+              )
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20.0, 2.0, 20.0, 2.0),
+              child: Text(
+                "Expense", 
+                style: TextStyle(
+                  color: getFontColor(focusedButton == "Expense"),
+                  fontWeight: FontWeight.bold
+                ),
+              ),
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              focusedButton = "Income";
+            });
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: getBackgroundColor(focusedButton == "Income"),
+              border: Border.all(
+                color:Color(0xff000000),
+                width: 1.0
+              ),
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(6), 
+                bottomRight: Radius.circular(6)
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20.0, 2.0, 20.0, 2.0),
+              child: Text(
+                "Income",
+                style: TextStyle(
+                  color: getFontColor(focusedButton == "Income"),
+                  fontWeight: FontWeight.bold
+                )
+              ),
+            )
+          ),
+        )
+      ],
+    );
   }
 }
 
@@ -178,7 +276,7 @@ class RecordDetailsKeyboard extends StatelessWidget {
               ]
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              padding: const EdgeInsets.fromLTRB(2.0, 2.0, 2.0, 4.0),
               child: TextField(
                 style: Theme.of(context).textTheme.bodyMedium,
                 decoration: InputDecoration(
@@ -187,13 +285,14 @@ class RecordDetailsKeyboard extends StatelessWidget {
               ),
             ),
             if (!isKeyboardVisible)
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Row(
+              SizedBox(
+                height: 175,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         RecordDetailsKeyboardButton(buttonText: "7"),
@@ -202,44 +301,35 @@ class RecordDetailsKeyboard extends StatelessWidget {
                         RecordDetailsKeyboardButton(buttonText: "Date: "),
                       ],
                     ),
-                  ),
-                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        RecordDetailsKeyboardButton(buttonText: "4"),
-                        RecordDetailsKeyboardButton(buttonText: "5"),
-                        RecordDetailsKeyboardButton(buttonText: "6"),
-                        RecordDetailsKeyboardButton(buttonText: "+"),
-                      ],
-                    ),
-                  ),
-                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        RecordDetailsKeyboardButton(buttonText: "1"),
-                        RecordDetailsKeyboardButton(buttonText: "2"),
-                        RecordDetailsKeyboardButton(buttonText: "3"),
-                        RecordDetailsKeyboardButton(buttonText: "-"),
-                      ],
-                    ),
-                  ),
-                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        RecordDetailsKeyboardButton(buttonText: "."),
-                        RecordDetailsKeyboardButton(buttonText: "0"),
-                        RecordDetailsKeyboardButton(buttonText: "Del"),
-                        RecordDetailsKeyboardButton(buttonText: "="),
-                      ],
-                    ),
-                  ),
-                ],
+                     Row(
+                       mainAxisAlignment: MainAxisAlignment.spaceAround,
+                       children: [
+                         RecordDetailsKeyboardButton(buttonText: "4"),
+                         RecordDetailsKeyboardButton(buttonText: "5"),
+                         RecordDetailsKeyboardButton(buttonText: "6"),
+                         RecordDetailsKeyboardButton(buttonText: "+"),
+                       ],
+                     ),
+                     Row(
+                       mainAxisAlignment: MainAxisAlignment.spaceAround,
+                       children: [
+                         RecordDetailsKeyboardButton(buttonText: "1"),
+                         RecordDetailsKeyboardButton(buttonText: "2"),
+                         RecordDetailsKeyboardButton(buttonText: "3"),
+                         RecordDetailsKeyboardButton(buttonText: "-"),
+                       ],
+                     ),
+                     Row(
+                       mainAxisAlignment: MainAxisAlignment.spaceAround,
+                       children: [
+                         RecordDetailsKeyboardButton(buttonText: "."),
+                         RecordDetailsKeyboardButton(buttonText: "0"),
+                         RecordDetailsKeyboardButton(buttonText: "Del"),
+                         RecordDetailsKeyboardButton(buttonText: "="),
+                       ],
+                     ),
+                  ],
+                ),
               )
           ],
         ),
@@ -248,7 +338,7 @@ class RecordDetailsKeyboard extends StatelessWidget {
   }
 }
 
-class RecordDetailsKeyboardButton extends StatelessWidget {
+class RecordDetailsKeyboardButton extends StatefulWidget {
   String buttonText;
 
   RecordDetailsKeyboardButton({
@@ -257,20 +347,45 @@ class RecordDetailsKeyboardButton extends StatelessWidget {
   });
 
   @override
+  State<RecordDetailsKeyboardButton> createState() => _RecordDetailsKeyboardButtonState();
+}
+
+class _RecordDetailsKeyboardButtonState extends State<RecordDetailsKeyboardButton> {
+  bool pressed = false;
+
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        print(buttonText);
-      },
-      child: Container(
-        width: 95, 
-        height: 40,
-        decoration: BoxDecoration(
-          color: Color(0xffffffff),
-          borderRadius: BorderRadius.circular(6)
-        ),
-        child: Center(
-          child: Text(buttonText)
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          print(widget.buttonText);
+        },
+        onTapDown: (_) {
+          setState(() {
+            pressed = true;
+          });
+        },
+        onTapUp: (_) {
+          setState(() {
+            pressed = false;
+          });
+        },
+        child: AnimatedOpacity(
+          duration: Duration(milliseconds: 100),
+          opacity: pressed ? 0.5 : 1.0,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2.0),
+            child: Container(
+              height: 40,
+              decoration: BoxDecoration(
+                color: Color(0xffffffff),
+                borderRadius: BorderRadius.circular(6)
+              ),
+              child: Center(
+                child: Text(widget.buttonText)
+              ),
+            ),
+          ),
         ),
       ),
     );
