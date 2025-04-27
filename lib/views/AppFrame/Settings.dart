@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:namer_app/router/RouterUtils.dart';
-import 'package:namer_app/views/Settings/Transactions.dart';
-import 'package:namer_app/views/Settings/Accounts.dart';
+import 'package:namer_app/views/Settings/TransactionList.dart';
+import 'package:namer_app/views/Settings/AccountList.dart';
 
 class Settings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        SettingItem(icon: Icons.category, name: "Transactions", widget: Transactions()),
-        SettingItem(icon: Icons.monetization_on, name: "Accounts", widget: Accounts()),
+        SettingItem(icon: Icons.category, name: "Transactions", widget: TransactionList()),
+        SettingItem(icon: Icons.monetization_on, name: "Accounts", widget: AccountList()),
       ],
     );
   }
