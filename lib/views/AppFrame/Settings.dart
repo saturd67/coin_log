@@ -1,0 +1,57 @@
+import 'package:flutter/material.dart';
+import 'package:namer_app/router/RouterUtils.dart';
+import 'package:namer_app/views/Settings/Transactions.dart';
+import 'package:namer_app/views/Settings/Accounts.dart';
+
+class Settings extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        SettingItem(icon: Icons.category, name: "Transactions", widget: Transactions()),
+        SettingItem(icon: Icons.monetization_on, name: "Accounts", widget: Accounts()),
+      ],
+    );
+  }
+}
+
+class SettingItem extends StatelessWidget {
+  IconData icon;
+  String name;
+  Widget widget;
+
+  SettingItem({
+    super.key,
+    required this.icon,
+    required this.name,
+    required this.widget
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(RouterUtils.createRoute(widget));
+      },
+      child: Container(
+        color: Theme.of(context).colorScheme.secondary,
+        height: 65,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+                child: Icon(
+                  icon,
+                  size: 30.0
+                ),
+              ),
+              Text(name, style: Theme.of(context).textTheme.bodyMedium)
+            ]
+          ),
+        )
+      ),
+    );
+  }
+}

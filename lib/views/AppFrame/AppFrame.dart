@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:namer_app/router/RouterUtils.dart';
 import 'package:namer_app/views/AppFrame/Record.dart';
 import 'package:namer_app/views/AppFrame/Summary.dart';
+import 'package:namer_app/views/AppFrame/Settings.dart';
 import 'package:namer_app/views/RecordDetails.dart';
 
 class AppFramePage extends StatefulWidget {
@@ -13,11 +15,19 @@ class AppFramePage extends StatefulWidget {
 class _AppFramePageState extends State<AppFramePage> {
     int selectedIndex = 0;
     static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-    static List<Widget> widgetOptions = <Widget>[
+    
+    static List<Widget> appBars = <Widget>[
+      RecordsAppBar(),
+      Text("Summary"),
+      Text("Calendar"),
+      Text("Settings")
+    ];
+    
+    static List<Widget> bodies = <Widget>[
         Record(),
         Summary(),
         Text('Index 2: School', style: optionStyle),
-        Text('Index 3: School', style: optionStyle),
+        Settings(),
     ];
 
     @override
@@ -27,9 +37,9 @@ class _AppFramePageState extends State<AppFramePage> {
             appBar: AppBar(
               shadowColor: Theme.of(context).colorScheme.surface,
               backgroundColor: Theme.of(context).colorScheme.primary,
-              title: AppBarRecordSummary()
+              title: appBars.elementAt(selectedIndex)
             ),
-            body: Center(child: widgetOptions.elementAt(selectedIndex)),
+            body: Center(child: bodies.elementAt(selectedIndex)),
             resizeToAvoidBottomInset: false,
             floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
             floatingActionButtonAnimator: FloatingActionButtonAnimator.noAnimation,
@@ -51,7 +61,7 @@ class _AppFramePageState extends State<AppFramePage> {
                       color: Theme.of(context).colorScheme.onPrimary
                   ),
                   onPressed: () {
-                      Navigator.of(context).push(_createRoute());
+                      Navigator.of(context).push(RouterUtils.createRoute(RecordDetails()));
                   }
                 ),
             ),
@@ -69,7 +79,7 @@ class _AppFramePageState extends State<AppFramePage> {
                       BottomNavigationBarItem(icon: Icon(Icons.article), label: 'Records'),
                       BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Summary'),
                       BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: 'Calendar'),
-                      BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Setting'),
+                      BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
                   ],
                   currentIndex: selectedIndex,
                   onTap: (int index) {
@@ -84,8 +94,8 @@ class _AppFramePageState extends State<AppFramePage> {
     }
 }
 
-class AppBarRecordSummary extends StatelessWidget {
-  const AppBarRecordSummary({
+class RecordsAppBar extends StatelessWidget {
+  const RecordsAppBar({
     super.key,
   });
 
@@ -185,19 +195,4 @@ class AppBarRecordSummary extends StatelessWidget {
       ),
     );
   }
-}
-
-Route _createRoute() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => RecordDetails(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 1.0);
-      const end = Offset.zero;
-      const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      return SlideTransition(position: animation.drive(tween), child: child);
-    },
-  );
 }

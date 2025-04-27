@@ -150,7 +150,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                 //   child: RecordDetailsKeyboard(isKeyboardVisible: isKeyboardVisible)
                 // ),
                 SizedBox(
-                  height: isKeyboardVisible ? 95: 270,
+                  height: isKeyboardVisible ? 92: 270,
                   child: RecordDetailsKeyboard(isKeyboardVisible: isKeyboardVisible)
                 ),
               ],
@@ -276,7 +276,7 @@ class RecordDetailsKeyboard extends StatelessWidget {
               ]
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(2.0, 2.0, 2.0, 4.0),
+              padding: const EdgeInsets.fromLTRB(2.0, 2.0, 2.0, 6.0),
               child: TextField(
                 style: Theme.of(context).textTheme.bodyMedium,
                 decoration: InputDecoration(
@@ -378,7 +378,7 @@ class _RecordDetailsKeyboardButtonState extends State<RecordDetailsKeyboardButto
             child: Container(
               height: 40,
               decoration: BoxDecoration(
-                color: Color(0xffffffff),
+                color: Theme.of(context).colorScheme.secondary,
                 borderRadius: BorderRadius.circular(6)
               ),
               child: Center(
