@@ -59,7 +59,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                       children: [
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), 
-                          child: SwitchButton()
+                          child: SwitchButton(labels: ["Expense", "Transfer", "Income"])
                         ),
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),

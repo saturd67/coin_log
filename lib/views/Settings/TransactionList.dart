@@ -27,7 +27,7 @@ class TransactionList extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10), 
-                  child: SwitchButton()
+                  child: SwitchButton(labels: ["Expenses", "Income"])
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.83,
