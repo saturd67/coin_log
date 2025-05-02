@@ -1,3 +1,4 @@
+import 'package:coin_log/widgets/ThemedTextField.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/widgets/GridViewIcon.dart';
 import 'package:coin_log/widgets/SwitchButton.dart';
@@ -40,19 +41,7 @@ class TransactionDetails extends StatelessWidget {
                       ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.75,
-                        child: TextField(
-                          style: Theme.of(context).textTheme.bodyMedium,
-                          decoration: InputDecoration(
-                            hintText: 'Name',
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(6.0),
-                              borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 2
-                              )
-                            )                
-                          ),
-                        ),
+                        child: ThemedTextField(placeholder: "Name")
                       ),
                     ],
                   ),
