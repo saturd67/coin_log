@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:namer_app/router/RouterUtils.dart';
-import 'package:namer_app/views/Settings/TransactionList.dart';
-import 'package:namer_app/views/Settings/AccountList.dart';
+import 'package:coin_log/router/RouterUtils.dart';
+import 'package:coin_log/views/Settings/TransactionList.dart';
+import 'package:coin_log/views/Settings/AccountList.dart';
 
 class Settings extends StatelessWidget {
   @override

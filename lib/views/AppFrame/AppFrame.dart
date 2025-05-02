@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:namer_app/router/RouterUtils.dart';
-import 'package:namer_app/views/AppFrame/Record.dart';
-import 'package:namer_app/views/AppFrame/Summary.dart';
-import 'package:namer_app/views/AppFrame/Settings.dart';
-import 'package:namer_app/views/RecordDetails.dart';
+import 'package:coin_log/router/RouterUtils.dart';
+import 'package:coin_log/views/AppFrame/Record.dart';
+import 'package:coin_log/views/AppFrame/Summary.dart';
+import 'package:coin_log/views/AppFrame/Settings.dart';
+import 'package:coin_log/views/RecordDetails.dart';
 
 class AppFramePage extends StatefulWidget {
   const AppFramePage({super.key});

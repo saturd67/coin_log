@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:namer_app/views/Settings/TransactionDetails.dart';
-import 'package:namer_app/widgets/GridViewIcon.dart';
-import 'package:namer_app/widgets/SwitchButton.dart';
+import 'package:coin_log/views/Settings/TransactionDetails.dart';
+import 'package:coin_log/widgets/GridViewIcon.dart';
+import 'package:coin_log/widgets/SwitchButton.dart';
 
 class TransactionList extends StatelessWidget {
   @override

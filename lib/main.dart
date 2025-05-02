@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namer_app/views/AppFrame/AppFrame.dart';
+import 'package:coin_log/views/AppFrame/AppFrame.dart';
 
 void main() {
   runApp(MyApp());

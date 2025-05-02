@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:namer_app/widgets/SwitchButton.dart';
-import 'package:namer_app/widgets/GridViewIcon.dart';
+import 'package:coin_log/widgets/SwitchButton.dart';
+import 'package:coin_log/widgets/GridViewIcon.dart';
 
 class RecordDetails extends StatefulWidget {
   @override
