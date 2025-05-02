@@ -1,7 +1,10 @@
+import 'package:coin_log/services/DatabaseService.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/views/AppFrame/AppFrame.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseService().database;
   runApp(MyApp());
 }
 
