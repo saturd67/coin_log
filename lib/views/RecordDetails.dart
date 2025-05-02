@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:namer_app/widgets/SwitchButton.dart';
+import 'package:namer_app/widgets/GridViewIcon.dart';
 
 class RecordDetails extends StatefulWidget {
   @override
@@ -81,15 +82,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                       mainAxisSize: MainAxisSize.max,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Container(
-                                          width:45,
-                                          height: 45,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Theme.of(context).colorScheme.tertiary
-                                          ),
-                                          child: Icon(Icons.picture_in_picture),
-                                        ),
+                                        GridViewIcon(),
                                         Text("Item $itemNumber", style: TextStyle(
                                           fontSize: 13
                                         ),)
@@ -123,15 +116,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                       mainAxisSize: MainAxisSize.max,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Container(
-                                          width: 45,
-                                          height: 45,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Theme.of(context).colorScheme.tertiary
-                                          ),
-                                          child: Icon(Icons.picture_in_picture),
-                                        ),
+                                        GridViewIcon(),
                                         Text("Item $itemNumber", style: TextStyle(fontSize: 13),)
                                       ],
                                     );

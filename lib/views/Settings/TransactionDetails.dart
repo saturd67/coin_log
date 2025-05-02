@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:namer_app/widgets/GridViewIcon.dart';
 import 'package:namer_app/widgets/SwitchButton.dart';
 
 class TransactionDetails extends StatelessWidget {
@@ -70,15 +71,7 @@ class TransactionDetails extends StatelessWidget {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
-                            width: 45,
-                            height: 45,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Theme.of(context).colorScheme.tertiary
-                            ),
-                            child: Icon(Icons.picture_in_picture),
-                          ),
+                          GridViewIcon(),
                           Text("Item ${index + 1}", style: TextStyle(fontSize: 13),)
                         ],
                       );
