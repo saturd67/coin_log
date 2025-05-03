@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class GridViewIcon extends StatelessWidget {
-  final Icon? icon;
+  final IconData? iconData;
+  final bool? isSelected;
 
   GridViewIcon ({
     super.key,
-    this.icon
+    this.iconData,
+    this.isSelected
   });
 
   @override
@@ -15,9 +17,9 @@ class GridViewIcon extends StatelessWidget {
       height: 45,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Theme.of(context).colorScheme.tertiary
+        color: isSelected != null && isSelected! ? Theme.of(context).colorScheme.primary :  Theme.of(context).colorScheme.tertiary
       ),
-      child: icon ?? Icon(Icons.picture_in_picture),
+      child: iconData != null ? Icon(iconData, color: isSelected != null && isSelected! ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).iconTheme.color) : Icon(Icons.picture_in_picture),
     );
   }
 }

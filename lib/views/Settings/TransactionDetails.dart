@@ -1,10 +1,22 @@
+import 'package:coin_log/objects/TransactionCategory.dart';
+import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:coin_log/widgets/ThemedTextField.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/widgets/GridViewIcon.dart';
 import 'package:coin_log/widgets/SwitchButton.dart';
 import 'package:coin_log/constants/TransactionCategoryMap.dart';
 
-class TransactionDetails extends StatelessWidget {
+class TransactionDetails extends StatefulWidget {
+
+  @override
+  State<TransactionDetails> createState() => _TransactionDetailsState();
+}
+
+class _TransactionDetailsState extends State<TransactionDetails> {
+  final TransactionCategoryService transactionCategoryService = TransactionCategoryService();
+
+  final TransactionCategory transactionCategory = TransactionCategory(name: "", icon: "", type: "", sequence: 1);
+  IconData? onDisplayIconData;
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +28,36 @@ class TransactionDetails extends StatelessWidget {
           title: const Text("Transaction Details"),
           actions: [
             IconButton(
-              onPressed: () {
-                print("Save");
+              onPressed: () async {
+
+                if (transactionCategory.name == "") {
+                  return;
+                }
+
+                if (transactionCategory.type == "") {
+                  return;
+                }
+
+                if (transactionCategory.icon == "") {
+                  return;
+                }
+                // int? identifier = await transactionCategoryService.add(TransactionCategory(name: "Test3", icon: "Test3", type: "Expend", sequence: 3));
+
+                // int identifier = await transactionCategoryService.update(TransactionCategory(identifier: 1, name: "Test1", icon: "Test1", sequence: 2));
+
+                // int identifier = await transactionCategoryService.delete(1);
+
+                // List<TransactionCategory> transactionCategories = await transactionCategoryService.list();
+                // transactionCategories.forEach((transactionCategory) {
+                //   print(transactionCategory.name);
+                // });
+
+                TransactionCategory? lastTransactionCategory = await transactionCategoryService.findLastByType("Expend");
+                if (lastTransactionCategory != null) {
+                  transactionCategory.sequence = lastTransactionCategory.sequence + 1;
+                }
+
+                print(transactionCategory.toMap());
               }, 
               icon: const Icon(Icons.check)
             )
@@ -36,20 +76,30 @@ class TransactionDetails extends StatelessWidget {
                       height: 45,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Theme.of(context).colorScheme.tertiary
+                        color: onDisplayIconData != null ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.tertiary
                       ),
-                      child: Icon(Icons.picture_in_picture),
+                      child: Icon(onDisplayIconData ?? Icons.picture_in_picture, color: onDisplayIconData != null ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).iconTheme.color),
                     ),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.75,
-                      child: ThemedTextField(placeholder: "Name")
+                      child: ThemedTextField(
+                        placeholder: "Name",
+                        onChanged: (value) {
+                          transactionCategory.name = value;
+                        },
+                      )
                     ),
                   ],
                 ),
               ),
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10), 
-                child: SwitchButton(labels: ["Expense", "Income"])
+                child: SwitchButton(
+                  labels: ["Expense", "Income"],
+                  onChanged: (value) {
+                    transactionCategory.type = value;
+                  }
+                )
               ),
               Expanded(
                 child: SingleChildScrollView(
@@ -76,13 +126,21 @@ class TransactionDetails extends StatelessWidget {
                             ),
                             itemCount: entry.value.length,
                             itemBuilder: (context, index) {
-                              return Column(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  GridViewIcon(icon: entry.value[index].icon),
-                                  Text(entry.value[index].name, style: TextStyle(fontSize: 13))
-                                ],
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    transactionCategory.icon = entry.value[index].keys.first;
+                                    onDisplayIconData = coinLogIconMap[transactionCategory.icon]!.icon;
+                                  });
+                                },
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    GridViewIcon(iconData: entry.value[index].values.first.icon, isSelected: entry.value[index].keys.first == transactionCategory.icon),
+                                    Text(entry.value[index].values.first.name, style: TextStyle(fontSize: 13))
+                                  ],
+                                ),
                               );
                             }
                           )
@@ -92,32 +150,6 @@ class TransactionDetails extends StatelessWidget {
                   )
                 ),
               )
-              // for (int i = 0; i < CoinLogIconCategory.values.length; i++) ... {
-              //   Column(
-              //     mainAxisSize: MainAxisSize.max,
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       Text(CoinLogIconCategory.values[i].value.toString()),
-              //       SizedBox(
-              //         height: MediaQuery.of(context).size.height * 0.75,
-              //         child: GridView.count(
-              //           crossAxisCount: 4,
-              //           shrinkWrap: true,
-              //           children: List.generate(50, (index) {
-              //             return Column(
-              //               mainAxisSize: MainAxisSize.max,
-              //               mainAxisAlignment: MainAxisAlignment.center,
-              //               children: [
-              //                 GridViewIcon(),
-              //                 Text("Item ${index + 1}", style: TextStyle(fontSize: 13),)
-              //               ],
-              //             );
-              //           }),
-              //         ),
-              //       ),
-              //     ]
-              //   )
-              // }
             ]
           ),
         )

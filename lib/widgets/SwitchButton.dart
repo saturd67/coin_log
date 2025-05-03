@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 class SwitchButton extends StatefulWidget {
   final List<String> labels;
+  final void Function(String)? onChanged;
 
   SwitchButton({
     super.key,
-    required this.labels
+    required this.labels,
+    this.onChanged
   });
 
   @override
@@ -14,6 +16,7 @@ class SwitchButton extends StatefulWidget {
 
 class _SwitchButtonState extends State<SwitchButton> {
   late List<String> _labels;
+  late void Function(String)? _onChanged;
 
   late String _focusedButton = "";
 
@@ -30,6 +33,7 @@ class _SwitchButtonState extends State<SwitchButton> {
     super.initState();
     _labels = widget.labels;
     _focusedButton = _labels[0];
+    _onChanged = widget.onChanged;
   }
 
   @override
@@ -41,6 +45,10 @@ class _SwitchButtonState extends State<SwitchButton> {
             onTap: () {
               setState(() {
                 _focusedButton = _labels[i];
+
+                if (_onChanged != null) {
+                  _onChanged!(_focusedButton);
+                }
               });
             },
             child: Container(

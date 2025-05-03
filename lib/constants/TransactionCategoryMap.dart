@@ -74,20 +74,20 @@ Map<String, CoinLogIcon> coinLogIconMap = {
 class CoinLogIcon {
   final CoinLogIconCategory category;
   final String name;
-  final Icon icon;
+  final IconData icon;
 
   CoinLogIcon({
     required this.category,
     required this.name,
-    required IconData icon
-  }): this.icon = Icon(icon);
+    required this.icon
+  });
 }
 
 
-Map<CoinLogIconCategory, List<CoinLogIcon>> getGroupedIcons() {
-  Map<CoinLogIconCategory, List<CoinLogIcon>> groupedIcons = {};
+Map<CoinLogIconCategory, List<Map<String,CoinLogIcon>>> getGroupedIcons() {
+  Map<CoinLogIconCategory, List<Map<String,CoinLogIcon>>> groupedIcons = {};
   coinLogIconMap.forEach((key, value) {
-    groupedIcons.putIfAbsent(value.category, () => []).add(value);
+    groupedIcons.putIfAbsent(value.category, () => []).add({key: value});
   });
   return groupedIcons;
 } 

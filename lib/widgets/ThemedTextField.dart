@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 class ThemedTextField extends StatelessWidget {
   final String? placeholder;
+  final void Function(String)? onChanged;
 
   ThemedTextField ({
     super.key,
-    this.placeholder
+    this.placeholder,
+    this.onChanged
   });
 
   @override
@@ -21,7 +23,8 @@ class ThemedTextField extends StatelessWidget {
             width: 2
           )
         )                
-      )
+      ),
+      onChanged: onChanged
     );
   }
 }
