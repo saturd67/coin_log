@@ -1,12 +1,20 @@
 import 'package:coin_log/objects/TransactionCategory.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:coin_log/widgets/ThemedTextField.dart';
+import 'package:coin_log/widgets/ThemedToast.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/widgets/GridViewIcon.dart';
 import 'package:coin_log/widgets/SwitchButton.dart';
 import 'package:coin_log/constants/TransactionCategoryMap.dart';
 
 class TransactionDetails extends StatefulWidget {
+
+  final int? identifier;
+
+  TransactionDetails({
+    super.key,
+    this.identifier
+  });
 
   @override
   State<TransactionDetails> createState() => _TransactionDetailsState();
@@ -15,8 +23,25 @@ class TransactionDetails extends StatefulWidget {
 class _TransactionDetailsState extends State<TransactionDetails> {
   final TransactionCategoryService transactionCategoryService = TransactionCategoryService();
 
-  final TransactionCategory transactionCategory = TransactionCategory(name: "", icon: "", type: "", sequence: 1);
+  late TransactionCategory transactionCategory = TransactionCategory(name: "", icon: "", type: "Expense", sequence: 1);
   IconData? onDisplayIconData;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.identifier != null) {
+      loadTransactionCategory();
+    }
+  }
+
+  void loadTransactionCategory() async {
+    final transactionCategory = await transactionCategoryService.findById(widget.identifier!);
+    setState(() {
+      this.transactionCategory = transactionCategory!;
+      onDisplayIconData = coinLogIconMap[this.transactionCategory.icon]!.icon;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,33 +56,29 @@ class _TransactionDetailsState extends State<TransactionDetails> {
               onPressed: () async {
 
                 if (transactionCategory.name == "") {
+                  ThemedToast.showToast("Invalid Name.");
                   return;
                 }
 
                 if (transactionCategory.type == "") {
+                  ThemedToast.showToast("Invalid Type.");
                   return;
                 }
 
                 if (transactionCategory.icon == "") {
+                  ThemedToast.showToast("Invalid Icon.");
                   return;
                 }
-                // int? identifier = await transactionCategoryService.add(TransactionCategory(name: "Test3", icon: "Test3", type: "Expend", sequence: 3));
-
-                // int identifier = await transactionCategoryService.update(TransactionCategory(identifier: 1, name: "Test1", icon: "Test1", sequence: 2));
-
-                // int identifier = await transactionCategoryService.delete(1);
-
-                // List<TransactionCategory> transactionCategories = await transactionCategoryService.list();
-                // transactionCategories.forEach((transactionCategory) {
-                //   print(transactionCategory.name);
-                // });
 
                 TransactionCategory? lastTransactionCategory = await transactionCategoryService.findLastByType("Expend");
                 if (lastTransactionCategory != null) {
                   transactionCategory.sequence = lastTransactionCategory.sequence + 1;
                 }
 
-                print(transactionCategory.toMap());
+                int? identifier = await transactionCategoryService.add(transactionCategory);
+                transactionCategory.identifier = identifier;
+                print("[TransactionDetail] - Added ${transactionCategory.toMap()}");
+                Navigator.of(context).pop("reload");
               }, 
               icon: const Icon(Icons.check)
             )
@@ -96,6 +117,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                 padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10), 
                 child: SwitchButton(
                   labels: ["Expense", "Income"],
+                  selectedValue: transactionCategory.type,
                   onChanged: (value) {
                     transactionCategory.type = value;
                   }

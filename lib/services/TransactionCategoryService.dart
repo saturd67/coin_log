@@ -34,6 +34,33 @@ class TransactionCategoryService {
     return maps.map((e) => TransactionCategory.fromMap(e)).toList();
   }
 
+  Future<List<TransactionCategory>> listByType(String type) async {
+    final db = await DatabaseService().database;
+    List<Map<String, dynamic>> maps = await db.query(
+        TABLE_NAME,
+        where: "type = ?",
+        whereArgs: [type]
+    );
+    return maps.map((e) => TransactionCategory.fromMap(e)).toList();
+  }
+
+  Future<TransactionCategory?> findById(int identifier) async {
+    final db = await DatabaseService().database;
+    List<Map<String, dynamic>> maps = await db.query(
+        TABLE_NAME,
+        where: 'identifier = ?',
+        limit: 1,
+        whereArgs: [identifier]
+    );
+
+    TransactionCategory? transactionCategory;
+    if (maps.isNotEmpty) {
+      transactionCategory = TransactionCategory.fromMap(maps.first);
+    }
+
+    return transactionCategory;
+  }
+
   Future<TransactionCategory?> findLastByType(String type) async {
     final db = await DatabaseService().database;
     List<Map<String, dynamic>> maps = await db.query(
@@ -44,8 +71,7 @@ class TransactionCategoryService {
       whereArgs: [type]
     );
 
-    TransactionCategory? transactionCategory = null;
-
+    TransactionCategory? transactionCategory;
     if (maps.isNotEmpty) {
       transactionCategory = TransactionCategory.fromMap(maps.first);
     }

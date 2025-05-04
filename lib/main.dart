@@ -1,11 +1,10 @@
 import 'package:coin_log/services/DatabaseService.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/views/AppFrame/AppFrame.dart';
-import 'package:sqflite/sqflite.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final db = await DatabaseService().database;
+  await DatabaseService().database;
   // await DatabaseService().listTables(db);
   runApp(MyApp());
 }

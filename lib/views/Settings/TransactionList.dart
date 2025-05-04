@@ -1,9 +1,38 @@
+import 'package:coin_log/objects/TransactionCategory.dart';
+import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/views/Settings/TransactionDetails.dart';
 import 'package:coin_log/widgets/GridViewIcon.dart';
 import 'package:coin_log/widgets/SwitchButton.dart';
 
-class TransactionList extends StatelessWidget {
+import 'package:coin_log/constants/TransactionCategoryMap.dart';
+
+class TransactionList extends StatefulWidget {
+
+  @override
+  State<TransactionList> createState() => _TransactionListState();
+}
+
+class _TransactionListState extends State<TransactionList> {
+
+  TransactionCategoryService transactionCategoryService = TransactionCategoryService();
+
+  List<TransactionCategory> transactionCategories = [];
+  String selectedType = "Expense";
+
+  @override
+  void initState() {
+    super.initState();
+    loadTransactionCategories();
+  }
+
+  void loadTransactionCategories() async {
+    final transactionCategories = await transactionCategoryService.listByType(selectedType);
+    setState(() {
+      this.transactionCategories = transactionCategories;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -14,9 +43,13 @@ class TransactionList extends StatelessWidget {
           title: const Text("Transactions"),
           actions: [
             IconButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => TransactionDetails()));
-              }, 
+              onPressed: () async {
+                final result = await Navigator.of(context).push(MaterialPageRoute(builder: (context) => TransactionDetails()));
+
+                if (result == "reload") {
+                  loadTransactionCategories();
+                }
+              },
               icon: const Icon(Icons.add_box)
             )
           ],
@@ -27,22 +60,40 @@ class TransactionList extends StatelessWidget {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10), 
-                  child: SwitchButton(labels: ["Expenses", "Income"])
+                  padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
+                  child: SwitchButton(
+                    labels: ["Expense", "Income"],
+                    selectedValue: selectedType,
+                    onChanged: (String value) {
+                      setState(() {
+                        selectedType = value;
+                        loadTransactionCategories();
+                      });
+                    },
+                  )
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.83,
                   child: GridView.count(
                     crossAxisCount: 4,
                     shrinkWrap: true,
-                    children: List.generate(50, (index) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          GridViewIcon(),
-                          Text("Item ${index + 1}", style: TextStyle(fontSize: 13),)
-                        ],
+                    children: List.generate(transactionCategories.length, (index) {
+                      return GestureDetector(
+                        onTap: () async {
+                          final result = await Navigator.of(context).push(MaterialPageRoute(builder: (context) => TransactionDetails(identifier: transactionCategories[index].identifier)));
+
+                          if (result == "reload") {
+                            loadTransactionCategories();
+                          }
+                        },
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GridViewIcon(iconData: coinLogIconMap[transactionCategories[index].icon]!.icon),
+                            Text(transactionCategories[index].name, style: TextStyle(fontSize: 13),)
+                          ],
+                        ),
                       );
                     }),
                   ),

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 class SwitchButton extends StatefulWidget {
   final List<String> labels;
+  final String selectedValue;
   final void Function(String)? onChanged;
 
   SwitchButton({
     super.key,
     required this.labels,
+    required this.selectedValue,
     this.onChanged
   });
 
@@ -32,8 +34,19 @@ class _SwitchButtonState extends State<SwitchButton> {
   void initState() {
     super.initState();
     _labels = widget.labels;
-    _focusedButton = _labels[0];
+    _focusedButton = widget.selectedValue ?? _labels[0];
     _onChanged = widget.onChanged;
+  }
+
+  @override
+  void didUpdateWidget(covariant SwitchButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.selectedValue != _focusedButton) {
+      setState(() {
+        _focusedButton = widget.selectedValue ?? widget.labels[0];
+      });
+    }
   }
 
   @override
