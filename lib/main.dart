@@ -1,8 +1,13 @@
 import 'package:coin_log/services/DatabaseService.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/views/AppFrame/AppFrame.dart';
+import 'package:logging/logging.dart';
 
 void main() async {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    print('${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}');
+  });
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseService().database;
   // await DatabaseService().listTables(db);

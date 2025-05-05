@@ -44,7 +44,7 @@ class _SwitchButtonState extends State<SwitchButton> {
 
     if (widget.selectedValue != _focusedButton) {
       setState(() {
-        _focusedButton = widget.selectedValue ?? widget.labels[0];
+        _focusedButton = widget.selectedValue;
       });
     }
   }

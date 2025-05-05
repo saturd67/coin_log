@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:coin_log/widgets/GridViewIcon.dart';
 import 'package:coin_log/widgets/SwitchButton.dart';
 import 'package:coin_log/constants/TransactionCategoryMap.dart';
+import 'package:logging/logging.dart';
 
 class TransactionDetails extends StatefulWidget {
 
@@ -21,14 +22,17 @@ class TransactionDetails extends StatefulWidget {
 }
 
 class _TransactionDetailsState extends State<TransactionDetails> {
+  final _log = Logger('TransactionDetails');
   final TransactionCategoryService transactionCategoryService = TransactionCategoryService();
 
-  late TransactionCategory transactionCategory = TransactionCategory(name: "", icon: "", type: "Expense", sequence: 1);
+  int? _identifier;
+  late TransactionCategory _transactionCategory = TransactionCategory(name: "", icon: "", type: "Expense", sequence: 1);
   IconData? onDisplayIconData;
 
   @override
   void initState() {
     super.initState();
+    _identifier = widget.identifier;
 
     if (widget.identifier != null) {
       loadTransactionCategory();
@@ -36,10 +40,10 @@ class _TransactionDetailsState extends State<TransactionDetails> {
   }
 
   void loadTransactionCategory() async {
-    final transactionCategory = await transactionCategoryService.findById(widget.identifier!);
+    final _transactionCategory = await transactionCategoryService.findById(widget.identifier!);
     setState(() {
-      this.transactionCategory = transactionCategory!;
-      onDisplayIconData = coinLogIconMap[this.transactionCategory.icon]!.icon;
+      this._transactionCategory = _transactionCategory!;
+      onDisplayIconData = coinLogIconMap[this._transactionCategory.icon]!.icon;
     });
   }
 
@@ -55,29 +59,39 @@ class _TransactionDetailsState extends State<TransactionDetails> {
             IconButton(
               onPressed: () async {
 
-                if (transactionCategory.name == "") {
+                if (_transactionCategory.name == "") {
                   ThemedToast.showToast("Invalid Name.");
                   return;
                 }
 
-                if (transactionCategory.type == "") {
+                if (_transactionCategory.type == "") {
                   ThemedToast.showToast("Invalid Type.");
                   return;
                 }
 
-                if (transactionCategory.icon == "") {
+                if (_transactionCategory.icon == "") {
                   ThemedToast.showToast("Invalid Icon.");
                   return;
                 }
 
-                TransactionCategory? lastTransactionCategory = await transactionCategoryService.findLastByType("Expend");
-                if (lastTransactionCategory != null) {
-                  transactionCategory.sequence = lastTransactionCategory.sequence + 1;
+                if (_identifier == null) {
+                  TransactionCategory? lastTransactionCategory = await transactionCategoryService.findLastByType("Expend");
+                  if (lastTransactionCategory != null) {
+                    _transactionCategory.sequence = lastTransactionCategory.sequence + 1;
+                  }
+
+                  int? identifier = await transactionCategoryService.add(_transactionCategory);
+                  _transactionCategory.identifier = identifier;
+                  // print("[TransactionDetail] - Added ${_transactionCategory.toMap()}");
+                  _log.info("Added ${_transactionCategory.toMap()}");
                 }
 
-                int? identifier = await transactionCategoryService.add(transactionCategory);
-                transactionCategory.identifier = identifier;
-                print("[TransactionDetail] - Added ${transactionCategory.toMap()}");
+                else {
+                  int? identifier = await transactionCategoryService.update(_transactionCategory);
+                  // print("[TransactionDetail] - Updated ${_transactionCategory.toMap()}");
+                  _log.info("Updated ${_transactionCategory.toMap()}");
+                }
+
                 Navigator.of(context).pop("reload");
               }, 
               icon: const Icon(Icons.check)
@@ -105,8 +119,9 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                       width: MediaQuery.of(context).size.width * 0.75,
                       child: ThemedTextField(
                         placeholder: "Name",
+                        value: _transactionCategory.name,
                         onChanged: (value) {
-                          transactionCategory.name = value;
+                          _transactionCategory.name = value;
                         },
                       )
                     ),
@@ -117,9 +132,9 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                 padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10), 
                 child: SwitchButton(
                   labels: ["Expense", "Income"],
-                  selectedValue: transactionCategory.type,
+                  selectedValue: _transactionCategory.type,
                   onChanged: (value) {
-                    transactionCategory.type = value;
+                    _transactionCategory.type = value;
                   }
                 )
               ),
@@ -151,15 +166,15 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                               return GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    transactionCategory.icon = entry.value[index].keys.first;
-                                    onDisplayIconData = coinLogIconMap[transactionCategory.icon]!.icon;
+                                    _transactionCategory.icon = entry.value[index].keys.first;
+                                    onDisplayIconData = coinLogIconMap[_transactionCategory.icon]!.icon;
                                   });
                                 },
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    GridViewIcon(iconData: entry.value[index].values.first.icon, isSelected: entry.value[index].keys.first == transactionCategory.icon),
+                                    GridViewIcon(iconData: entry.value[index].values.first.icon, isSelected: entry.value[index].keys.first == _transactionCategory.icon),
                                     Text(entry.value[index].values.first.name, style: TextStyle(fontSize: 13))
                                   ],
                                 ),

@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:logging/logging.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseService {
+  final _log = Logger('DatabaseService');
+
   static final DatabaseService _instance = DatabaseService._internal();
   factory DatabaseService() => _instance;
   DatabaseService._internal();
@@ -24,11 +27,11 @@ class DatabaseService {
       final dbFile = File(path);
       if (await dbFile.exists()) {
         await dbFile.delete();
-        print('[DatabaseService] - Database file deleted: $path');
+        _log.info('Database file deleted: $path');
       }
 
       else {
-        print('[DatabaseService] - No database file found at $path');
+        _log.info('No database file found at $path');
       }
     }
 
@@ -57,11 +60,11 @@ class DatabaseService {
     final exists = await dbFile.exists();
 
     if (exists) {
-      print('[DatabaseService] - Database file exists at: $path');
+      _log.info('Database file exists at: $path');
     }
 
     else {
-      print('[DatabaseService] - Database file does Not exist at : $path');
+      _log.info('Database file does Not exist at : $path');
     }
   }
 
@@ -70,9 +73,9 @@ class DatabaseService {
       "SELECT name FROM sqlite_master WHERE type='table';"
     );
 
-    print("[DatabaseService] - Tables in database:");
+    _log.info('Tables in database:');
     for (final table in tables) {
-      print(table['name']);
+      _log.info(table['name']);
     }
   }
 }
