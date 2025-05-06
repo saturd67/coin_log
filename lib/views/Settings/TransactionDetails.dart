@@ -2,6 +2,7 @@ import 'package:coin_log/objects/TransactionCategory.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:coin_log/widgets/ThemedTextField.dart';
 import 'package:coin_log/widgets/ThemedToast.dart';
+import 'package:coin_log/widgets/showConfirmationDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/widgets/GridViewIcon.dart';
 import 'package:coin_log/widgets/SwitchButton.dart';
@@ -130,12 +131,33 @@ class _TransactionDetailsState extends State<TransactionDetails> {
               ),
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10), 
-                child: SwitchButton(
-                  labels: ["Expense", "Income"],
-                  selectedValue: _transactionCategory.type,
-                  onChanged: (value) {
-                    _transactionCategory.type = value;
-                  }
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SwitchButton(
+                      labels: ["Expense", "Income"],
+                      selectedValue: _transactionCategory.type,
+                      onChanged: (value) {
+                        _transactionCategory.type = value;
+                      }
+                    ),
+                    if (_identifier != null)
+                      IconButton(
+                          onPressed: () async {
+                            showConfirmationDialog(
+                                context,
+                                "Are you sure you want to delete?",
+                                    () async {
+                                    await transactionCategoryService.delete(_identifier!);
+                                    Navigator.of(context).pop("reload");
+                                  },
+                                    () {});
+                            // await transactionCategoryService.delete(_identifier!);
+                            // Navigator.of(context).pop("reload");
+                          },
+                          icon: Icon(Icons.delete, color: Color(0xffff0000))
+                      )
+                  ],
                 )
               ),
               Expanded(
