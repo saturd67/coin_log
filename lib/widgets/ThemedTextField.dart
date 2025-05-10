@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 class ThemedTextField extends StatefulWidget {
   final String? placeholder;
+  final int? maxLenght;
   final String? value;
   final void Function(String)? onChanged;
 
   ThemedTextField ({
     super.key,
     this.placeholder,
+    this.maxLenght,
     this.value,
     this.onChanged
   });
@@ -17,11 +19,16 @@ class ThemedTextField extends StatefulWidget {
 }
 
 class _ThemedTextFieldState extends State<ThemedTextField> {
+  late String? _placeholder;
+  late int? _maxLength;
 
   final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
+    _placeholder = widget.placeholder;
+    _maxLength = widget.maxLenght;
+
     setState(() {
       _controller.text = widget.value ?? "";
     });
@@ -41,7 +48,7 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
     return TextField(
       style: Theme.of(context).textTheme.bodyMedium,
       decoration: InputDecoration(
-        hintText: widget.placeholder,
+        hintText: _placeholder,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6.0),
           borderSide: BorderSide(
@@ -51,6 +58,7 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
         )
       ),
       controller: _controller,
+      maxLength: _maxLength,
       onChanged: widget.onChanged
     );
   }

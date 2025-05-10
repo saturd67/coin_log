@@ -76,13 +76,12 @@ class _TransactionListState extends State<TransactionList> {
                       ),
                       SizedBox(
                           height: MediaQuery.of(context).size.height * 0.83,
-                          width: MediaQuery.of(context).size.width * 0.9,
+                          width: MediaQuery.of(context).size.width,
                           child: PrimaryScrollController(
                             controller: ScrollController(),
                             child: ReorderableWrap(
-                                alignment: WrapAlignment.spaceBetween,
-                                spacing: 8.0,
-                                runSpacing: 8.0,
+                                spacing: 2.0,
+                                runSpacing: 2.0,
                                 maxMainAxisCount: 4,
                                 buildDraggableFeedback: (context, constraints, child) {
                                   return Column(
@@ -108,21 +107,25 @@ class _TransactionListState extends State<TransactionList> {
                                   await _transactionCategoryService.updateSequence(_transactionCategories);
                                 },
                                 children: List.generate(_transactionCategories.length, (index) {
-                                  return GestureDetector(
-                                    onTap: () async {
-                                      final result = await Navigator.of(context).push(MaterialPageRoute(
-                                          builder: (context) => TransactionDetails(identifier: _transactionCategories[index].identifier)));
-                                      if (result == "reload") {
-                                        loadTransactionCategories();
-                                      }
-                                    },
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        GridViewIcon(iconData: coinLogIconMap[_transactionCategories[index].icon]!.icon),
-                                        Text(_transactionCategories[index].name, style: TextStyle(fontSize: 13))
-                                      ],
+                                  return SizedBox(
+                                    width: (MediaQuery.of(context).size.width / 4) -2,
+                                    height: 85,
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        final result = await Navigator.of(context).push(MaterialPageRoute(
+                                            builder: (context) => TransactionDetails(identifier: _transactionCategories[index].identifier)));
+                                        if (result == "reload") {
+                                          loadTransactionCategories();
+                                        }
+                                      },
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          GridViewIcon(iconData: coinLogIconMap[_transactionCategories[index].icon]!.icon),
+                                          Text(_transactionCategories[index].name, style: TextStyle(fontSize: 13))
+                                        ],
+                                      ),
                                     ),
                                   );
                                 })

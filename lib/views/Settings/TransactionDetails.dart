@@ -120,6 +120,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                       width: MediaQuery.of(context).size.width * 0.75,
                       child: ThemedTextField(
                         placeholder: "Name",
+                        maxLenght: 10,
                         value: _transactionCategory.name,
                         onChanged: (value) {
                           _transactionCategory.name = value;
@@ -179,7 +180,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                             physics: NeverScrollableScrollPhysics(),
                             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 4,
-                              crossAxisSpacing: 8.0,
+                              crossAxisSpacing: 2.0,
                               mainAxisSpacing: 2.0,
                               childAspectRatio: 1,
                             ),

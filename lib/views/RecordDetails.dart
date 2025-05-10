@@ -135,7 +135,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                   ),
                 ),
                 SizedBox(
-                  height: isKeyboardVisible ? 92: 270,
+                  height: isKeyboardVisible ? 95: 270,
                   child: RecordDetailsKeyboard(isKeyboardVisible: isKeyboardVisible)
                 ),
               ],
