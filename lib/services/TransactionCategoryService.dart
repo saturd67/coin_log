@@ -19,6 +19,20 @@ class TransactionCategoryService {
       whereArgs: [transactionCategory.identifier]);
   }
 
+  Future<void> updateSequence(List<TransactionCategory> transactionCategories) async {
+    final db = await DatabaseService().database;
+    await db.transaction((transaction) async {
+      for (int i = 0; i < transactionCategories.length; i++) {
+        transactionCategories[i].sequence = i + 1;
+        await transaction.update(
+          TABLE_NAME,
+            transactionCategories[i].toMap(),
+          where: 'identifier = ?',
+          whereArgs: [transactionCategories[i].identifier]);
+      }
+    });
+  }
+
   Future<int?> delete(int identifier) async {
     final db = await DatabaseService().database;
     return await db.delete(
@@ -39,6 +53,7 @@ class TransactionCategoryService {
     List<Map<String, dynamic>> maps = await db.query(
         TABLE_NAME,
         where: "type = ?",
+        orderBy: "sequence",
         whereArgs: [type]
     );
     return maps.map((e) => TransactionCategory.fromMap(e)).toList();
