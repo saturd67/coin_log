@@ -63,7 +63,7 @@ class _AccountListState extends State<AccountList> {
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
-                      padding:  const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
+                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
                       child: SizedBox(
                           height: MediaQuery.of(context).size.height * 0.8,
                           width: MediaQuery.of(context).size.width,
@@ -98,7 +98,7 @@ class _AccountListState extends State<AccountList> {
                                 },
                                 children: List.generate(_accounts.length, (index) {
                                   return SizedBox(
-                                    width: (MediaQuery.of(context).size.width / 4) -2,
+                                    width: (MediaQuery.of(context).size.width / 4) - 4,
                                     height: 85,
                                     child: GestureDetector(
                                       onTap: () async {

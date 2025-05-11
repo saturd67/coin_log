@@ -1,5 +1,6 @@
 import 'package:coin_log/objects/Account.dart';
 import 'package:coin_log/services/DatabaseService.dart';
+import 'package:sqflite/sqflite.dart';
 
 class AccountService {
 
@@ -7,18 +8,35 @@ class AccountService {
 
   Future<int?> save(Account account) async {
     final db = await DatabaseService().database;
-    Account? tempAccount = await findLast();
-    account.sequence = tempAccount != null ? tempAccount.sequence + 1 : 1;
-    return await db.insert(TABLE_NAME, account.toMap());
+
+    Account? lastAccount = await findLast();
+    account.sequence = lastAccount != null ? lastAccount.sequence + 1 : 1;
+
+    await db.transaction((transaction) async {
+      if (account.isDefault) {
+        await _resetIsDefault(transaction);
+      }
+      return await transaction.insert(TABLE_NAME, account.toMap());
+    });
+    return null;
   }
 
   Future<int?> update(Account account) async {
     final db = await DatabaseService().database;
-    return await db.update(
+
+    await db.transaction((transaction) async {
+      if (account.isDefault) {
+        await _resetIsDefault(transaction);
+      }
+      return await transaction.update(
         TABLE_NAME,
         account.toMap(),
         where: 'identifier = ?',
-        whereArgs: [account.identifier]);
+        whereArgs: [account.identifier]
+      );
+    });
+
+    return null;
   }
 
   Future<void> updateSequence(List<Account> transactionCategories) async {
@@ -84,5 +102,9 @@ class AccountService {
     }
 
     return account;
+  }
+
+  Future<void> _resetIsDefault(Transaction transaction) async {
+    await transaction.rawUpdate("UPDATE $TABLE_NAME SET IS_DEFAULT = 0 WHERE IS_DEFAULT = 1", []);
   }
 }

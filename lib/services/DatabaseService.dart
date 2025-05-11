@@ -70,10 +70,6 @@ class DatabaseService {
         await createAccountTable(database);
       },
       onUpgrade: (Database database, int oldVersion, int newVersion) async {
-        database.execute("""
-        DROP TABLE IF EXISTS CL_ACCOUNT;
-        """);
-        await createAccountTable(database);
         // if (oldVersion < 2) {
         //   await database.execute("ALTER TABLE ...");
         // }
