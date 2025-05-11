@@ -1,9 +1,12 @@
+import 'dart:core';
+
 import 'package:flutter/material.dart';
 
 enum CoinLogIconCategory {
   food(name: "food", value: "Food"),
   shopping(name: "shopping", value: "Shopping"),
   transportation(name: "transportation", value: "Transportation"),
+  account(name: "account", value: "Account"),
   other(name: "other", value: "Other");
 
   final String name;
@@ -13,7 +16,7 @@ enum CoinLogIconCategory {
 
 }
 
-Map<String, CoinLogIcon> coinLogIconMap = {
+Map<String, CoinLogIcon> coinLogTransactionCategoryIconMap = {
   "lunch_dining": CoinLogIcon(category: CoinLogIconCategory.food, name: "Lunch Dining", icon: Icons.lunch_dining),
   "restaurant": CoinLogIcon(category: CoinLogIconCategory.food, name: "Restaurant", icon: Icons.restaurant),
   "coffee": CoinLogIcon(category: CoinLogIconCategory.food, name: "Coffee", icon: Icons.local_cafe),
@@ -71,6 +74,15 @@ Map<String, CoinLogIcon> coinLogIconMap = {
   "visibility": CoinLogIcon(category: CoinLogIconCategory.other, name: "Visibility", icon: Icons.visibility),
 };
 
+Map<String, CoinLogIcon> coinLogAccountIconMap = {
+  "account_balance": CoinLogIcon(category: CoinLogIconCategory.account, name: "Bank", icon: Icons.account_balance),
+  "account_balance_wallet_rounded": CoinLogIcon(category: CoinLogIconCategory.account, name: "Wallet", icon: Icons.account_balance_wallet_rounded),
+  "credit_card": CoinLogIcon(category: CoinLogIconCategory.account, name: "Card", icon: Icons.credit_card),
+  "monetization_on": CoinLogIcon(category: CoinLogIconCategory.account, name: "E-Wallet", icon: Icons.monetization_on),
+  "money": CoinLogIcon(category: CoinLogIconCategory.account, name: "Cash", icon: Icons.money),
+  "phonelink_ring": CoinLogIcon(category: CoinLogIconCategory.account, name: "E-Wallet", icon: Icons.phonelink_ring),
+};
+
 class CoinLogIcon {
   final CoinLogIconCategory category;
   final String name;
@@ -83,8 +95,7 @@ class CoinLogIcon {
   });
 }
 
-
-Map<CoinLogIconCategory, List<Map<String,CoinLogIcon>>> getGroupedIcons() {
+Map<CoinLogIconCategory, List<Map<String,CoinLogIcon>>> getGroupedIcons(Map<String, CoinLogIcon> coinLogIconMap) {
   Map<CoinLogIconCategory, List<Map<String,CoinLogIcon>>> groupedIcons = {};
   coinLogIconMap.forEach((key, value) {
     groupedIcons.putIfAbsent(value.category, () => []).add({key: value});

@@ -5,7 +5,7 @@ import 'package:coin_log/views/Settings/TransactionDetails.dart';
 import 'package:coin_log/widgets/GridViewIcon.dart';
 import 'package:coin_log/widgets/SwitchButton.dart';
 
-import 'package:coin_log/constants/TransactionCategoryMap.dart';
+import 'package:coin_log/constants/IconMap.dart';
 import 'package:reorderables/reorderables.dart';
 
 class TransactionList extends StatefulWidget {
@@ -25,10 +25,10 @@ class _TransactionListState extends State<TransactionList> {
   @override
   void initState() {
     super.initState();
-    loadTransactionCategories();
+    load();
   }
 
-  void loadTransactionCategories() async {
+  void load() async {
     final _transactionCategories = await _transactionCategoryService.listByType(_selectedType);
     setState(() {
       this._transactionCategories = _transactionCategories;
@@ -49,7 +49,7 @@ class _TransactionListState extends State<TransactionList> {
                       final result = await Navigator.of(context).push(
                           MaterialPageRoute(builder: (context) => TransactionDetails()));
                       if (result == "reload") {
-                        loadTransactionCategories();
+                        load();
                       }
                     },
                     icon: const Icon(Icons.add_box)
@@ -58,82 +58,83 @@ class _TransactionListState extends State<TransactionList> {
             ),
             body: Container(
               color: Theme.of(context).colorScheme.secondary,
-              child: SingleChildScrollView(
-                child: Column(
-                    children: [
-                      Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
-                          child: SwitchButton(
-                            labels: ["Expense", "Income"],
-                            selectedValue: _selectedType,
-                            onChanged: (String value) {
-                              setState(() {
-                                _selectedType = value;
-                                loadTransactionCategories();
-                              });
-                            },
-                          )
-                      ),
-                      SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.83,
-                          width: MediaQuery.of(context).size.width,
-                          child: PrimaryScrollController(
-                            controller: ScrollController(),
-                            child: ReorderableWrap(
-                                spacing: 2.0,
-                                runSpacing: 2.0,
-                                maxMainAxisCount: 4,
-                                buildDraggableFeedback: (context, constraints, child) {
-                                  return Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      GridViewIcon(iconData: coinLogIconMap[_transactionCategories[_reorderIndex!].icon]!.icon, containerSize: 55, iconSize: 26),
-                                    ],
-                                  );
-                                },
-                                onReorderStarted: (index) {
-                                  setState(() {
-                                    _reorderIndex = index;
-                                  });
-                                },
-                                onReorder: (oldIndex, newIndex) async {
-                                  setState(() {
-                                    _reorderIndex = null;
-                                    final item = _transactionCategories.removeAt(oldIndex);
-                                    _transactionCategories.insert(newIndex, item);
-                                  });
+              child: Column(
+                  children: [
+                    Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
+                        child: SwitchButton(
+                          labels: ["Expense", "Income"],
+                          selectedValue: _selectedType,
+                          onChanged: (String value) {
+                            setState(() {
+                              _selectedType = value;
+                              load();
+                            });
+                          },
+                        )
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            child: PrimaryScrollController(
+                              controller: ScrollController(),
+                              child: ReorderableWrap(
+                                  spacing: 2.0,
+                                  runSpacing: 2.0,
+                                  maxMainAxisCount: 4,
+                                  buildDraggableFeedback: (context, constraints, child) {
+                                    return Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        GridViewIcon(iconData: coinLogTransactionCategoryIconMap[_transactionCategories[_reorderIndex!].icon]!.icon, containerSize: 55, iconSize: 26),
+                                      ],
+                                    );
+                                  },
+                                  onReorderStarted: (index) {
+                                    setState(() {
+                                      _reorderIndex = index;
+                                    });
+                                  },
+                                  onReorder: (oldIndex, newIndex) async {
+                                    setState(() {
+                                      _reorderIndex = null;
+                                      final item = _transactionCategories.removeAt(oldIndex);
+                                      _transactionCategories.insert(newIndex, item);
+                                    });
 
-                                  await _transactionCategoryService.updateSequence(_transactionCategories);
-                                },
-                                children: List.generate(_transactionCategories.length, (index) {
-                                  return SizedBox(
-                                    width: (MediaQuery.of(context).size.width / 4) -2,
-                                    height: 85,
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        final result = await Navigator.of(context).push(MaterialPageRoute(
-                                            builder: (context) => TransactionDetails(identifier: _transactionCategories[index].identifier)));
-                                        if (result == "reload") {
-                                          loadTransactionCategories();
-                                        }
-                                      },
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                          GridViewIcon(iconData: coinLogIconMap[_transactionCategories[index].icon]!.icon),
-                                          Text(_transactionCategories[index].name, style: TextStyle(fontSize: 13))
-                                        ],
+                                    await _transactionCategoryService.updateSequence(_transactionCategories);
+                                  },
+                                  children: List.generate(_transactionCategories.length, (index) {
+                                    return SizedBox(
+                                      width: (MediaQuery.of(context).size.width / 4) -2,
+                                      height: 85,
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          final result = await Navigator.of(context).push(MaterialPageRoute(
+                                              builder: (context) => TransactionDetails(identifier: _transactionCategories[index].identifier)));
+                                          if (result == "reload") {
+                                            load();
+                                          }
+                                        },
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            GridViewIcon(iconData: coinLogTransactionCategoryIconMap[_transactionCategories[index].icon]!.icon),
+                                            Text(_transactionCategories[index].name, style: TextStyle(fontSize: 13))
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                })
-                            ),
-                          )
+                                    );
+                                  })
+                              ),
+                            )
+                        ),
                       ),
-                    ]
-                ),
+                    ),
+                  ]
               ),
             )
         )

@@ -6,7 +6,7 @@ import 'package:coin_log/widgets/showConfirmationDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/widgets/GridViewIcon.dart';
 import 'package:coin_log/widgets/SwitchButton.dart';
-import 'package:coin_log/constants/TransactionCategoryMap.dart';
+import 'package:coin_log/constants/IconMap.dart';
 import 'package:logging/logging.dart';
 
 class TransactionDetails extends StatefulWidget {
@@ -36,15 +36,15 @@ class _TransactionDetailsState extends State<TransactionDetails> {
     _identifier = widget.identifier;
 
     if (widget.identifier != null) {
-      loadTransactionCategory();
+      load();
     }
   }
 
-  void loadTransactionCategory() async {
+  void load() async {
     final _transactionCategory = await transactionCategoryService.findById(widget.identifier!);
     setState(() {
       this._transactionCategory = _transactionCategory!;
-      onDisplayIconData = coinLogIconMap[this._transactionCategory.icon]!.icon;
+      onDisplayIconData = coinLogTransactionCategoryIconMap[this._transactionCategory.icon]!.icon;
     });
   }
 
@@ -76,20 +76,15 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                 }
 
                 if (_identifier == null) {
-                  TransactionCategory? lastTransactionCategory = await transactionCategoryService.findLastByType("Expend");
-                  if (lastTransactionCategory != null) {
-                    _transactionCategory.sequence = lastTransactionCategory.sequence + 1;
-                  }
-
-                  int? identifier = await transactionCategoryService.add(_transactionCategory);
+                  int? identifier = await transactionCategoryService.save(_transactionCategory);
                   _transactionCategory.identifier = identifier;
-                  // print("[TransactionDetail] - Added ${_transactionCategory.toMap()}");
-                  _log.info("Added ${_transactionCategory.toMap()}");
+
+                  _log.info("Saved ${_transactionCategory.toMap()}");
                 }
 
                 else {
                   int? identifier = await transactionCategoryService.update(_transactionCategory);
-                  // print("[TransactionDetail] - Updated ${_transactionCategory.toMap()}");
+
                   _log.info("Updated ${_transactionCategory.toMap()}");
                 }
 
@@ -104,11 +99,11 @@ class _TransactionDetailsState extends State<TransactionDetails> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(2.0, 12.0, 2.0, 6.0),
+                padding: const EdgeInsets.fromLTRB(2.0, 12.0, 12.0, 10.0),
                 child: Row(
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.2,
+                      width: 65,
                       height: 45,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
@@ -116,8 +111,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                       ),
                       child: Icon(onDisplayIconData ?? Icons.picture_in_picture, color: onDisplayIconData != null ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).iconTheme.color),
                     ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.75,
+                    Expanded(
                       child: ThemedTextField(
                         placeholder: "Name",
                         maxLenght: 10,
@@ -131,7 +125,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10), 
+                padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 10.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -164,7 +158,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
-                    children: getGroupedIcons().entries.map((entry) {
+                    children: getGroupedIcons(coinLogTransactionCategoryIconMap).entries.map((entry) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -172,7 +166,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                           Center(
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 8.0),
-                              child: Text(entry.key.value.toString(), style: TextStyle(fontWeight: FontWeight.bold),)
+                              child: Text(entry.key.value.toString())
                             ),
                           ),
                           GridView.builder(
@@ -190,7 +184,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                                 onTap: () {
                                   setState(() {
                                     _transactionCategory.icon = entry.value[index].keys.first;
-                                    onDisplayIconData = coinLogIconMap[_transactionCategory.icon]!.icon;
+                                    onDisplayIconData = coinLogTransactionCategoryIconMap[_transactionCategory.icon]!.icon;
                                   });
                                 },
                                 child: Column(

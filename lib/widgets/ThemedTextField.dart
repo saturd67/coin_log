@@ -44,6 +44,12 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return TextField(
       style: Theme.of(context).textTheme.bodyMedium,
@@ -59,6 +65,14 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
       ),
       controller: _controller,
       maxLength: _maxLength,
+      buildCounter: (
+          BuildContext context, {
+            required int currentLength,
+            required bool isFocused,
+            required int? maxLength,
+          }) {
+        return null; // Hides the counter
+      },
       onChanged: widget.onChanged
     );
   }

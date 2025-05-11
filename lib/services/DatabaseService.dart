@@ -14,9 +14,36 @@ class DatabaseService {
   Database? _db;
 
   Future<Database> get database async {
-    if (_db != null) return _db!;
+    if (_db != null) {
+      return _db!;
+    }
     _db = await _initDB(false);
     return _db!;
+  }
+
+  Future<void> createTransactionCategoryTable(Database db) async {
+    await db.execute('''
+          CREATE TABLE CL_TRANSACTION_CATEGORY (
+            IDENTIFIER INTEGER PRIMARY KEY AUTOINCREMENT,
+            NAME VARCHAR(10) NOT NULL,
+            ICON VARCHAR(50) NOT NULL,
+            TYPE VARCHAR(25) NOT NULL,
+            SEQUENCE INTEGER NOT NULL
+          );
+        ''');
+  }
+
+  Future<void> createAccountTable(Database db) async {
+    await db.execute('''
+          CREATE TABLE CL_ACCOUNT (
+            IDENTIFIER INTEGER PRIMARY KEY AUTOINCREMENT,
+            NAME VARCHAR(10) NOT NULL,
+            ICON VARCHAR(50) NOT NULL,
+            SEQUENCE INTEGER NOT NULL,
+            BALANCE DOUBLE NOT NULL,
+            IS_DEFAULT INTEGER NOT NULL
+          );
+    ''');
   }
 
   Future<Database> _initDB(bool isResetDatabase) async {
@@ -37,18 +64,20 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 1,
-      onCreate: (Database db, int version) async {
-        await db.execute('''
-          CREATE TABLE CL_TRANSACTION_CATEGORY (
-            IDENTIFIER INTEGER PRIMARY KEY AUTOINCREMENT,
-            NAME VARCHAR(100) NOT NULL,
-            ICON VARCHAR(50) NOT NULL,
-            TYPE VARCHAR(25) NOT NULL,
-            SEQUENCE INTEGER NOT NULL
-          );
-        ''');
+      version: 2,
+      onCreate: (Database database, int version) async {
+        await createTransactionCategoryTable(database);
+        await createAccountTable(database);
       },
+      onUpgrade: (Database database, int oldVersion, int newVersion) async {
+        database.execute("""
+        DROP TABLE IF EXISTS CL_ACCOUNT;
+        """);
+        await createAccountTable(database);
+        // if (oldVersion < 2) {
+        //   await database.execute("ALTER TABLE ...");
+        // }
+      }
     );
   }
 

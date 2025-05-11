@@ -5,8 +5,10 @@ class TransactionCategoryService {
 
   final String TABLE_NAME = "CL_TRANSACTION_CATEGORY";
   
-  Future<int?> add(TransactionCategory transactionCategory) async {
+  Future<int?> save(TransactionCategory transactionCategory) async {
     final db = await DatabaseService().database;
+    TransactionCategory? lastTransactionCategory = await findLastByType(transactionCategory.type);
+    transactionCategory.sequence = lastTransactionCategory != null ? lastTransactionCategory.sequence + 1 : 1;
     return await db.insert(TABLE_NAME, transactionCategory.toMap());
   }
 

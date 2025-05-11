@@ -9,7 +9,7 @@ void main() async {
     print('${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}');
   });
   WidgetsFlutterBinding.ensureInitialized();
-  await DatabaseService().database;
+  var db = await DatabaseService().database;
   // await DatabaseService().listTables(db);
   runApp(MyApp());
 }
