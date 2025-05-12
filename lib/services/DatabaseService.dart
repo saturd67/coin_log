@@ -64,7 +64,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (Database database, int version) async {
         await createTransactionCategoryTable(database);
         await createAccountTable(database);

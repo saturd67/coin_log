@@ -9,7 +9,6 @@ import 'package:coin_log/constants/IconMap.dart';
 import 'package:reorderables/reorderables.dart';
 
 class TransactionList extends StatefulWidget {
-
   @override
   State<TransactionList> createState() => _TransactionListState();
 }

@@ -8,8 +8,8 @@ class Settings extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        SettingItem(icon: Icons.category, name: "Transactions", widget: TransactionList()),
-        SettingItem(icon: Icons.monetization_on, name: "Accounts", widget: AccountList()),
+        SettingItem(icon: Icons.category, name: "Transactions", page: TransactionList()),
+        SettingItem(icon: Icons.monetization_on, name: "Accounts", page: AccountList()),
       ],
     );
   }
@@ -18,20 +18,20 @@ class Settings extends StatelessWidget {
 class SettingItem extends StatelessWidget {
   IconData icon;
   String name;
-  Widget widget;
+  Widget page;
 
   SettingItem({
     super.key,
     required this.icon,
     required this.name,
-    required this.widget
+    required this.page
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(RouterUtils.createRoute(widget));
+        Navigator.of(context).push(RouterUtils.createRoute(page));
       },
       child: Container(
         color: Theme.of(context).colorScheme.secondary,
@@ -47,7 +47,7 @@ class SettingItem extends StatelessWidget {
                   size: 30.0
                 ),
               ),
-              Text(name, style: Theme.of(context).textTheme.bodyMedium)
+              Text(name)
             ]
           ),
         )

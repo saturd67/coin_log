@@ -8,6 +8,7 @@ void main() async {
   Logger.root.onRecord.listen((record) {
     print('${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}');
   });
+
   WidgetsFlutterBinding.ensureInitialized();
   var db = await DatabaseService().database;
   // await DatabaseService().listTables(db);

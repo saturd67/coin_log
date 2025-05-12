@@ -1,3 +1,4 @@
+import 'package:coin_log/views/AppFrame/AccountsBalance.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/router/RouterUtils.dart';
 import 'package:coin_log/views/AppFrame/Record.dart';
@@ -19,14 +20,14 @@ class _AppFramePageState extends State<AppFramePage> {
     static List<Widget> appBars = <Widget>[
       RecordsAppBar(),
       Text("Summary"),
-      Text("Calendar"),
+      Text("Accounts"),
       Text("Settings")
     ];
     
     static List<Widget> bodies = <Widget>[
         Record(),
         Summary(),
-        Text('Index 2: School', style: optionStyle),
+        AccountsBalance(),
         Settings(),
     ];
 
@@ -78,7 +79,7 @@ class _AppFramePageState extends State<AppFramePage> {
                   items: const <BottomNavigationBarItem>[
                       BottomNavigationBarItem(icon: Icon(Icons.article), label: 'Records'),
                       BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Summary'),
-                      BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: 'Calendar'),
+                      BottomNavigationBarItem(icon: Icon(Icons.monetization_on), label: 'Accounts'),
                       BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
                   ],
                   currentIndex: selectedIndex,
