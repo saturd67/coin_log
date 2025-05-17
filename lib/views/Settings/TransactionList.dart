@@ -67,8 +67,8 @@ class _TransactionListState extends State<TransactionList> {
                           onChanged: (String value) {
                             setState(() {
                               _selectedType = value;
-                              load();
                             });
+                            load();
                           },
                         )
                     ),

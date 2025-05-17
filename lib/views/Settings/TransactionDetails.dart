@@ -27,7 +27,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
   final TransactionCategoryService transactionCategoryService = TransactionCategoryService();
 
   int? _identifier;
-  late TransactionCategory _transactionCategory = TransactionCategory(name: "", icon: "", type: "Expense", sequence: 1);
+  late TransactionCategory _transactionCategory = TransactionCategory(name: "", icon: "", type: "Expense", sequence: 1, isDeleted: false);
   IconData? onDisplayIconData;
 
   @override

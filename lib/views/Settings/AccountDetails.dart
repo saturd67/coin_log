@@ -28,7 +28,7 @@ class _TransactionDetailsState extends State<AccountDetails> {
   final AccountService accountService = AccountService();
 
   int? _identifier;
-  late Account _account = Account(name: "", icon: "", sequence: 1, balance: 0.0, isDefault: false);
+  late Account _account = Account(name: "", icon: "", sequence: 1, balance: 0.0, isDefault: false, isDeleted: false);
   IconData? onDisplayIconData;
 
   @override

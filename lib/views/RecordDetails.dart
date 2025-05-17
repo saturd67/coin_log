@@ -1,9 +1,15 @@
 import 'dart:async';
 
+import 'package:coin_log/objects/Account.dart';
+import 'package:coin_log/objects/TransactionCategory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:coin_log/widgets/SwitchButton.dart';
 import 'package:coin_log/widgets/GridViewIcon.dart';
+
+import 'package:coin_log/constants/IconMap.dart';
+import 'package:coin_log/services/TransactionCategoryService.dart';
+import 'package:coin_log/services/AccountService.dart';
 
 class RecordDetails extends StatefulWidget {
   @override
@@ -11,8 +17,15 @@ class RecordDetails extends StatefulWidget {
 }
 
 class _RecordDetailsState extends State<RecordDetails> {
-  double targetItemsPerColumn = 4;
-  double sourceItemsPerColumn = 1;
+
+  TransactionCategoryService _transactionCategoryService = TransactionCategoryService();
+  AccountService _accountService = AccountService();
+
+  List<TransactionCategory> _transactionCategories = [];
+  List<Account> _accounts = [];
+  String _selectedType = "Expense";
+  double _targetItemsPerColumn = 4;
+  double _sourceItemsPerColumn = 1;
 
   bool isKeyboardVisible = false;
   late final KeyboardVisibilityController keyboardVisibilityController;
@@ -26,6 +39,25 @@ class _RecordDetailsState extends State<RecordDetails> {
       setState(() {
         isKeyboardVisible = isVisible;
       });
+    });
+
+    loadTransactionCategories();
+    loadAccounts();
+  }
+
+  void loadTransactionCategories() async {
+    final _transactionCategories = await _transactionCategoryService.listByType(_selectedType);
+
+    setState(() {
+      this._transactionCategories = _transactionCategories;
+    });
+  }
+
+  void loadAccounts() async {
+    final _accounts = await _accountService.list();
+
+    setState(() {
+      this._accounts = _accounts;
     });
   }
 
@@ -62,7 +94,13 @@ class _RecordDetailsState extends State<RecordDetails> {
                           padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), 
                           child: SwitchButton(
                             labels: ["Expense", "Transfer", "Income"],
-                            selectedValue: "Expense",
+                            selectedValue: _selectedType,
+                            onChanged: (String value) {
+                              setState(() {
+                                _selectedType = value;
+                              });
+                              loadTransactionCategories();
+                            },
                           )
                         ),
                         Padding(
@@ -70,25 +108,27 @@ class _RecordDetailsState extends State<RecordDetails> {
                           child: SizedBox(
                             height: 265,
                             child: PageView.builder(
-                              itemCount: 3, // Number of pages
+                              itemCount: (_transactionCategories.length / 12).ceil(), // Number of pages
                               itemBuilder: (context, pageIndex) {
                                 return GridView.builder(
                                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 4, // 1 row
-                                    childAspectRatio: 1.25, // Wide items
-                                    mainAxisSpacing: 8, // Space between items
+                                    crossAxisCount: 4,
+                                    childAspectRatio: 1.25,
+                                    mainAxisSpacing: 8,
                                   ),
                                   itemCount: 12, // 4 items per page
                                   itemBuilder: (context, index) {
-                                    int itemNumber = pageIndex * 4 + index + 1;
+                                    int itemIndex = pageIndex * 4 + index;
                                     return Column(
                                       mainAxisSize: MainAxisSize.max,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        GridViewIcon(),
-                                        Text("Item $itemNumber", style: TextStyle(
-                                          fontSize: 13
-                                        ),)
+                                        if (itemIndex < _transactionCategories.length) ... {
+                                          GridViewIcon(iconData: coinLogTransactionCategoryIconMap[_transactionCategories[itemIndex].icon]!.icon),
+                                          Text(_transactionCategories[itemIndex].name, style: TextStyle(
+                                              fontSize: 13
+                                          ),)
+                                        }
                                       ],
                                     );
                                   },
@@ -104,7 +144,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                           child: SizedBox(
                             height: 85,
                             child: PageView.builder(
-                              itemCount: 3, // Number of pages
+                              itemCount: (_accounts.length / 4).ceil(), // Number of pages
                               itemBuilder: (context, pageIndex) {
                                 return GridView.builder(
                                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -114,13 +154,15 @@ class _RecordDetailsState extends State<RecordDetails> {
                                   ),
                                   itemCount: 4, // 4 items per page
                                   itemBuilder: (context, index) {
-                                    int itemNumber = pageIndex * 4 + index + 1;
+                                    int itemIndex = pageIndex * 4 + index;
                                     return Column(
                                       mainAxisSize: MainAxisSize.max,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        GridViewIcon(),
-                                        Text("Item $itemNumber", style: TextStyle(fontSize: 13),)
+                                        if (itemIndex < _accounts.length) ... {
+                                          GridViewIcon(iconData: coinLogAccountIconMap[_accounts[itemIndex].icon]!.icon),
+                                          Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13),)
+                                        }
                                       ],
                                     );
                                   },

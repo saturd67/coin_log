@@ -5,6 +5,7 @@ class Account {
   int sequence;
   double balance;
   bool isDefault;
+  bool isDeleted;
 
   Account({
     this.identifier,
@@ -12,7 +13,8 @@ class Account {
     required this.icon,
     required this.sequence,
     required this.balance,
-    required this.isDefault
+    required this.isDefault,
+    required this.isDeleted
   });
 
   factory Account.fromMap(Map<String, dynamic> map) {
@@ -22,7 +24,8 @@ class Account {
       icon: map['ICON'],
       sequence: map['SEQUENCE'],
       balance: map['BALANCE'],
-      isDefault: map['IS_DEFAULT'] == 1 ? true : false
+      isDefault: map['IS_DEFAULT'] == 1 ? true : false,
+      isDeleted: map['IS_DELETED'] == 1 ? true : false
     );
   }
 
@@ -32,7 +35,8 @@ class Account {
       'ICON': icon,
       'SEQUENCE': sequence,
       'BALANCE': balance,
-      'IS_DEFAULT': isDefault ? 1 : 0
+      'IS_DEFAULT': isDefault ? 1 : 0,
+      'IS_DELETED': isDeleted ? 1 : 0
     };
 
     if (identifier != null) {

@@ -1,7 +1,6 @@
 import 'package:coin_log/objects/Account.dart';
 import 'package:coin_log/objects/Record.dart';
 import 'package:coin_log/services/DatabaseService.dart';
-import 'package:sqflite/sqflite.dart';
 
 class RecordService {
 
