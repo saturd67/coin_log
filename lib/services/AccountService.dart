@@ -62,15 +62,6 @@ class AccountService {
     );
   }
 
-  Future<List<Account>> list() async {
-    final db = await DatabaseService().database;
-    List<Map<String, dynamic>> maps = await db.query(
-        TABLE_NAME,
-        orderBy: 'sequence'
-    );
-    return maps.map((e) => Account.fromMap(e)).toList();
-  }
-
   Future<Account?> findById(int identifier) async {
     final db = await DatabaseService().database;
     List<Map<String, dynamic>> maps = await db.query(
@@ -86,6 +77,15 @@ class AccountService {
     }
 
     return account;
+  }
+
+  Future<List<Account>> list() async {
+    final db = await DatabaseService().database;
+    List<Map<String, dynamic>> maps = await db.query(
+        TABLE_NAME,
+        orderBy: 'sequence'
+    );
+    return maps.map((e) => Account.fromMap(e)).toList();
   }
 
   Future<Account?> findLast() async {

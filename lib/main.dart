@@ -11,7 +11,7 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   var db = await DatabaseService().database;
-  // await DatabaseService().listTables(db);
+  await DatabaseService().listTables(db);
   runApp(MyApp());
 }
 

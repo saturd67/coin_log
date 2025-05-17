@@ -21,6 +21,12 @@ class DatabaseService {
     return _db!;
   }
 
+  Future<void> configDatabase(Database db) async {
+    await db.execute('''
+          PRAGMA foreign_keys = ON;
+        ''');
+  }
+
   Future<void> createTransactionCategoryTable(Database db) async {
     await db.execute('''
           CREATE TABLE CL_TRANSACTION_CATEGORY (
@@ -28,7 +34,8 @@ class DatabaseService {
             NAME VARCHAR(10) NOT NULL,
             ICON VARCHAR(50) NOT NULL,
             TYPE VARCHAR(25) NOT NULL,
-            SEQUENCE INTEGER NOT NULL
+            SEQUENCE INTEGER NOT NULL,
+            IS_DELETED INTEGER NOT NULL
           );
         ''');
   }
@@ -41,9 +48,27 @@ class DatabaseService {
             ICON VARCHAR(50) NOT NULL,
             SEQUENCE INTEGER NOT NULL,
             BALANCE DOUBLE NOT NULL,
-            IS_DEFAULT INTEGER NOT NULL
+            IS_DEFAULT INTEGER NOT NULL,
+            IS_DELETED INTEGER NOT NULL
           );
     ''');
+  }
+
+  Future<void> createRecordTable(Database db) async {
+    await db.execute('''
+          CREATE TABLE CL_RECORD (
+            IDENTIFIER              INTEGER PRIMARY KEY AUTOINCREMENT,
+            TRANSACTION_CATEGORY_ID INTEGER NOT NULL,
+            ACCOUNT_ID              INTEGER NOT NULL,
+            DATE                    DATE NOT NULL,
+            DESCRIPTION             VARCHAR(50),
+            ENTRY_TYPE              VARCHAR(5) NOT NULL,
+            AMOUNT                  DOUBLE NOT NULL,
+            
+            FOREIGN KEY (TRANSACTION_CATEGORY_ID) REFERENCES CL_TRANSACTION_CATEGORY(identifier),
+            FOREIGN KEY (ACCOUNT_ID) REFERENCES CL_ACCOUNT(identifier)
+          );
+        ''');
   }
 
   Future<Database> _initDB(bool isResetDatabase) async {
@@ -64,10 +89,12 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 1,
       onCreate: (Database database, int version) async {
+        await configDatabase(database);
         await createTransactionCategoryTable(database);
         await createAccountTable(database);
+        await createRecordTable(database);
       },
       onUpgrade: (Database database, int oldVersion, int newVersion) async {
         // if (oldVersion < 2) {
