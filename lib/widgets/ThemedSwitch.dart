@@ -16,8 +16,6 @@ class ThemedSwitch extends StatefulWidget {
 
 class _ThemedSwitchState extends State<ThemedSwitch> {
 
-
-
   @override
   Widget build(BuildContext context) {
     return Switch(

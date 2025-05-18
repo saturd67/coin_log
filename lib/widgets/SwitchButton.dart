@@ -17,10 +17,8 @@ class SwitchButton extends StatefulWidget {
 }
 
 class _SwitchButtonState extends State<SwitchButton> {
-  late List<String> _labels;
-  late void Function(String)? _onChanged;
 
-  late String _focusedButton = "";
+  late String _focusedButton = widget.selectedValue ?? widget.labels[0];
 
   Color getBackgroundColor(bool isFocus) {
     return isFocus ? Color(0xff000000) : Color(0xffffffff);
@@ -28,14 +26,6 @@ class _SwitchButtonState extends State<SwitchButton> {
 
   Color getFontColor(bool isFocus) {
     return isFocus ? Color(0xffffffff) : Color(0xff000000);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _labels = widget.labels;
-    _focusedButton = widget.selectedValue ?? _labels[0];
-    _onChanged = widget.onChanged;
   }
 
   @override
@@ -53,20 +43,20 @@ class _SwitchButtonState extends State<SwitchButton> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        for (int i = 0; i < _labels.length; i++) ... {
+        for (int i = 0; i < widget.labels.length; i++) ... {
           GestureDetector(
             onTap: () {
               setState(() {
-                _focusedButton = _labels[i];
+                _focusedButton = widget.labels[i];
 
-                if (_onChanged != null) {
-                  _onChanged!(_focusedButton);
+                if (widget.onChanged != null) {
+                  widget.onChanged!(_focusedButton);
                 }
               });
             },
             child: Container(
               decoration: BoxDecoration(
-                color: getBackgroundColor(_focusedButton == _labels[i]),
+                color: getBackgroundColor(_focusedButton == widget.labels[i]),
                 border: Border.all(
                   color: Color(0xff000000), 
                   width: 1.0
@@ -76,7 +66,7 @@ class _SwitchButtonState extends State<SwitchButton> {
                   topLeft: Radius.circular(6),
                   bottomLeft: Radius.circular(6)
                 )
-                : i == _labels.length - 1
+                : i == widget.labels.length - 1
                 ? BorderRadius.only(
                   topRight: Radius.circular(6),
                   bottomRight: Radius.circular(6)
@@ -86,9 +76,9 @@ class _SwitchButtonState extends State<SwitchButton> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20.0, 2.0, 20.0, 2.0),
                 child: Text(
-                  _labels[i], 
+                  widget.labels[i],
                   style: TextStyle(
-                    color: getFontColor(_focusedButton == _labels[i]),
+                    color: getFontColor(_focusedButton == widget.labels[i]),
                     fontWeight: FontWeight.bold
                   ),
                 ),

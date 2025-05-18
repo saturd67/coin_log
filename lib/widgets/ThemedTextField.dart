@@ -3,15 +3,13 @@ import 'package:flutter/material.dart';
 class ThemedTextField extends StatefulWidget {
   final String? placeholder;
   final int? maxLenght;
-  final String? value;
-  final void Function(String)? onChanged;
+  final TextEditingController? controller;
 
   ThemedTextField ({
     super.key,
     this.placeholder,
     this.maxLenght,
-    this.value,
-    this.onChanged
+    this.controller
   });
 
   @override
@@ -19,42 +17,13 @@ class ThemedTextField extends StatefulWidget {
 }
 
 class _ThemedTextFieldState extends State<ThemedTextField> {
-  late String? _placeholder;
-  late int? _maxLength;
-
-  final TextEditingController _controller = TextEditingController();
-
-  @override
-  void initState() {
-    _placeholder = widget.placeholder;
-    _maxLength = widget.maxLenght;
-
-    setState(() {
-      _controller.text = widget.value ?? "";
-    });
-  }
-
-  @override
-  void didUpdateWidget(covariant ThemedTextField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.value != _controller.text) {
-      _controller.text = widget.value!;
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       style: Theme.of(context).textTheme.bodyMedium,
       decoration: InputDecoration(
-        hintText: _placeholder,
+        hintText: widget.placeholder,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6.0),
           borderSide: BorderSide(
@@ -63,8 +32,8 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
           )
         )
       ),
-      controller: _controller,
-      maxLength: _maxLength,
+      controller: widget.controller,
+      maxLength: widget.maxLenght,
       buildCounter: (
           BuildContext context, {
             required int currentLength,
@@ -72,8 +41,7 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
             required int? maxLength,
           }) {
         return null; // Hides the counter
-      },
-      onChanged: widget.onChanged
+      }
     );
   }
 }

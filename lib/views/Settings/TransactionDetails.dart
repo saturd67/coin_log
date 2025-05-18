@@ -29,6 +29,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
   int? _identifier;
   late TransactionCategory _transactionCategory = TransactionCategory(name: "", icon: "", type: "Expense", sequence: 1, isDeleted: false);
   IconData? onDisplayIconData;
+  TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -44,8 +45,15 @@ class _TransactionDetailsState extends State<TransactionDetails> {
     final _transactionCategory = await transactionCategoryService.findById(widget.identifier!);
     setState(() {
       this._transactionCategory = _transactionCategory!;
+      _controller.text = this._transactionCategory.name;
       onDisplayIconData = coinLogTransactionCategoryIconMap[this._transactionCategory.icon]!.icon;
     });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -59,6 +67,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
           actions: [
             IconButton(
               onPressed: () async {
+                _transactionCategory.name = _controller.text;
 
                 if (_transactionCategory.name == "") {
                   ThemedToast.showToast("Invalid Name.");
@@ -115,10 +124,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                       child: ThemedTextField(
                         placeholder: "Name",
                         maxLenght: 10,
-                        value: _transactionCategory.name,
-                        onChanged: (value) {
-                          _transactionCategory.name = value;
-                        },
+                        controller: _controller,
                       )
                     ),
                   ],

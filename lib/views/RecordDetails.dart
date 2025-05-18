@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:coin_log/objects/Account.dart';
 import 'package:coin_log/objects/TransactionCategory.dart';
+import 'package:coin_log/widgets/ThemedTextField.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:coin_log/widgets/SwitchButton.dart';
@@ -10,6 +11,7 @@ import 'package:coin_log/widgets/GridViewIcon.dart';
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:coin_log/services/AccountService.dart';
+import 'package:coin_log/objects/Record.dart';
 
 class RecordDetails extends StatefulWidget {
   @override
@@ -21,23 +23,30 @@ class _RecordDetailsState extends State<RecordDetails> {
   TransactionCategoryService _transactionCategoryService = TransactionCategoryService();
   AccountService _accountService = AccountService();
 
+  Record _record = Record(transactionCategoryId: 0, accountId: 0, date: DateTime.now(), entryType: "Out", amount: 0.0);
   List<TransactionCategory> _transactionCategories = [];
   List<Account> _accounts = [];
   String _selectedType = "Expense";
+  int? _selectedTransactionCategoryId;
+  int? _selectedAccountId;
+  int? _selectedSourceAccountId;
+  int? _selectedDestinationAccountId;
+  TextEditingController _descriptionController = TextEditingController();
+  String _amount = "0";
   double _targetItemsPerColumn = 4;
   double _sourceItemsPerColumn = 1;
 
-  bool isKeyboardVisible = false;
+  bool _isKeyboardVisible = false;
   late final KeyboardVisibilityController keyboardVisibilityController;
-  late final StreamSubscription<bool> keyboardSubscription;
+  late final StreamSubscription<bool> _keyboardSubscription;
 
   @override
   void initState() {
     super.initState();
 
-    keyboardSubscription = KeyboardVisibilityController().onChange.listen((isVisible) {
+    _keyboardSubscription = KeyboardVisibilityController().onChange.listen((isVisible) {
       setState(() {
-        isKeyboardVisible = isVisible;
+        _isKeyboardVisible = isVisible;
       });
     });
 
@@ -63,8 +72,8 @@ class _RecordDetailsState extends State<RecordDetails> {
 
   @override
   void dispose() {
-    keyboardSubscription.cancel();
-
+    _keyboardSubscription.cancel();
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -93,109 +102,284 @@ class _RecordDetailsState extends State<RecordDetails> {
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), 
                           child: SwitchButton(
-                            labels: ["Expense", "Transfer", "Income"],
+                            labels: ["Expense", "Income", "Transfer"],
                             selectedValue: _selectedType,
                             onChanged: (String value) {
                               setState(() {
+                                _selectedTransactionCategoryId = null;
+                                _selectedSourceAccountId = null;
+                                _selectedDestinationAccountId = null;
                                 _selectedType = value;
                               });
                               loadTransactionCategories();
                             },
                           )
                         ),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                          child: SizedBox(
-                            height: 265,
-                            child: PageView.builder(
-                              itemCount: (_transactionCategories.length / 12).ceil(), // Number of pages
-                              itemBuilder: (context, pageIndex) {
-                                return GridView.builder(
-                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 4,
-                                    childAspectRatio: 1.25,
-                                    mainAxisSpacing: 8,
-                                  ),
-                                  itemCount: 12, // 4 items per page
-                                  itemBuilder: (context, index) {
-                                    int itemIndex = pageIndex * 4 + index;
-                                    return Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        if (itemIndex < _transactionCategories.length) ... {
-                                          GridViewIcon(iconData: coinLogTransactionCategoryIconMap[_transactionCategories[itemIndex].icon]!.icon),
-                                          Text(_transactionCategories[itemIndex].name, style: TextStyle(
-                                              fontSize: 13
-                                          ),)
-                                        }
-                                      ],
-                                    );
-                                  },
-                                  physics: NeverScrollableScrollPhysics(), // Disable GridView scrolling
-                                );
-                              },
+                        if (['Expense', 'Income'].contains(_selectedType)) ... {
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                            child: SizedBox(
+                              height: 265,
+                              child: PageView.builder(
+                                itemCount: (_transactionCategories.length / 12).ceil(), // Number of pages
+                                itemBuilder: (context, pageIndex) {
+                                  return GridView.builder(
+                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 4,
+                                      childAspectRatio: 1.25,
+                                      mainAxisSpacing: 8,
+                                    ),
+                                    itemCount: 12, // 4 items per page
+                                    itemBuilder: (context, index) {
+                                      int itemIndex = pageIndex * 4 + index;
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedTransactionCategoryId = _transactionCategories[itemIndex].identifier!;
+                                          });
+                                        },
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            if (itemIndex < _transactionCategories.length) ... {
+                                              GridViewIcon(iconData: coinLogTransactionCategoryIconMap[_transactionCategories[itemIndex].icon]!.icon, isSelected: _transactionCategories[itemIndex].identifier == _selectedTransactionCategoryId,),
+                                              Text(_transactionCategories[itemIndex].name, style: TextStyle(
+                                                  fontSize: 13
+                                              ),)
+                                            }
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    physics: NeverScrollableScrollPhysics(), // Disable GridView scrolling
+                                  );
+                                },
+                              ),
                             ),
                           ),
-                        ),
-                        Padding(padding: EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold))),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                          child: SizedBox(
-                            height: 85,
-                            child: PageView.builder(
-                              itemCount: (_accounts.length / 4).ceil(), // Number of pages
-                              itemBuilder: (context, pageIndex) {
-                                return GridView.builder(
-                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 4, // 1 row
-                                    childAspectRatio: 1.25, // Wide items
-                                    mainAxisSpacing: 8, // Space between items
-                                  ),
-                                  itemCount: 4, // 4 items per page
-                                  itemBuilder: (context, index) {
-                                    int itemIndex = pageIndex * 4 + index;
-                                    return Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        if (itemIndex < _accounts.length) ... {
-                                          GridViewIcon(iconData: coinLogAccountIconMap[_accounts[itemIndex].icon]!.icon),
-                                          Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13),)
-                                        }
-                                      ],
+                          Padding(padding: EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold))),
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                            child: SizedBox(
+                                height: 85,
+                                child: PageView.builder(
+                                  itemCount: (_accounts.length / 4).ceil(), // Number of pages
+                                  itemBuilder: (context, pageIndex) {
+                                    return GridView.builder(
+                                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 4,
+                                        childAspectRatio: 1.25,
+                                        mainAxisSpacing: 8,
+                                      ),
+                                      itemCount: 4,
+                                      itemBuilder: (context, index) {
+                                        int itemIndex = pageIndex * 4 + index;
+                                        return GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _selectedAccountId = _accounts[itemIndex].identifier!;
+                                            });
+                                          },
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              if (itemIndex < _accounts.length) ... {
+                                                GridViewIcon(iconData: coinLogAccountIconMap[_accounts[itemIndex].icon]!.icon, isSelected: _selectedAccountId == null ? _accounts[itemIndex].isDefault : _accounts[itemIndex].identifier == _selectedAccountId,),
+                                                Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13),)
+                                              }
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      physics: NeverScrollableScrollPhysics(),
                                     );
                                   },
-                                  physics: NeverScrollableScrollPhysics(),
-                                );
-                              },
-                            )
+                                )
+                            ),
                           ),
-                        )
+                        },
+                        if (_selectedType == "Transfer") ... {
+                          Padding(padding: EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold))),
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                            child: SizedBox(
+                                height: 85,
+                                child: PageView.builder(
+                                  itemCount: (_accounts.length / 4).ceil(), // Number of pages
+                                  itemBuilder: (context, pageIndex) {
+                                    return GridView.builder(
+                                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 4,
+                                        childAspectRatio: 1.25,
+                                        mainAxisSpacing: 8,
+                                      ),
+                                      itemCount: 4,
+                                      itemBuilder: (context, index) {
+                                        int itemIndex = pageIndex * 4 + index;
+                                        return GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _selectedSourceAccountId = _accounts[itemIndex].identifier!;
+                                            });
+                                          },
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              if (itemIndex < _accounts.length) ... {
+                                                GridViewIcon(iconData: coinLogAccountIconMap[_accounts[itemIndex].icon]!.icon, isSelected: _accounts[itemIndex].identifier == _selectedSourceAccountId),
+                                                Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13),)
+                                              }
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      physics: NeverScrollableScrollPhysics(),
+                                    );
+                                  },
+                                )
+                            ),
+                          ),
+                          Padding(padding: EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), child: Text("To: ", style: TextStyle(fontWeight: FontWeight.bold))),
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                            child: SizedBox(
+                                height: 85,
+                                child: PageView.builder(
+                                  itemCount: (_accounts.length / 4).ceil(), // Number of pages
+                                  itemBuilder: (context, pageIndex) {
+                                    return GridView.builder(
+                                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 4,
+                                        childAspectRatio: 1.25,
+                                        mainAxisSpacing: 8,
+                                      ),
+                                      itemCount: 4,
+                                      itemBuilder: (context, index) {
+                                        int itemIndex = pageIndex * 4 + index;
+                                        return GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _selectedDestinationAccountId = _accounts[itemIndex].identifier;
+                                            });
+                                          },
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              if (itemIndex < _accounts.length) ... {
+                                                GridViewIcon(iconData: coinLogAccountIconMap[_accounts[itemIndex].icon]!.icon, isSelected: _accounts[itemIndex].identifier == _selectedDestinationAccountId),
+                                                Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13))
+                                              }
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      physics: NeverScrollableScrollPhysics(),
+                                    );
+                                  },
+                                )
+                            ),
+                          ),
+                        }
                       ],
                     ),
                   ),
                 ),
                 SizedBox(
-                  height: isKeyboardVisible ? 95: 270,
-                  child: RecordDetailsKeyboard(isKeyboardVisible: isKeyboardVisible)
+                  height: _isKeyboardVisible ? 95: 270,
+                  child: RecordDetailsKeyboard(
+                      isKeyboardVisible: _isKeyboardVisible,
+                      descriptionController: _descriptionController,
+                      amount: _amount,
+                      onButtonPressed: (String input) {
+
+                        if (input == "." || num.tryParse(input) != null) {
+                          if (input == "0" && _amount == "0") {
+                            addInput(input);
+                          }
+
+                          else if (!_amount.contains(".") && num.tryParse(input) != null) {
+                            addInput(input);
+                          }
+
+                          else if (_amount.contains(".") && num.tryParse(input) != null && _amount.substring(_amount.indexOf(".")).length <= 2) {
+                            addInput(input);
+                          }
+
+                          else if (!_amount.contains(".") && input == ".") {
+                            addInput(input);
+                          }
+
+                          else if (input == "Del") {
+                            deleteInput();
+                          }
+                        }
+
+                        else if (["+", "-"].contains(input)) {
+                          //
+                        }
+
+                        else if (input == "=") {
+                          //
+                        }
+
+                        else {
+                          // Date
+                        }
+                      }
+                  )
                 ),
               ],
             ),
           )
         )
       );
+  }
 
+  void addInput(String input) {
+    if (_amount != "0") {
+      setState(() {
+        _amount += input;
+      });
+    }
+
+    else {
+      setState(() {
+        _amount = input;
+      });
+    }
+  }
+
+  void deleteInput() {
+    setState(() {
+      _amount = _amount.substring(0, _amount.length - 1);
+    });
   }
 }
 
-class RecordDetailsKeyboard extends StatelessWidget {
+class RecordDetailsKeyboard extends StatefulWidget {
+
   bool isKeyboardVisible;
+  TextEditingController? descriptionController = TextEditingController();
+  String? amount = "";
+  final void Function(String)? onButtonPressed;
 
   RecordDetailsKeyboard({
     super.key,
-    required this.isKeyboardVisible
+    required this.isKeyboardVisible,
+    this.descriptionController,
+    this.amount,
+    this.onButtonPressed
   });
+
+  @override
+  State<RecordDetailsKeyboard> createState() => _RecordDetailsKeyboardState();
+}
+
+class _RecordDetailsKeyboardState extends State<RecordDetailsKeyboard> {
 
   @override
   Widget build(BuildContext context) {
@@ -208,21 +392,19 @@ class RecordDetailsKeyboard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,            
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(style: Theme.of(context).textTheme.bodyLarge, "50.00"),
+                Text(style: Theme.of(context).textTheme.bodyLarge, widget.amount ?? widget.amount!),
               ]
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 2.0, 2.0, 6.0),
-              child: TextField(
-                style: Theme.of(context).textTheme.bodyMedium,
-                decoration: InputDecoration(
-                  hintText: 'Descriptions'                
-                ),
-              ),
+              child: ThemedTextField(
+                placeholder: "Descriptions",
+                controller: widget.descriptionController
+              )
             ),
-            if (!isKeyboardVisible)
+            if (!widget.isKeyboardVisible)
               SizedBox(
                 height: 175,
                 child: Column(
@@ -233,37 +415,37 @@ class RecordDetailsKeyboard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        RecordDetailsKeyboardButton(buttonText: "7"),
-                        RecordDetailsKeyboardButton(buttonText: "8"),
-                        RecordDetailsKeyboardButton(buttonText: "9"),
-                        RecordDetailsKeyboardButton(buttonText: "Date: "),
+                        RecordDetailsKeyboardButton(buttonText: "7", onButtonPressed: widget.onButtonPressed),
+                        RecordDetailsKeyboardButton(buttonText: "8", onButtonPressed: widget.onButtonPressed),
+                        RecordDetailsKeyboardButton(buttonText: "9", onButtonPressed: widget.onButtonPressed),
+                        RecordDetailsKeyboardButton(buttonText: "Date: ", onButtonPressed: widget.onButtonPressed),
                       ],
                     ),
                      Row(
                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                        children: [
-                         RecordDetailsKeyboardButton(buttonText: "4"),
-                         RecordDetailsKeyboardButton(buttonText: "5"),
-                         RecordDetailsKeyboardButton(buttonText: "6"),
-                         RecordDetailsKeyboardButton(buttonText: "+"),
+                         RecordDetailsKeyboardButton(buttonText: "4", onButtonPressed: widget.onButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "5", onButtonPressed: widget.onButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "6", onButtonPressed: widget.onButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "+", onButtonPressed: widget.onButtonPressed),
                        ],
                      ),
                      Row(
                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                        children: [
-                         RecordDetailsKeyboardButton(buttonText: "1"),
-                         RecordDetailsKeyboardButton(buttonText: "2"),
-                         RecordDetailsKeyboardButton(buttonText: "3"),
-                         RecordDetailsKeyboardButton(buttonText: "-"),
+                         RecordDetailsKeyboardButton(buttonText: "1", onButtonPressed: widget.onButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "2", onButtonPressed: widget.onButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "3", onButtonPressed: widget.onButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "-", onButtonPressed: widget.onButtonPressed),
                        ],
                      ),
                      Row(
                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                        children: [
-                         RecordDetailsKeyboardButton(buttonText: "."),
-                         RecordDetailsKeyboardButton(buttonText: "0"),
-                         RecordDetailsKeyboardButton(buttonText: "Del"),
-                         RecordDetailsKeyboardButton(buttonText: "="),
+                         RecordDetailsKeyboardButton(buttonText: ".", onButtonPressed: widget.onButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "0", onButtonPressed: widget.onButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "Del", onButtonPressed: widget.onButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "=", onButtonPressed: widget.onButtonPressed),
                        ],
                      ),
                   ],
@@ -278,10 +460,12 @@ class RecordDetailsKeyboard extends StatelessWidget {
 
 class RecordDetailsKeyboardButton extends StatefulWidget {
   String buttonText;
+  final void Function(String)? onButtonPressed;
 
   RecordDetailsKeyboardButton({
     super.key,
-    required this.buttonText
+    required this.buttonText,
+    this.onButtonPressed
   });
 
   @override
@@ -296,7 +480,9 @@ class _RecordDetailsKeyboardButtonState extends State<RecordDetailsKeyboardButto
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          print(widget.buttonText);
+          if (widget.onButtonPressed != null) {
+            widget.onButtonPressed!(widget.buttonText);
+          }
         },
         onTapDown: (_) {
           setState(() {

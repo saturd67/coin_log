@@ -30,6 +30,7 @@ class _TransactionDetailsState extends State<AccountDetails> {
   int? _identifier;
   late Account _account = Account(name: "", icon: "", sequence: 1, balance: 0.0, isDefault: false, isDeleted: false);
   IconData? onDisplayIconData;
+  TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -45,8 +46,15 @@ class _TransactionDetailsState extends State<AccountDetails> {
     final _account = await accountService.findById(widget.identifier!);
     setState(() {
       this._account = _account!;
+      _controller.text = this._account.name;
       onDisplayIconData = coinLogAccountIconMap[this._account.icon]!.icon;
     });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -60,6 +68,7 @@ class _TransactionDetailsState extends State<AccountDetails> {
               actions: [
                 IconButton(
                     onPressed: () async {
+                      _account.name = _controller.text;
 
                       if (_account.name == "") {
                         ThemedToast.showToast("Invalid Name.");
@@ -111,10 +120,7 @@ class _TransactionDetailsState extends State<AccountDetails> {
                               child: ThemedTextField(
                                 placeholder: "Name",
                                 maxLenght: 10,
-                                value: _account.name,
-                                onChanged: (value) {
-                                  _account.name = value;
-                                },
+                                controller: _controller,
                               )
                           ),
                         ],
