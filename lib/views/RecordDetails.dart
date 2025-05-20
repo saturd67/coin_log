@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:coin_log/objects/Account.dart';
 import 'package:coin_log/objects/TransactionCategory.dart';
+import 'package:coin_log/utils/Calculator.dart';
 import 'package:coin_log/widgets/ThemedTextField.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:coin_log/widgets/SwitchButton.dart';
 import 'package:coin_log/widgets/GridViewIcon.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
@@ -295,40 +297,11 @@ class _RecordDetailsState extends State<RecordDetails> {
                       descriptionController: _descriptionController,
                       amount: _amount,
                       onButtonPressed: (String input) {
-
-                        if (input == "." || num.tryParse(input) != null) {
-                          if (input == "0" && _amount == "0") {
-                            addInput(input);
-                          }
-
-                          else if (!_amount.contains(".") && num.tryParse(input) != null) {
-                            addInput(input);
-                          }
-
-                          else if (_amount.contains(".") && num.tryParse(input) != null && _amount.substring(_amount.indexOf(".")).length <= 2) {
-                            addInput(input);
-                          }
-
-                          else if (!_amount.contains(".") && input == ".") {
-                            addInput(input);
-                          }
-
-                          else if (input == "Del") {
-                            deleteInput();
-                          }
-                        }
-
-                        else if (["+", "-"].contains(input)) {
-                          //
-                        }
-
-                        else if (input == "=") {
-                          //
-                        }
-
-                        else {
-                          // Date
-                        }
+                        Calculator calculator = Calculator(_amount);
+                        final tempAmount = calculator.onInput(input);
+                        setState(() {
+                          _amount = tempAmount;
+                        });
                       }
                   )
                 ),
@@ -339,18 +312,23 @@ class _RecordDetailsState extends State<RecordDetails> {
       );
   }
 
-  void addInput(String input) {
-    if (_amount != "0") {
-      setState(() {
-        _amount += input;
-      });
-    }
+  void calculate(String expressionString) {
+    ExpressionParser parser = GrammarParser();
+    Expression expression = parser.parse(expressionString);
+    ContextModel contextModel = ContextModel();
 
-    else {
-      setState(() {
-        _amount = input;
-      });
-    }
+    double result = expression.evaluate(EvaluationType.REAL, contextModel);
+
+    setState(() {
+      print(result * 100 % 100);
+      if (result * 100 % 100 == 0) {
+        _amount = result.toStringAsFixed(0);
+      }
+
+      else {
+        _amount = result.toStringAsFixed(2);
+      }
+    });
   }
 
   void deleteInput() {
@@ -391,11 +369,14 @@ class _RecordDetailsKeyboardState extends State<RecordDetailsKeyboard> {
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(style: Theme.of(context).textTheme.bodyLarge, widget.amount ?? widget.amount!),
-              ]
+            SizedBox(
+              height: 30,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(style: Theme.of(context).textTheme.bodyLarge, widget.amount ?? widget.amount!),
+                ]
+              ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 2.0, 2.0, 6.0),
