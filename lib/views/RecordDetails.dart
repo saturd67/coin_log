@@ -35,8 +35,6 @@ class _RecordDetailsState extends State<RecordDetails> {
   int? _selectedDestinationAccountId;
   TextEditingController _descriptionController = TextEditingController();
   String _amount = "0";
-  double _targetItemsPerColumn = 4;
-  double _sourceItemsPerColumn = 1;
 
   bool _isKeyboardVisible = false;
   late final KeyboardVisibilityController keyboardVisibilityController;
@@ -338,6 +336,7 @@ class _RecordDetailsState extends State<RecordDetails> {
   }
 }
 
+@immutable
 class RecordDetailsKeyboard extends StatefulWidget {
 
   bool isKeyboardVisible;
@@ -439,6 +438,7 @@ class _RecordDetailsKeyboardState extends State<RecordDetailsKeyboard> {
   }
 }
 
+@immutable
 class RecordDetailsKeyboardButton extends StatefulWidget {
   String buttonText;
   final void Function(String)? onButtonPressed;
