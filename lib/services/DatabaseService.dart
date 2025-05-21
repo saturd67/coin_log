@@ -17,7 +17,7 @@ class DatabaseService {
     if (_db != null) {
       return _db!;
     }
-    _db = await _initDB(false);
+    _db = await _initDB(true);
     return _db!;
   }
 
@@ -39,6 +39,8 @@ class DatabaseService {
           );
         ''');
   }
+
+
 
   Future<void> createAccountTable(Database db) async {
     await db.execute('''
@@ -71,6 +73,26 @@ class DatabaseService {
         ''');
   }
 
+  Future<void> insertTransactionCategory(Database db) async {
+    await db.execute('''
+      INSERT INTO CL_TRANSACTION_CATEGORY (NAME, ICON, TYPE, SEQUENCE, IS_DELETED) VALUES
+        ("Breakfast", "coffee", "Expense", 1, False),
+        ("Lunch", "lunch_dining", "Expense", 2, False),
+        ("Dinner", "burger", "Expense", 3, False),
+        ("Salary", "info", "Income", 1, False),
+        ("Other", "star", "Income", 2, False);
+    ''');
+  }
+
+  Future<void> insertAccount(Database db) async {
+    await db.execute('''
+      INSERT INTO CL_ACCOUNT (NAME, ICON, SEQUENCE, BALANCE, IS_DEFAULT, IS_DELETED) VALUES
+        ("Bank", "account_balance", 1, 0.0, False, False),
+        ("E-Wallet", "monetization_on", 2, 0.0, True, False),
+        ("Cash", "money", 2, 0.0, False, False);
+    ''');
+  }
+
   Future<Database> _initDB(bool isResetDatabase) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'coin_log.db');
@@ -95,6 +117,8 @@ class DatabaseService {
         await createTransactionCategoryTable(database);
         await createAccountTable(database);
         await createRecordTable(database);
+        await insertTransactionCategory(database);
+        await insertAccount(database);
       },
       onUpgrade: (Database database, int oldVersion, int newVersion) async {
         // if (oldVersion < 2) {

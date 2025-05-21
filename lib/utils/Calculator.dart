@@ -7,9 +7,9 @@ class Calculator {
 
   String onInput(String input) {
     List<String> amountParts = amount.split(' ');
-    String firstOperand = amountParts.length >= 2 ? amountParts[0] : "";
-    String operator = amountParts.length >= 2 ? " ${amountParts[1]} " : "";
-    String lastOperand = amountParts.length == 3 ? amountParts[2] : amountParts.length == 1 ? amountParts[0] : "";
+    String firstOperand = _getFirstOperand(amount);
+    String operator = _getOperator(amount);
+    String lastOperand = _getLastOperand(amount);
 
     if (input == ".") {
       if (lastOperand == ""){
@@ -55,14 +55,6 @@ class Calculator {
       }
     }
 
-    else if (input == "=") {
-
-      // Exp: 100 + 200
-      if (firstOperand != "" && operator != "" && lastOperand != "") {
-        return _calculate(firstOperand, operator, lastOperand);
-      }
-    }
-
     else if (input == "Del") {
 
       // Exp: 100 or 100 + 200
@@ -79,11 +71,34 @@ class Calculator {
       }
     }
 
-    else {
-      // Date
+    return amount;
+  }
+
+  String onCalculate() {
+    String firstOperand = _getFirstOperand(amount);
+    String operator = _getOperator(amount);
+    String lastOperand = _getLastOperand(amount);
+
+    if (firstOperand != "" && operator != "" && lastOperand != "") {
+      return _calculate(firstOperand, operator, lastOperand);
     }
 
     return amount;
+  }
+
+  String _getFirstOperand(String amount) {
+    List<String> amountParts = amount.split(' ');
+    return amountParts.length >= 2 ? amountParts[0] : "";
+  }
+
+  String _getOperator(String amount) {
+    List<String> amountParts = amount.split(' ');
+    return amountParts.length >= 2 ? " ${amountParts[1]} " : "";
+  }
+
+  String _getLastOperand(String amoutn) {
+    List<String> amountParts = amoutn.split(' ');
+    return amountParts.length == 3 ? amountParts[2] : amountParts.length == 1 ? amountParts[0] : "";
   }
 
   String _addValue(String lastOperand, String input) {

@@ -2,18 +2,20 @@ import 'dart:async';
 
 import 'package:coin_log/objects/Account.dart';
 import 'package:coin_log/objects/TransactionCategory.dart';
+import 'package:coin_log/services/RecordService.dart';
 import 'package:coin_log/utils/Calculator.dart';
 import 'package:coin_log/widgets/ThemedTextField.dart';
+import 'package:coin_log/widgets/ThemedToast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:coin_log/widgets/SwitchButton.dart';
 import 'package:coin_log/widgets/GridViewIcon.dart';
-import 'package:math_expressions/math_expressions.dart';
 
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/objects/Record.dart';
+import 'package:logging/logging.dart';
 
 class RecordDetails extends StatefulWidget {
   @override
@@ -21,14 +23,15 @@ class RecordDetails extends StatefulWidget {
 }
 
 class _RecordDetailsState extends State<RecordDetails> {
+  final _log = Logger('RecordDetails');
 
   TransactionCategoryService _transactionCategoryService = TransactionCategoryService();
   AccountService _accountService = AccountService();
+  RecordService _recordService = RecordService();
 
-  Record _record = Record(transactionCategoryId: 0, accountId: 0, date: DateTime.now(), entryType: "Out", amount: 0.0);
+  Record _record = Record(transactionCategoryId: 0, accountId: 0, date: DateTime.now(), entryType: "Expense", amount: 0.0);
   List<TransactionCategory> _transactionCategories = [];
   List<Account> _accounts = [];
-  String _selectedType = "Expense";
   int? _selectedTransactionCategoryId;
   int? _selectedAccountId;
   int? _selectedSourceAccountId;
@@ -55,7 +58,7 @@ class _RecordDetailsState extends State<RecordDetails> {
   }
 
   void loadTransactionCategories() async {
-    final _transactionCategories = await _transactionCategoryService.listByType(_selectedType);
+    final _transactionCategories = await _transactionCategoryService.listByType(_record.entryType);
 
     setState(() {
       this._transactionCategories = _transactionCategories;
@@ -64,7 +67,8 @@ class _RecordDetailsState extends State<RecordDetails> {
 
   void loadAccounts() async {
     final _accounts = await _accountService.list();
-
+    List<Account> defaultAccounts = _accounts.where((account) => account.isDefault == true).toList();
+    _selectedAccountId =defaultAccounts[0].identifier;
     setState(() {
       this._accounts = _accounts;
     });
@@ -103,19 +107,19 @@ class _RecordDetailsState extends State<RecordDetails> {
                           padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), 
                           child: SwitchButton(
                             labels: ["Expense", "Income", "Transfer"],
-                            selectedValue: _selectedType,
+                            selectedValue: _record.entryType,
                             onChanged: (String value) {
                               setState(() {
                                 _selectedTransactionCategoryId = null;
                                 _selectedSourceAccountId = null;
                                 _selectedDestinationAccountId = null;
-                                _selectedType = value;
+                                _record.entryType = value;
                               });
                               loadTransactionCategories();
                             },
                           )
                         ),
-                        if (['Expense', 'Income'].contains(_selectedType)) ... {
+                        if (['Expense', 'Income'].contains(_record.entryType)) ... {
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
                             child: SizedBox(
@@ -200,7 +204,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                             ),
                           ),
                         },
-                        if (_selectedType == "Transfer") ... {
+                        if (_record.entryType == "Transfer") ... {
                           Padding(padding: EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold))),
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
@@ -291,16 +295,47 @@ class _RecordDetailsState extends State<RecordDetails> {
                 SizedBox(
                   height: _isKeyboardVisible ? 95: 270,
                   child: RecordDetailsKeyboard(
-                      isKeyboardVisible: _isKeyboardVisible,
-                      descriptionController: _descriptionController,
-                      amount: _amount,
-                      onButtonPressed: (String input) {
+                    isKeyboardVisible: _isKeyboardVisible,
+                    descriptionController: _descriptionController,
+                    amount: _amount,
+                    onValueButtonPressed: (String input) {
+                      Calculator calculator = Calculator(_amount);
+                      final tempAmount = calculator.onInput(input);
+                      setState(() {
+                        _amount = tempAmount;
+                      });
+                    },
+                    onDateButtonPressed: () {
+                      //
+                    },
+                    onSaveButtonPressed: () async {
+                      if (_record.entryType == "Expense" || _record.entryType == "Income") {
+                        if (_selectedTransactionCategoryId == null || _selectedTransactionCategoryId == 0) {
+                          return ThemedToast.showToast("Invalid Transaction Category");
+                        }
+
+                        else if (_selectedAccountId == null || _selectedAccountId == 0) {
+                          return ThemedToast.showToast("Invalid Account");
+                        }
+
+                        _record.transactionCategoryId = _selectedTransactionCategoryId!;
+                        _record.accountId = _selectedAccountId!;
+
                         Calculator calculator = Calculator(_amount);
-                        final tempAmount = calculator.onInput(input);
                         setState(() {
-                          _amount = tempAmount;
+                          _amount = calculator.onCalculate();
                         });
+                        _record.amount = double.parse(_amount);
+                        int? identifier = await _recordService.save(_record);
+                        _log.info("Saved ${_record.toMap()}");
+
+                        Navigator.of(context).pop("reload");
                       }
+
+                      else if (_record.entryType == "Transfer") {
+                        //
+                      }
+                    }
                   )
                 ),
               ],
@@ -308,31 +343,6 @@ class _RecordDetailsState extends State<RecordDetails> {
           )
         )
       );
-  }
-
-  void calculate(String expressionString) {
-    ExpressionParser parser = GrammarParser();
-    Expression expression = parser.parse(expressionString);
-    ContextModel contextModel = ContextModel();
-
-    double result = expression.evaluate(EvaluationType.REAL, contextModel);
-
-    setState(() {
-      print(result * 100 % 100);
-      if (result * 100 % 100 == 0) {
-        _amount = result.toStringAsFixed(0);
-      }
-
-      else {
-        _amount = result.toStringAsFixed(2);
-      }
-    });
-  }
-
-  void deleteInput() {
-    setState(() {
-      _amount = _amount.substring(0, _amount.length - 1);
-    });
   }
 }
 
@@ -342,14 +352,18 @@ class RecordDetailsKeyboard extends StatefulWidget {
   bool isKeyboardVisible;
   TextEditingController? descriptionController = TextEditingController();
   String? amount = "";
-  final void Function(String)? onButtonPressed;
+  final void Function(String)? onValueButtonPressed;
+  final void Function()? onDateButtonPressed;
+  final void Function()? onSaveButtonPressed;
 
   RecordDetailsKeyboard({
     super.key,
     required this.isKeyboardVisible,
     this.descriptionController,
     this.amount,
-    this.onButtonPressed
+    this.onValueButtonPressed,
+    this.onDateButtonPressed,
+    this.onSaveButtonPressed
   });
 
   @override
@@ -395,37 +409,37 @@ class _RecordDetailsKeyboardState extends State<RecordDetailsKeyboard> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        RecordDetailsKeyboardButton(buttonText: "7", onButtonPressed: widget.onButtonPressed),
-                        RecordDetailsKeyboardButton(buttonText: "8", onButtonPressed: widget.onButtonPressed),
-                        RecordDetailsKeyboardButton(buttonText: "9", onButtonPressed: widget.onButtonPressed),
-                        RecordDetailsKeyboardButton(buttonText: "Date: ", onButtonPressed: widget.onButtonPressed),
+                        RecordDetailsKeyboardButton(buttonText: "7", onValueButtonPressed: widget.onValueButtonPressed),
+                        RecordDetailsKeyboardButton(buttonText: "8", onValueButtonPressed: widget.onValueButtonPressed),
+                        RecordDetailsKeyboardButton(buttonText: "9", onValueButtonPressed: widget.onValueButtonPressed),
+                        RecordDetailsKeyboardButton(buttonText: "Date: ", onDateButtonPressed: widget.onDateButtonPressed),
                       ],
                     ),
                      Row(
                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                        children: [
-                         RecordDetailsKeyboardButton(buttonText: "4", onButtonPressed: widget.onButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "5", onButtonPressed: widget.onButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "6", onButtonPressed: widget.onButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "+", onButtonPressed: widget.onButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "4", onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "5", onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "6", onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "+", onValueButtonPressed: widget.onValueButtonPressed),
                        ],
                      ),
                      Row(
                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                        children: [
-                         RecordDetailsKeyboardButton(buttonText: "1", onButtonPressed: widget.onButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "2", onButtonPressed: widget.onButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "3", onButtonPressed: widget.onButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "-", onButtonPressed: widget.onButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "1", onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "2", onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "3", onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "-", onValueButtonPressed: widget.onValueButtonPressed),
                        ],
                      ),
                      Row(
                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                        children: [
-                         RecordDetailsKeyboardButton(buttonText: ".", onButtonPressed: widget.onButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "0", onButtonPressed: widget.onButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "Del", onButtonPressed: widget.onButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "=", onButtonPressed: widget.onButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: ".", onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "0", onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "Del", onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: "=", onSaveButtonPressed: widget.onSaveButtonPressed),
                        ],
                      ),
                   ],
@@ -441,12 +455,16 @@ class _RecordDetailsKeyboardState extends State<RecordDetailsKeyboard> {
 @immutable
 class RecordDetailsKeyboardButton extends StatefulWidget {
   String buttonText;
-  final void Function(String)? onButtonPressed;
+  final void Function(String)? onValueButtonPressed;
+  final void Function()? onDateButtonPressed;
+  final void Function()? onSaveButtonPressed;
 
   RecordDetailsKeyboardButton({
     super.key,
     required this.buttonText,
-    this.onButtonPressed
+    this.onValueButtonPressed,
+    this.onDateButtonPressed,
+    this.onSaveButtonPressed
   });
 
   @override
@@ -461,8 +479,16 @@ class _RecordDetailsKeyboardButtonState extends State<RecordDetailsKeyboardButto
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          if (widget.onButtonPressed != null) {
-            widget.onButtonPressed!(widget.buttonText);
+          if (widget.onValueButtonPressed != null) {
+            widget.onValueButtonPressed!(widget.buttonText);
+          }
+
+          else if (widget.onDateButtonPressed != null) {
+            widget.onDateButtonPressed!();
+          }
+
+          else if (widget.onSaveButtonPressed != null) {
+            widget.onSaveButtonPressed!();
           }
         },
         onTapDown: (_) {

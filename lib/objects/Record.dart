@@ -28,7 +28,7 @@ class Record {
       identifier: map['IDENTIFIER'],
       transactionCategoryId: map['TRANSACTION_CATEGORY_ID'],
       accountId: map['ACCOUNT_ID'],
-      date: map['DATE'],
+      date: DateTime.parse(map['DATE']),
       description: map['DESCRIPTION'],
       entryType: map['ENTRY_TYPE'],
       amount: map['AMOUNT']
@@ -39,7 +39,7 @@ class Record {
     final map = <String, dynamic> {
       'TRANSACTION_CATEGORY_ID': transactionCategoryId,
       'ACCOUNT_ID': accountId,
-      'DATE': date,
+      'DATE': date.toString(),
       'DESCRIPTION': description,
       'ENTRY_TYPE': entryType,
       'AMOUNT': amount

@@ -37,12 +37,12 @@ class RecordService {
     );
   }
 
-  Future<List<Account>> list() async {
+  Future<List<Record>> list() async {
     final db = await DatabaseService().database;
     List<Map<String, dynamic>> maps = await db.query(
       TABLE_NAME,
       orderBy: 'date desc'
     );
-    return maps.map((e) => Account.fromMap(e)).toList();
+    return maps.map((e) => Record.fromMap(e)).toList();
   }
 }

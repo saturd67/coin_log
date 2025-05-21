@@ -1,11 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:coin_log/main.dart';
 
-class Record extends StatelessWidget {
+import 'package:coin_log/objects/Record.dart';
+import 'package:coin_log/services/RecordService.dart';
+
+class RecordList extends StatefulWidget {
+  const RecordList({Key? key}) : super(key: key);
+
+  @override
+  State<RecordList> createState() => RecordListState();
+}
+
+class RecordListState extends State<RecordList> {
+  RecordService _recordService = RecordService();
+
+  String test = "Ori";
+
+  @override
+  void initState() {
+    super.initState();
+    load();
+  }
+
+  void load() async {
+    final List<Record> records = await _recordService.list();
+    records.forEach((Record record) { print(record.toMap()); });
+  }
+
+  void loadTest() {
+    print("Load Test");
+
+    setState(() {
+      test = "Updated test";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: [
+        Text(test),
         RecordDay(),
       ],
     );

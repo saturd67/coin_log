@@ -1,7 +1,7 @@
 import 'package:coin_log/views/AppFrame/AccountsBalance.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/router/RouterUtils.dart';
-import 'package:coin_log/views/AppFrame/Record.dart';
+import 'package:coin_log/views/AppFrame/RecordList.dart';
 import 'package:coin_log/views/AppFrame/Summary.dart';
 import 'package:coin_log/views/AppFrame/Settings.dart';
 import 'package:coin_log/views/RecordDetails.dart';
@@ -15,21 +15,27 @@ class AppFramePage extends StatefulWidget {
 
 class _AppFramePageState extends State<AppFramePage> {
     int selectedIndex = 0;
-    static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-    
-    static List<Widget> appBars = <Widget>[
+
+    final GlobalKey<RecordListState> recordListKey =  GlobalKey<RecordListState>();
+
+    List<Widget> appBars = <Widget>[
       RecordsAppBar(),
       Text("Summary"),
       Text("Accounts"),
       Text("Settings")
     ];
     
-    static List<Widget> bodies = <Widget>[
-        Record(),
+    late List<Widget> bodies;
+
+    @override
+    void initState() {
+      bodies = <Widget>[
+        RecordList(key: recordListKey,),
         Summary(),
         AccountsBalance(),
         Settings(),
-    ];
+      ];
+    }
 
     @override
     Widget build(BuildContext context) {
@@ -61,8 +67,14 @@ class _AppFramePageState extends State<AppFramePage> {
                       Icons.add,
                       color: Theme.of(context).colorScheme.onPrimary
                   ),
-                  onPressed: () {
-                      Navigator.of(context).push(RouterUtils.createRoute(RecordDetails()));
+                  onPressed: () async {
+                    final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordDetails()));
+                    if (result == "reload") {
+                      setState(() {
+                        selectedIndex = 0;
+                      });
+                      recordListKey.currentState?.loadTest();
+                    }
                   }
                 ),
             ),
