@@ -45,12 +45,12 @@ class MyApp extends StatelessWidget {
                 displayMedium: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.normal,
-                    color: Color(0xff888888)
+                    color: Color(0xff3b3b3b)
                 ),
                 displaySmall: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xff888888)
+                    color: Color(0xff3b3b3b)
                 ),
                 bodyLarge: TextStyle(
                     fontSize: 20,
@@ -78,7 +78,7 @@ class MyApp extends StatelessWidget {
               border: OutlineInputBorder(),
               filled: true,
               fillColor: Color(0xffffffff),
-              hintStyle: TextStyle(color: Color(0xff888888))
+              hintStyle: TextStyle(color: Color(0xff3b3b3b))
             ),
             appBarTheme: const AppBarTheme(
               elevation: 2,

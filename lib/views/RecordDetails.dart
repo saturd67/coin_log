@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:coin_log/constants/WeekMap.dart';
 import 'package:coin_log/objects/Account.dart';
 import 'package:coin_log/objects/TransactionCategory.dart';
 import 'package:coin_log/services/RecordService.dart';
@@ -298,6 +299,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                     isKeyboardVisible: _isKeyboardVisible,
                     descriptionController: _descriptionController,
                     amount: _amount,
+                    date: _record.date,
                     onValueButtonPressed: (String input) {
                       Calculator calculator = Calculator(_amount);
                       final tempAmount = calculator.onInput(input);
@@ -305,8 +307,39 @@ class _RecordDetailsState extends State<RecordDetails> {
                         _amount = tempAmount;
                       });
                     },
-                    onDateButtonPressed: () {
-                      //
+                    onDateButtonPressed: () async {
+                      final DateTime? selectedDate = await showDatePicker(
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: Theme.of(context).colorScheme.primary,
+                                  onPrimary: Theme.of(context).colorScheme.onPrimary,
+                                  surface: Theme.of(context).colorScheme.secondary,
+                                  onSurface: Theme.of(context).textTheme.bodyMedium!.color!
+                                ),
+                                textButtonTheme: TextButtonThemeData(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Theme.of(context).colorScheme.primary,
+                                  )
+                                )
+                              ),
+                              child: child!
+                            );
+                          },
+                          context: context,
+                          helpText: "Date",
+                          initialEntryMode: DatePickerEntryMode.calendarOnly,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2001),
+                          lastDate: DateTime(2100)
+                      );
+
+                      if (selectedDate != null) {
+                        setState(() {
+                          _record.date = selectedDate;
+                        });
+                      }
                     },
                     onSaveButtonPressed: () async {
                       if (_record.type == "Expense" || _record.type == "Income") {
@@ -352,6 +385,7 @@ class RecordDetailsKeyboard extends StatefulWidget {
   bool isKeyboardVisible;
   TextEditingController? descriptionController = TextEditingController();
   String? amount = "";
+  DateTime? date;
   final void Function(String)? onValueButtonPressed;
   final void Function()? onDateButtonPressed;
   final void Function()? onSaveButtonPressed;
@@ -361,6 +395,7 @@ class RecordDetailsKeyboard extends StatefulWidget {
     required this.isKeyboardVisible,
     this.descriptionController,
     this.amount,
+    this.date,
     this.onValueButtonPressed,
     this.onDateButtonPressed,
     this.onSaveButtonPressed
@@ -412,7 +447,7 @@ class _RecordDetailsKeyboardState extends State<RecordDetailsKeyboard> {
                         RecordDetailsKeyboardButton(buttonText: "7", onValueButtonPressed: widget.onValueButtonPressed),
                         RecordDetailsKeyboardButton(buttonText: "8", onValueButtonPressed: widget.onValueButtonPressed),
                         RecordDetailsKeyboardButton(buttonText: "9", onValueButtonPressed: widget.onValueButtonPressed),
-                        RecordDetailsKeyboardButton(buttonText: "Date: ", onDateButtonPressed: widget.onDateButtonPressed),
+                        RecordDetailsKeyboardButton(buttonText: widget.date != null ? "${widget.date!.day}/${widget.date!.month} ${weekMap[widget.date!.weekday.toString()]}" : "", color: Theme.of(context).colorScheme.primary, onDateButtonPressed: widget.onDateButtonPressed),
                       ],
                     ),
                      Row(
@@ -439,7 +474,7 @@ class _RecordDetailsKeyboardState extends State<RecordDetailsKeyboard> {
                          RecordDetailsKeyboardButton(buttonText: ".", onValueButtonPressed: widget.onValueButtonPressed),
                          RecordDetailsKeyboardButton(buttonText: "0", onValueButtonPressed: widget.onValueButtonPressed),
                          RecordDetailsKeyboardButton(buttonText: "Del", onValueButtonPressed: widget.onValueButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "=", onSaveButtonPressed: widget.onSaveButtonPressed),
+                         RecordDetailsKeyboardButton(buttonIcon: Icons.check, color: Theme.of(context).colorScheme.onPrimary, backgroundColor: Theme.of(context).colorScheme.primary, onSaveButtonPressed: widget.onSaveButtonPressed),
                        ],
                      ),
                   ],
@@ -454,14 +489,20 @@ class _RecordDetailsKeyboardState extends State<RecordDetailsKeyboard> {
 
 @immutable
 class RecordDetailsKeyboardButton extends StatefulWidget {
-  String buttonText;
+  String? buttonText;
+  IconData? buttonIcon;
+  Color? color;
+  Color? backgroundColor;
   final void Function(String)? onValueButtonPressed;
   final void Function()? onDateButtonPressed;
   final void Function()? onSaveButtonPressed;
 
   RecordDetailsKeyboardButton({
     super.key,
-    required this.buttonText,
+    this.buttonText,
+    this.buttonIcon,
+    this.color,
+    this.backgroundColor,
     this.onValueButtonPressed,
     this.onDateButtonPressed,
     this.onSaveButtonPressed
@@ -472,15 +513,21 @@ class RecordDetailsKeyboardButton extends StatefulWidget {
 }
 
 class _RecordDetailsKeyboardButtonState extends State<RecordDetailsKeyboardButton> {
-  bool pressed = false;
+  bool _pressed = false;
+  Color? _color;
+  Color? _backgroundColor;
+
 
   @override
   Widget build(BuildContext context) {
+    _color = widget.color != null ? widget.color! : Theme.of(context).textTheme.bodyMedium?.color;
+    _backgroundColor = widget.backgroundColor != null ? widget.backgroundColor! : Theme.of(context).colorScheme.secondary;
+
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          if (widget.onValueButtonPressed != null) {
-            widget.onValueButtonPressed!(widget.buttonText);
+          if (widget.onValueButtonPressed != null && widget.buttonText != null) {
+            widget.onValueButtonPressed!(widget.buttonText!);
           }
 
           else if (widget.onDateButtonPressed != null) {
@@ -493,32 +540,32 @@ class _RecordDetailsKeyboardButtonState extends State<RecordDetailsKeyboardButto
         },
         onTapDown: (_) {
           setState(() {
-            pressed = true;
+            _pressed = true;
           });
         },
         onTapUp: (_) {
           setState(() {
-            pressed = false;
+            _pressed = false;
           });
         },
         onTapCancel: () {
           setState(() {
-            pressed = false;
+            _pressed = false;
           });
         },
         child: AnimatedOpacity(
           duration: Duration(milliseconds: 100),
-          opacity: pressed ? 0.5 : 1.0,
+          opacity: _pressed ? 0.5 : 1.0,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 2.0),
             child: Container(
               height: 40,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondary,
+                color: _backgroundColor,
                 borderRadius: BorderRadius.circular(6)
               ),
               child: Center(
-                child: Text(widget.buttonText)
+                child: widget.buttonText != null ? Text(widget.buttonText!, style: TextStyle(color: _color,)) : widget.buttonIcon != null ? Icon(widget.buttonIcon, color: _color,) : null
               ),
             ),
           ),
