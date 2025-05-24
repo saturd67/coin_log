@@ -64,7 +64,7 @@ class DatabaseService {
             ACCOUNT_ID              INTEGER NOT NULL,
             DATE                    DATE NOT NULL,
             DESCRIPTION             VARCHAR(50),
-            ENTRY_TYPE              VARCHAR(5) NOT NULL,
+            TYPE              VARCHAR(5) NOT NULL,
             AMOUNT                  DOUBLE NOT NULL,
             
             FOREIGN KEY (TRANSACTION_CATEGORY_ID) REFERENCES CL_TRANSACTION_CATEGORY(identifier),
@@ -90,6 +90,14 @@ class DatabaseService {
         ("Bank", "account_balance", 1, 0.0, False, False),
         ("E-Wallet", "monetization_on", 2, 0.0, True, False),
         ("Cash", "money", 2, 0.0, False, False);
+    ''');
+  }
+  
+  Future<void> insertRecords(Database db) async {
+    await db.execute('''
+      INSERT INTO CL_RECORD (TRANSACTION_CATEGORY_ID, ACCOUNT_ID, DATE, DESCRIPTION, TYPE, AMOUNT) VALUES
+        (1, 2, "2025-05-24 10:07:36.085738", null, "Expense", 5.0),
+        (2, 2, "2025-05-25 10:07:36.085738", null, "Expense", 15.0);
     ''');
   }
 
@@ -119,6 +127,7 @@ class DatabaseService {
         await createRecordTable(database);
         await insertTransactionCategory(database);
         await insertAccount(database);
+        await insertRecords(database);
       },
       onUpgrade: (Database database, int oldVersion, int newVersion) async {
         // if (oldVersion < 2) {

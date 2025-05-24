@@ -7,7 +7,7 @@ class Record {
   int accountId;
   DateTime date;
   String? description;
-  String entryType;
+  String type;
   double amount;
 
   TransactionCategory? transactionCategory;
@@ -19,7 +19,7 @@ class Record {
     required this.accountId,
     required this.date,
     this.description,
-    required this.entryType,
+    required this.type,
     required this.amount
   });
 
@@ -30,7 +30,7 @@ class Record {
       accountId: map['ACCOUNT_ID'],
       date: DateTime.parse(map['DATE']),
       description: map['DESCRIPTION'],
-      entryType: map['ENTRY_TYPE'],
+      type: map['TYPE'],
       amount: map['AMOUNT']
     );
   }
@@ -41,7 +41,7 @@ class Record {
       'ACCOUNT_ID': accountId,
       'DATE': date.toString(),
       'DESCRIPTION': description,
-      'ENTRY_TYPE': entryType,
+      'TYPE': type,
       'AMOUNT': amount
     };
 

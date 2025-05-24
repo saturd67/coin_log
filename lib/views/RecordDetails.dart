@@ -29,7 +29,7 @@ class _RecordDetailsState extends State<RecordDetails> {
   AccountService _accountService = AccountService();
   RecordService _recordService = RecordService();
 
-  Record _record = Record(transactionCategoryId: 0, accountId: 0, date: DateTime.now(), entryType: "Expense", amount: 0.0);
+  Record _record = Record(transactionCategoryId: 0, accountId: 0, date: DateTime.now(), type: "Expense", amount: 0.0);
   List<TransactionCategory> _transactionCategories = [];
   List<Account> _accounts = [];
   int? _selectedTransactionCategoryId;
@@ -58,7 +58,7 @@ class _RecordDetailsState extends State<RecordDetails> {
   }
 
   void loadTransactionCategories() async {
-    final _transactionCategories = await _transactionCategoryService.listByType(_record.entryType);
+    final _transactionCategories = await _transactionCategoryService.listByType(_record.type);
 
     setState(() {
       this._transactionCategories = _transactionCategories;
@@ -107,19 +107,19 @@ class _RecordDetailsState extends State<RecordDetails> {
                           padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), 
                           child: SwitchButton(
                             labels: ["Expense", "Income", "Transfer"],
-                            selectedValue: _record.entryType,
+                            selectedValue: _record.type,
                             onChanged: (String value) {
                               setState(() {
                                 _selectedTransactionCategoryId = null;
                                 _selectedSourceAccountId = null;
                                 _selectedDestinationAccountId = null;
-                                _record.entryType = value;
+                                _record.type = value;
                               });
                               loadTransactionCategories();
                             },
                           )
                         ),
-                        if (['Expense', 'Income'].contains(_record.entryType)) ... {
+                        if (['Expense', 'Income'].contains(_record.type)) ... {
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
                             child: SizedBox(
@@ -204,7 +204,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                             ),
                           ),
                         },
-                        if (_record.entryType == "Transfer") ... {
+                        if (_record.type == "Transfer") ... {
                           Padding(padding: EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold))),
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
@@ -309,7 +309,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                       //
                     },
                     onSaveButtonPressed: () async {
-                      if (_record.entryType == "Expense" || _record.entryType == "Income") {
+                      if (_record.type == "Expense" || _record.type == "Income") {
                         if (_selectedTransactionCategoryId == null || _selectedTransactionCategoryId == 0) {
                           return ThemedToast.showToast("Invalid Transaction Category");
                         }
@@ -332,7 +332,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                         Navigator.of(context).pop("reload");
                       }
 
-                      else if (_record.entryType == "Transfer") {
+                      else if (_record.type == "Transfer") {
                         //
                       }
                     }

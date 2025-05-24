@@ -45,4 +45,15 @@ class RecordService {
     );
     return maps.map((e) => Record.fromMap(e)).toList();
   }
+
+  Future<List<Record>> listByYearMonth(String year, String month) async {
+    final db = await DatabaseService().database;
+    List<Map<String, dynamic>> maps = await db.query(
+      TABLE_NAME,
+      where: 'strftime("%Y", date) >= ? and strftime("%m", date) <= ?',
+      orderBy: 'date desc',
+      whereArgs: [year, month]
+    );
+    return maps.map((e) => Record.fromMap(e)).toList();
+  }
 }

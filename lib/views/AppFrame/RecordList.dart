@@ -1,8 +1,14 @@
+import 'package:coin_log/constants/IconMap.dart';
+import 'package:coin_log/objects/TransactionCategory.dart';
+import 'package:coin_log/services/AccountService.dart';
+import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/main.dart';
 
 import 'package:coin_log/objects/Record.dart';
 import 'package:coin_log/services/RecordService.dart';
+
+import 'package:coin_log/constants/WeekMap.dart';
 
 class RecordList extends StatefulWidget {
   const RecordList({Key? key}) : super(key: key);
@@ -12,9 +18,11 @@ class RecordList extends StatefulWidget {
 }
 
 class RecordListState extends State<RecordList> {
+  TransactionCategoryService _transactionCategoryService = TransactionCategoryService();
+  AccountService _accountService = AccountService();
   RecordService _recordService = RecordService();
 
-  String test = "Ori";
+  Map<String, GroupedRecordItem> groupedRecords = <String, GroupedRecordItem>{};
 
   @override
   void initState() {
@@ -23,15 +31,32 @@ class RecordListState extends State<RecordList> {
   }
 
   void load() async {
-    final List<Record> records = await _recordService.list();
-    records.forEach((Record record) { print(record.toMap()); });
-  }
+    final List<Record> records = await _recordService.listByYearMonth("2025", "05");
+    Map<String, GroupedRecordItem> groupedRecords = <String, GroupedRecordItem>{};
 
-  void loadTest() {
-    print("Load Test");
+    for (Record record in records) {
+      record.transactionCategory = await _transactionCategoryService.findById(record.transactionCategoryId);
+      record.account = await _accountService.findById(record.accountId);
+
+      String formattedDate = "${record.date.month}/${record.date.day}  ${weekMap[record.date.weekday.toString()]}";
+
+      double income = record.type == "Income" ? record.amount : 0;
+      double expense = record.type == "Expense" ? record.amount : 0;
+
+      if (!groupedRecords.keys.contains(formattedDate)) {
+
+        groupedRecords.putIfAbsent(formattedDate, () => GroupedRecordItem(income, expense, [record]));
+      }
+
+      else {
+        groupedRecords[formattedDate]!.sumIncome += income;
+        groupedRecords[formattedDate]!.sumExpense += expense;
+        groupedRecords[formattedDate]!.records.add(record);
+      }
+    }
 
     setState(() {
-      test = "Updated test";
+      this.groupedRecords = groupedRecords;
     });
   }
 
@@ -39,18 +64,29 @@ class RecordListState extends State<RecordList> {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        Text(test),
-        RecordDay(),
-      ],
+        for (var record in groupedRecords.entries) ... {
+          RecordDay(date: record.key, groupedRecordItem: record.value)
+        }
+      ]
     );
   }
 }
 
-class RecordDay extends StatelessWidget {
-  const RecordDay({
+class RecordDay extends StatefulWidget {
+  String date;
+  GroupedRecordItem groupedRecordItem;
+
+  RecordDay({
     super.key,
+    required this.date,
+    required this.groupedRecordItem
   });
 
+  @override
+  State<RecordDay> createState() => _RecordDayState();
+}
+
+class _RecordDayState extends State<RecordDay> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -79,11 +115,17 @@ class RecordDay extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              RecordDayHeader(),
+              RecordDayHeader(date: widget.date, sumIncome: widget.groupedRecordItem.sumIncome.toStringAsFixed(2), sumExpense: widget.groupedRecordItem.sumExpense.toStringAsFixed(2)),
               Divider(
                 height: 5,
               ),
-              RecordDayBody(),
+              Column(
+                children: [
+                  for (var record in widget.groupedRecordItem.records) ... {
+                      RecordDayBodyItem(iconData: record.transactionCategory!.icon, name: record.transactionCategory!.name, type: record.type, amount: record.amount.toStringAsFixed(2))
+                  }
+                ]
+              )
             ],
           ),
         ),
@@ -92,11 +134,23 @@ class RecordDay extends StatelessWidget {
   }
 }
 
-class RecordDayHeader extends StatelessWidget {
-  const RecordDayHeader({
+class RecordDayHeader extends StatefulWidget {
+  String date;
+  String sumIncome;
+  String sumExpense;
+
+  RecordDayHeader({
     super.key,
+    required this.date,
+    required this.sumIncome,
+    required this.sumExpense
   });
 
+  @override
+  State<RecordDayHeader> createState() => _RecordDayHeaderState();
+}
+
+class _RecordDayHeaderState extends State<RecordDayHeader> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -116,13 +170,8 @@ class RecordDayHeader extends StatelessWidget {
                   Padding(
                     padding:
                         EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
-                    child: Text(
-                      '7/12'
-                    ),
-                  ),
-                  Text(
-                    'Sat',
-                  ),
+                    child: Text(widget.date),
+                  )
                 ],
               ),
             ),
@@ -132,7 +181,7 @@ class RecordDayHeader extends StatelessWidget {
               decoration: BoxDecoration(),
               alignment: AlignmentDirectional(1, 0),
               child: Text(
-                '+400.00',
+                '+${widget.sumIncome}',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.success
                 ),
@@ -144,7 +193,7 @@ class RecordDayHeader extends StatelessWidget {
               decoration: BoxDecoration(),
               alignment: AlignmentDirectional(1, 0),
               child: Text(
-                '-200.00',
+                '-${widget.sumExpense}',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.error
                 ),
@@ -157,27 +206,25 @@ class RecordDayHeader extends StatelessWidget {
   }
 }
 
-class RecordDayBody extends StatelessWidget {
-  const RecordDayBody({
+class RecordDayBodyItem extends StatefulWidget {
+  String iconData;
+  String name;
+  String type;
+  String amount;
+
+  RecordDayBodyItem({
     super.key,
+    required this.iconData,
+    required this.name,
+    required this.type,
+    required this.amount
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        RecordDayBodyItem(),
-        RecordDayBodyItemExample1(),
-      ],
-    );
-  }
+  State<RecordDayBodyItem> createState() => _RecordDayBodyItemState();
 }
 
-class RecordDayBodyItem extends StatelessWidget {
-  const RecordDayBodyItem({
-    super.key,
-  });
-
+class _RecordDayBodyItemState extends State<RecordDayBodyItem> {
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -200,14 +247,12 @@ class RecordDayBodyItem extends StatelessWidget {
                       padding: EdgeInsetsDirectional.fromSTEB(
                           0, 0, 10, 0),
                       child: Icon(
-                        Icons.lunch_dining,
+                        coinLogTransactionCategoryIconMap[widget.iconData]!.icon,
                         color: Color(0xFFFFD700),
                         size: 30,
                       ),
                     ),
-                    Text(
-                      'Lunch'
-                    ),
+                    Text(widget.name),
                   ],
                 ),
               ),
@@ -224,16 +269,15 @@ class RecordDayBodyItem extends StatelessWidget {
                   decoration: BoxDecoration(),
                   alignment: AlignmentDirectional(1, 0),
                   child: Text(
-                    '-100.00',
+                    widget.type == "Income" ? "+${widget.amount}" : widget.type == "Expense" ? "-${widget.amount}" : "",
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.error
+                      color: widget.type == "Income" ? Theme.of(context).colorScheme.success : widget.type == "Expense" ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.error,
                     ),
                   ),
                 ),
               ),
             ],
           ),
-          RecordDayBodyItemDetail(),
         ],
       ),
     );
@@ -423,4 +467,12 @@ class RecordDayBodyItemExample1 extends StatelessWidget {
       ),
     );
   }
+}
+
+class GroupedRecordItem {
+  late double sumIncome;
+  late double sumExpense;
+  late List<Record> records;
+
+  GroupedRecordItem(this.sumIncome, this.sumExpense, this.records);
 }

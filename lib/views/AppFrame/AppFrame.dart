@@ -73,7 +73,7 @@ class _AppFramePageState extends State<AppFramePage> {
                       setState(() {
                         selectedIndex = 0;
                       });
-                      recordListKey.currentState?.loadTest();
+                      recordListKey.currentState?.load();
                     }
                   }
                 ),
