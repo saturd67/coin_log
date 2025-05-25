@@ -6,11 +6,18 @@ import 'package:coin_log/views/Settings/AccountList.dart';
 class Settings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        SettingItem(icon: Icons.category, name: "Transactions", page: TransactionList()),
-        SettingItem(icon: Icons.monetization_on, name: "Accounts", page: AccountList()),
-      ],
+    return Scaffold(
+      appBar:  AppBar(
+          shadowColor: Theme.of(context).colorScheme.surface,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          title: Text("Settings")
+      ),
+      body: ListView(
+        children: [
+          SettingItem(icon: Icons.category, name: "Transactions", page: TransactionList()),
+          SettingItem(icon: Icons.monetization_on, name: "Accounts", page: AccountList()),
+        ],
+      ),
     );
   }
 }

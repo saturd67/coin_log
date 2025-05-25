@@ -30,10 +30,17 @@ class _AccountsBalanceState extends State<AccountsBalance> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: List.generate(_accounts.length, (index) {
-        return AccountsBalanceItem(icon: coinLogAccountIconMap[_accounts[index].icon]!.icon, name: _accounts[index].name, balance: _accounts[index].balance);
-      })
+    return Scaffold(
+      appBar:  AppBar(
+          shadowColor: Theme.of(context).colorScheme.surface,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          title: Text("Summary")
+      ),
+      body: ListView(
+        children: List.generate(_accounts.length, (index) {
+          return AccountsBalanceItem(icon: coinLogAccountIconMap[_accounts[index].icon]!.icon, name: _accounts[index].name, balance: _accounts[index].balance);
+        })
+      ),
     );
   }
 }

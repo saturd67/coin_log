@@ -1,7 +1,10 @@
 import 'package:coin_log/constants/IconMap.dart';
+import 'package:coin_log/constants/MonthMap.dart';
 import 'package:coin_log/objects/TransactionCategory.dart';
+import 'package:coin_log/router/RouterUtils.dart';
 import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
+import 'package:coin_log/views/RecordView.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/main.dart';
 
@@ -9,6 +12,7 @@ import 'package:coin_log/objects/Record.dart';
 import 'package:coin_log/services/RecordService.dart';
 
 import 'package:coin_log/constants/WeekMap.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 class RecordList extends StatefulWidget {
   const RecordList({Key? key}) : super(key: key);
@@ -22,18 +26,23 @@ class RecordListState extends State<RecordList> {
   AccountService _accountService = AccountService();
   RecordService _recordService = RecordService();
 
-  Map<String, GroupedRecordItem> groupedRecords = <String, GroupedRecordItem>{};
+  Map<String, GroupedRecordItem> _groupedRecords = <String, GroupedRecordItem>{};
+  DateTime _selectedDate = DateTime.now();
+  double _totalIncome = 0;
+  double _totalExpense = 0;
 
   @override
   void initState() {
     super.initState();
-    load();
+    load(_selectedDate);
   }
 
-  void load() async {
-    final List<Record> records = await _recordService.listByYearMonth("2025", "05");
+  void load(DateTime selectedDateTime) async {
+    final List<Record> records = await _recordService.listByYearMonth(selectedDateTime.year.toString(), selectedDateTime.month.toString().padLeft(2, "0"));
     Map<String, GroupedRecordItem> groupedRecords = <String, GroupedRecordItem>{};
 
+    double totalIncome = 0;
+    double totalExpense = 0;
     for (Record record in records) {
       record.transactionCategory = await _transactionCategoryService.findById(record.transactionCategoryId);
       record.account = await _accountService.findById(record.accountId);
@@ -41,10 +50,12 @@ class RecordListState extends State<RecordList> {
       String formattedDate = "${record.date.month}/${record.date.day}  ${weekMap[record.date.weekday.toString()]}";
 
       double income = record.type == "Income" ? record.amount : 0;
+      totalIncome += income;
+
       double expense = record.type == "Expense" ? record.amount : 0;
+      totalExpense += expense;
 
       if (!groupedRecords.keys.contains(formattedDate)) {
-
         groupedRecords.putIfAbsent(formattedDate, () => GroupedRecordItem(income, expense, [record]));
       }
 
@@ -56,18 +67,184 @@ class RecordListState extends State<RecordList> {
     }
 
     setState(() {
-      this.groupedRecords = groupedRecords;
+      _totalIncome = totalIncome;
+      _totalExpense = totalExpense;
+      _groupedRecords = groupedRecords;
     });
+  }
+
+  void onDateTimeChange() async {
+    DateTime? selectedDate = await showMonthPicker(
+      context: context,
+      monthPickerDialogSettings: MonthPickerDialogSettings(
+          dialogSettings: PickerDialogSettings(
+              dialogBackgroundColor: Theme.of(context).colorScheme.secondary
+          ),
+          headerSettings: PickerHeaderSettings(
+              headerBackgroundColor: Theme.of(context).colorScheme.primary,
+              headerCurrentPageTextStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontSize: Theme.of(context).textTheme.headlineLarge!.fontSize
+              )
+          ),
+          dateButtonsSettings: PickerDateButtonsSettings(
+              currentYearTextColor: Theme.of(context).colorScheme.onSecondary,
+              currentMonthTextColor: Theme.of(context).colorScheme.onSecondary,
+              unselectedYearsTextColor: Theme.of(context).textTheme.bodyMedium!.color,
+              unselectedMonthsTextColor: Theme.of(context).textTheme.bodyMedium!.color,
+              selectedYearTextColor: Theme.of(context).colorScheme.primary,
+              selectedMonthTextColor: Theme.of(context).colorScheme.primary
+          )
+      ),
+      initialDate: _selectedDate,
+      firstDate: DateTime(2001),
+      lastDate: DateTime(2100),
+    );
+
+    if (selectedDate != null) {
+      setState(() {
+        _selectedDate = selectedDate;
+      });
+
+      load(_selectedDate);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        for (var record in groupedRecords.entries) ... {
-          RecordDay(date: record.key, groupedRecordItem: record.value)
-        }
-      ]
+    return Scaffold(
+      appBar: AppBar(
+          shadowColor: Theme.of(context).colorScheme.surface,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          title: RecordsAppBar(selectedDateTime: _selectedDate, totalIncome: _totalIncome, totalExpense: _totalExpense, onDateTimeChange: onDateTimeChange)
+      ),
+      body: ListView(
+        children: [
+          for (var record in _groupedRecords.entries) ... {
+            RecordDay(date: record.key, groupedRecordItem: record.value)
+          }
+        ]
+      ),
+    );
+  }
+}
+
+class RecordsAppBar extends StatefulWidget {
+  DateTime selectedDateTime;
+  double totalIncome;
+  double totalExpense;
+  Function() onDateTimeChange;
+
+  RecordsAppBar({
+    super.key,
+    required this.selectedDateTime,
+    required this.totalIncome,
+    required this.totalExpense,
+    required this.onDateTimeChange
+  });
+
+  @override
+  State<RecordsAppBar> createState() => _RecordsAppBarState();
+}
+
+class _RecordsAppBarState extends State<RecordsAppBar> {
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicHeight(
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: widget.onDateTimeChange,
+            child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.selectedDateTime.year.toString(),
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500
+                    ),
+                  ),
+                  Text(
+                    monthMap[widget.selectedDateTime.month.toString()]!,
+                    style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.w500
+                    ),
+                  )
+                ]
+            ),
+          ),
+          Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Income:',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500
+                  ),
+                ),
+                Text(
+                  '+${widget.totalIncome.toStringAsFixed(2)}',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500
+                  ),
+                )
+              ]
+          ),
+          Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Expenses:',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500
+                  ),
+                ),
+                Text(
+                  '-${widget.totalExpense.toStringAsFixed(2)}',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500
+                  ),
+                )
+              ]
+          ),
+          Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Balance:',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500
+                  ),
+                ),
+                Text(
+                  (widget.totalIncome - widget.totalExpense).toStringAsFixed(2),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500
+                  ),
+                )
+              ]
+          )
+        ],
+      ),
     );
   }
 }
@@ -89,44 +266,49 @@ class RecordDay extends StatefulWidget {
 class _RecordDayState extends State<RecordDay> {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      color: Theme.of(context).colorScheme.secondary,
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Padding(
-        padding: EdgeInsetsDirectional.fromSTEB(5, 0, 5, 0),
-        child: Container(
-          width: 100,
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(0),
-              bottomRight: Radius.circular(0),
-              topLeft: Radius.circular(0),
-              topRight: Radius.circular(0),
-            ),
-            shape: BoxShape.rectangle,
-          ),
-          alignment: AlignmentDirectional(0, -1),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RecordDayHeader(date: widget.date, sumIncome: widget.groupedRecordItem.sumIncome.toStringAsFixed(2), sumExpense: widget.groupedRecordItem.sumExpense.toStringAsFixed(2)),
-              Divider(
-                height: 5,
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(RouterUtils.createRoute(RecordView()));
+      },
+      child: Card(
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        color: Theme.of(context).colorScheme.secondary,
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: EdgeInsetsDirectional.fromSTEB(5, 0, 5, 0),
+          child: Container(
+            width: 100,
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(0),
+                bottomRight: Radius.circular(0),
+                topLeft: Radius.circular(0),
+                topRight: Radius.circular(0),
               ),
-              Column(
-                children: [
-                  for (var record in widget.groupedRecordItem.records) ... {
-                      RecordDayBodyItem(iconData: record.transactionCategory!.icon, name: record.transactionCategory!.name, type: record.type, amount: record.amount.toStringAsFixed(2))
-                  }
-                ]
-              )
-            ],
+              shape: BoxShape.rectangle,
+            ),
+            alignment: AlignmentDirectional(0, -1),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RecordDayHeader(date: widget.date, sumIncome: widget.groupedRecordItem.sumIncome.toStringAsFixed(2), sumExpense: widget.groupedRecordItem.sumExpense.toStringAsFixed(2)),
+                Divider(
+                  height: 5,
+                ),
+                Column(
+                  children: [
+                    for (var record in widget.groupedRecordItem.records) ... {
+                        RecordDayBodyItem(iconData: record.transactionCategory!.icon, name: record.transactionCategory!.name, type: record.type, amount: record.amount.toStringAsFixed(2))
+                    }
+                  ]
+                )
+              ],
+            ),
           ),
         ),
       ),

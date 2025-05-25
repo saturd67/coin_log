@@ -18,6 +18,7 @@ dependencies:
   path: ^1.9.0
   fluttertoast: ^8.2.12
   reorderables: ^0.4.2
+  month_picker_dialog: ^6.2.2
   math_expressions: ^2.7.0
 
 dev_dependencies:

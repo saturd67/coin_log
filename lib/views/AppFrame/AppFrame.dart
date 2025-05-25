@@ -5,6 +5,7 @@ import 'package:coin_log/views/AppFrame/RecordList.dart';
 import 'package:coin_log/views/AppFrame/Summary.dart';
 import 'package:coin_log/views/AppFrame/Settings.dart';
 import 'package:coin_log/views/RecordDetails.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 class AppFramePage extends StatefulWidget {
   const AppFramePage({super.key});
@@ -18,13 +19,6 @@ class _AppFramePageState extends State<AppFramePage> {
 
     final GlobalKey<RecordListState> recordListKey =  GlobalKey<RecordListState>();
 
-    List<Widget> appBars = <Widget>[
-      RecordsAppBar(),
-      Text("Summary"),
-      Text("Accounts"),
-      Text("Settings")
-    ];
-    
     late List<Widget> bodies;
 
     @override
@@ -41,11 +35,6 @@ class _AppFramePageState extends State<AppFramePage> {
     Widget build(BuildContext context) {
         return SafeArea(
           child: Scaffold(
-            appBar: AppBar(
-              shadowColor: Theme.of(context).colorScheme.surface,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              title: appBars.elementAt(selectedIndex)
-            ),
             body: Center(child: bodies.elementAt(selectedIndex)),
             resizeToAvoidBottomInset: false,
             floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -73,7 +62,7 @@ class _AppFramePageState extends State<AppFramePage> {
                       setState(() {
                         selectedIndex = 0;
                       });
-                      recordListKey.currentState?.load();
+                      recordListKey.currentState?.load(DateTime.now());
                     }
                   }
                 ),
@@ -105,107 +94,4 @@ class _AppFramePageState extends State<AppFramePage> {
           ),
         );
     }
-}
-
-class RecordsAppBar extends StatelessWidget {
-  const RecordsAppBar({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return IntrinsicHeight(
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '2024',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500
-                ),
-              ),
-              Text(
-                'Dec',
-                style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.w500
-                ),
-              )
-            ]
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Income:',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500
-                ),
-              ),
-              Text(
-                '+800.00',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500
-                ),
-              )
-            ]
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Expenses:',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500
-                ),
-              ),
-              Text(
-                '-500.00',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500
-                ),
-              )
-            ]
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Balance:',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500
-                ),
-              ),
-              Text(
-                '300.00',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500
-                ),
-              )
-            ]
-          )
-        ],
-      ),
-    );
-  }
 }

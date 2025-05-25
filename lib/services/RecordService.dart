@@ -50,7 +50,7 @@ class RecordService {
     final db = await DatabaseService().database;
     List<Map<String, dynamic>> maps = await db.query(
       TABLE_NAME,
-      where: 'strftime("%Y", date) >= ? and strftime("%m", date) <= ?',
+      where: 'strftime("%Y", date) = ? and strftime("%m", date) = ?',
       orderBy: 'date desc',
       whereArgs: [year, month]
     );
