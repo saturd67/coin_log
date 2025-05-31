@@ -35,6 +35,13 @@ class RecordService {
       limit: 1,
       whereArgs: [identifier]
     );
+
+    Record? record;
+    if (maps.isNotEmpty) {
+      record = Record.fromMap(maps.first);
+    }
+
+    return record;
   }
 
   Future<List<Record>> list() async {

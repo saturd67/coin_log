@@ -155,10 +155,8 @@ class _TransactionDetailsState extends State<AccountDetails> {
                                           Navigator.of(context).pop("reload");
                                         },
                                             () {});
-                                    // await transactionCategoryService.delete(_identifier!);
-                                    // Navigator.of(context).pop("reload");
                                   },
-                                  icon: Icon(Icons.delete, color: Color(0xffff0000))
+                                  icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error)
                               )
                           ],
                         )

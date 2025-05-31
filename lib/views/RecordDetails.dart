@@ -362,7 +362,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                         int? identifier = await _recordService.save(_record);
                         _log.info("Saved ${_record.toMap()}");
 
-                        Navigator.of(context).pop("reload");
+                        Navigator.of(context).pop(["reload", _record.date]);
                       }
 
                       else if (_record.type == "Transfer") {

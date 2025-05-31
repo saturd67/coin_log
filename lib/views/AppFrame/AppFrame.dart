@@ -57,12 +57,12 @@ class _AppFramePageState extends State<AppFramePage> {
                       color: Theme.of(context).colorScheme.onPrimary
                   ),
                   onPressed: () async {
-                    final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordDetails()));
-                    if (result == "reload") {
+                    final results = await Navigator.of(context).push(RouterUtils.createRoute(RecordDetails()));
+                    if (results.length > 1 && results[0] == "reload") {
                       setState(() {
                         selectedIndex = 0;
                       });
-                      recordListKey.currentState?.load(DateTime.now());
+                      recordListKey.currentState?.load(results[1]);
                     }
                   }
                 ),

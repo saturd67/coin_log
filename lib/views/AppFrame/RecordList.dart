@@ -1,18 +1,16 @@
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:coin_log/constants/MonthMap.dart';
-import 'package:coin_log/objects/TransactionCategory.dart';
 import 'package:coin_log/router/RouterUtils.dart';
 import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:coin_log/views/RecordView.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/main.dart';
-
 import 'package:coin_log/objects/Record.dart';
 import 'package:coin_log/services/RecordService.dart';
-
 import 'package:coin_log/constants/WeekMap.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:coin_log/utils/DateTimeFormatter.dart';
 
 class RecordList extends StatefulWidget {
   const RecordList({Key? key}) : super(key: key);
@@ -47,7 +45,7 @@ class RecordListState extends State<RecordList> {
       record.transactionCategory = await _transactionCategoryService.findById(record.transactionCategoryId);
       record.account = await _accountService.findById(record.accountId);
 
-      String formattedDate = "${record.date.month}/${record.date.day}  ${weekMap[record.date.weekday.toString()]}";
+      String formattedDate = "${DateTimeFormatter.toDayMonth(record.date)}  ${weekMap[record.date.weekday.toString()]}";
 
       double income = record.type == "Income" ? record.amount : 0;
       totalIncome += income;
@@ -67,6 +65,7 @@ class RecordListState extends State<RecordList> {
     }
 
     setState(() {
+      _selectedDate = selectedDateTime;
       _totalIncome = totalIncome;
       _totalExpense = totalExpense;
       _groupedRecords = groupedRecords;
@@ -121,7 +120,7 @@ class RecordListState extends State<RecordList> {
       body: ListView(
         children: [
           for (var record in _groupedRecords.entries) ... {
-            RecordDay(date: record.key, groupedRecordItem: record.value)
+            RecordDay(date: record.key, groupedRecordItem: record.value, load: load)
           }
         ]
       ),
@@ -252,11 +251,13 @@ class _RecordsAppBarState extends State<RecordsAppBar> {
 class RecordDay extends StatefulWidget {
   String date;
   GroupedRecordItem groupedRecordItem;
+  final void Function(DateTime) load;
 
   RecordDay({
     super.key,
     required this.date,
-    required this.groupedRecordItem
+    required this.groupedRecordItem,
+    required this.load
   });
 
   @override
@@ -266,49 +267,44 @@ class RecordDay extends StatefulWidget {
 class _RecordDayState extends State<RecordDay> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(RouterUtils.createRoute(RecordView()));
-      },
-      child: Card(
-        clipBehavior: Clip.antiAliasWithSaveLayer,
-        color: Theme.of(context).colorScheme.secondary,
-        elevation: 1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Padding(
-          padding: EdgeInsetsDirectional.fromSTEB(5, 0, 5, 0),
-          child: Container(
-            width: 100,
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(0),
-                bottomRight: Radius.circular(0),
-                topLeft: Radius.circular(0),
-                topRight: Radius.circular(0),
+    return Card(
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      color: Theme.of(context).colorScheme.secondary,
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: EdgeInsetsDirectional.fromSTEB(5, 0, 5, 0),
+        child: Container(
+          width: 100,
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(0),
+              bottomRight: Radius.circular(0),
+              topLeft: Radius.circular(0),
+              topRight: Radius.circular(0),
+            ),
+            shape: BoxShape.rectangle,
+          ),
+          alignment: AlignmentDirectional(0, -1),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RecordDayHeader(date: widget.date, sumIncome: widget.groupedRecordItem.sumIncome.toStringAsFixed(2), sumExpense: widget.groupedRecordItem.sumExpense.toStringAsFixed(2)),
+              Divider(
+                height: 5,
               ),
-              shape: BoxShape.rectangle,
-            ),
-            alignment: AlignmentDirectional(0, -1),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RecordDayHeader(date: widget.date, sumIncome: widget.groupedRecordItem.sumIncome.toStringAsFixed(2), sumExpense: widget.groupedRecordItem.sumExpense.toStringAsFixed(2)),
-                Divider(
-                  height: 5,
-                ),
-                Column(
-                  children: [
-                    for (var record in widget.groupedRecordItem.records) ... {
-                        RecordDayBodyItem(iconData: record.transactionCategory!.icon, name: record.transactionCategory!.name, type: record.type, amount: record.amount.toStringAsFixed(2))
-                    }
-                  ]
-                )
-              ],
-            ),
+              Column(
+                children: [
+                  for (var record in widget.groupedRecordItem.records) ... {
+                      RecordDayBodyItem(record: record, load: widget.load)
+                  }
+                ]
+              )
+            ],
           ),
         ),
       ),
@@ -389,17 +385,13 @@ class _RecordDayHeaderState extends State<RecordDayHeader> {
 }
 
 class RecordDayBodyItem extends StatefulWidget {
-  String iconData;
-  String name;
-  String type;
-  String amount;
+  Record record;
+  void Function(DateTime) load;
 
   RecordDayBodyItem({
     super.key,
-    required this.iconData,
-    required this.name,
-    required this.type,
-    required this.amount
+    required this.record,
+    required this.load
   });
 
   @override
@@ -409,240 +401,63 @@ class RecordDayBodyItem extends StatefulWidget {
 class _RecordDayBodyItemState extends State<RecordDayBodyItem> {
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: AlignmentDirectional(0, 0),
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Container(
-                width:
-                    MediaQuery.sizeOf(context).width * 0.63,
-                height: 50,
-                decoration: BoxDecoration(),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(
-                          0, 0, 10, 0),
-                      child: Icon(
-                        coinLogTransactionCategoryIconMap[widget.iconData]!.icon,
-                        color: Color(0xFFFFD700),
-                        size: 30,
-                      ),
-                    ),
-                    Text(widget.name),
-                  ],
-                ),
-              ),
-              InkWell(
-                splashColor: Colors.transparent,
-                focusColor: Colors.transparent,
-                hoverColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onTap: () async {},
-                child: Container(
+    return GestureDetector(
+      onTap: () async {
+        final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordView(identifier: widget.record.identifier!,)));
+        if (result == "reload") {
+          widget.load(widget.record.date);
+        }
+      },
+      child: Align(
+        alignment: AlignmentDirectional(0, 0),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Container(
                   width:
-                      MediaQuery.sizeOf(context).width * 0.32,
+                      MediaQuery.sizeOf(context).width * 0.63,
                   height: 50,
                   decoration: BoxDecoration(),
-                  alignment: AlignmentDirectional(1, 0),
-                  child: Text(
-                    widget.type == "Income" ? "+${widget.amount}" : widget.type == "Expense" ? "-${widget.amount}" : "",
-                    style: TextStyle(
-                      color: widget.type == "Income" ? Theme.of(context).colorScheme.success : widget.type == "Expense" ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.error,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            0, 0, 10, 0),
+                        child: Icon(
+                          coinLogTransactionCategoryIconMap[widget.record.transactionCategory!.icon]!.icon,
+                          color: Color(0xFFFFD700),
+                          size: 30,
+                        ),
+                      ),
+                      Text(widget.record.transactionCategory!.name),
+                    ],
+                  ),
+                ),
+                InkWell(
+                  splashColor: Colors.transparent,
+                  focusColor: Colors.transparent,
+                  hoverColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  onTap: () async {},
+                  child: Container(
+                    width:
+                        MediaQuery.sizeOf(context).width * 0.32,
+                    height: 50,
+                    decoration: BoxDecoration(),
+                    alignment: AlignmentDirectional(1, 0),
+                    child: Text(
+                      widget.record.type == "Income" ? "+${widget.record.amount}" : widget.record.type == "Expense" ? "-${widget.record.amount}" : "",
+                      style: TextStyle(
+                        color: widget.record.type == "Income" ? Theme.of(context).colorScheme.success : widget.record.type == "Expense" ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.error,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class RecordDayBodyItemDetail extends StatelessWidget {
-  const RecordDayBodyItemDetail({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(),
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Container(
-            width:
-                MediaQuery.sizeOf(context).width * 0.05,
-            decoration: BoxDecoration(),
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Container(
-                decoration: BoxDecoration(),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Container(
-                      width: MediaQuery.sizeOf(context)
-                              .width *
-                          0.58,
-                      decoration: BoxDecoration(),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Padding(
-                            padding: EdgeInsetsDirectional
-                                .fromSTEB(0, 0, 10, 0),
-                            child: Icon(
-                              Icons
-                                  .account_balance_wallet_rounded,
-                              color: Color(0xFF0035FF),
-                              size: 24,
-                            ),
-                          ),
-                          Text(
-                            'Tng E-Wallet'
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: MediaQuery.sizeOf(context)
-                              .width *
-                          0.32,
-                      decoration: BoxDecoration(),
-                      child: Text(
-                        '500.00',
-                        textAlign: TextAlign.end
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Container(
-                      width: MediaQuery.sizeOf(context)
-                              .width *
-                          0.58,
-                      decoration: BoxDecoration(),
-                      alignment:
-                          AlignmentDirectional(1, 0),
-                      child: Text(
-                        'Balance: '
-                      ),
-                    ),
-                    Container(
-                      width: MediaQuery.sizeOf(context)
-                              .width *
-                          0.32,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(0),
-                          bottomRight: Radius.circular(0),
-                          topLeft: Radius.circular(0),
-                          topRight: Radius.circular(0),
-                        ),
-                      ),
-                      child: Align(
-                        alignment:
-                            AlignmentDirectional(1, 0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment:
-                              CrossAxisAlignment.end,
-                          children: [
-                            Divider(
-                              height: 5,
-                            ),
-                            Text(
-                              '400.00',
-                              textAlign: TextAlign.end
-                            ),
-                            Divider(
-                              height: 2,
-                            ),
-                            Divider(
-                              height: 2,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class RecordDayBodyItemExample1 extends StatelessWidget {
-  const RecordDayBodyItemExample1({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: AlignmentDirectional(0, 0),
-      child: Container(
-        height: 45,
-        decoration: BoxDecoration(),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Align(
-              alignment: AlignmentDirectional(0, -1),
-              child: Container(
-                width: MediaQuery.sizeOf(context).width * 0.63,
-                height: 50,
-                decoration: BoxDecoration(),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(
-                          0, 0, 10, 0),
-                      child: Icon(
-                        Icons.dinner_dining,
-                        color: Color(0xFFFFD700),
-                        size: 30,
-                      ),
-                    ),
-                    Text(
-                      'Dinner',
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              width: MediaQuery.sizeOf(context).width * 0.32,
-              height: 50,
-              decoration: BoxDecoration(),
-              alignment: AlignmentDirectional(1, 0),
-              child: Text(
-                '-100.00',
-                  style: TextStyle(
-                  color: Theme.of(context).colorScheme.error
-                ),
-              ),
+              ],
             ),
           ],
         ),
