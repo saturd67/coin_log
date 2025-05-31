@@ -5,6 +5,7 @@ import 'package:coin_log/objects/Account.dart';
 import 'package:coin_log/objects/TransactionCategory.dart';
 import 'package:coin_log/services/RecordService.dart';
 import 'package:coin_log/utils/Calculator.dart';
+import 'package:coin_log/views/AppFrame/AppFrame.dart';
 import 'package:coin_log/widgets/ThemedTextField.dart';
 import 'package:coin_log/widgets/ThemedToast.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,13 @@ import 'package:coin_log/objects/Record.dart';
 import 'package:logging/logging.dart';
 
 class RecordDetails extends StatefulWidget {
+  int? identifier;
+
+  RecordDetails({
+    super.key,
+    this.identifier
+  });
+
   @override
   State<RecordDetails> createState() => _RecordDetailsState();
 }
@@ -53,6 +61,30 @@ class _RecordDetailsState extends State<RecordDetails> {
         _isKeyboardVisible = isVisible;
       });
     });
+
+
+
+    if (widget.identifier != null) {
+      load(widget.identifier!);
+    }
+
+    else {
+      loadTransactionCategories();
+      loadAccounts();
+    }
+  }
+
+  void load(int identifier) async {
+    final _record = await _recordService.findById(identifier);
+
+    if (_record != null) {
+      setState(() {
+        this._record = _record;
+        _amount = _record.amount.toStringAsFixed(2);
+        _selectedTransactionCategoryId = _record.transactionCategoryId;
+        _selectedAccountId = _record.accountId;
+      });
+    }
 
     loadTransactionCategories();
     loadAccounts();
@@ -359,10 +391,21 @@ class _RecordDetailsState extends State<RecordDetails> {
                           _amount = calculator.onCalculate();
                         });
                         _record.amount = double.parse(_amount);
-                        int? identifier = await _recordService.save(_record);
-                        _log.info("Saved ${_record.toMap()}");
 
-                        Navigator.of(context).pop(["reload", _record.date]);
+                        if (widget.identifier == null) {
+                          int? identifier = await _recordService.save(_record);
+                          _log.info("Saved ${_record.toMap()}");
+
+                          Navigator.of(context).pop(["reload", _record.date]);
+                        }
+
+                        else {
+                          int? identifier = await _recordService.update(_record);
+                          _log.info("Updated ${_record.toMap()}");
+
+                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => AppFramePage()), (Route<dynamic> route) => false);
+                        }
+
                       }
 
                       else if (_record.type == "Transfer") {

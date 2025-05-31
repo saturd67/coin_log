@@ -401,7 +401,7 @@ class RecordDayBodyItem extends StatefulWidget {
 class _RecordDayBodyItemState extends State<RecordDayBodyItem> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: () async {
         final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordView(identifier: widget.record.identifier!,)));
         if (result == "reload") {
@@ -437,23 +437,16 @@ class _RecordDayBodyItemState extends State<RecordDayBodyItem> {
                     ],
                   ),
                 ),
-                InkWell(
-                  splashColor: Colors.transparent,
-                  focusColor: Colors.transparent,
-                  hoverColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  onTap: () async {},
-                  child: Container(
-                    width:
-                        MediaQuery.sizeOf(context).width * 0.32,
-                    height: 50,
-                    decoration: BoxDecoration(),
-                    alignment: AlignmentDirectional(1, 0),
-                    child: Text(
-                      widget.record.type == "Income" ? "+${widget.record.amount}" : widget.record.type == "Expense" ? "-${widget.record.amount}" : "",
-                      style: TextStyle(
-                        color: widget.record.type == "Income" ? Theme.of(context).colorScheme.success : widget.record.type == "Expense" ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.error,
-                      ),
+                Container(
+                  width:
+                      MediaQuery.sizeOf(context).width * 0.32,
+                  height: 50,
+                  decoration: BoxDecoration(),
+                  alignment: AlignmentDirectional(1, 0),
+                  child: Text(
+                    widget.record.type == "Income" ? "+${widget.record.amount}" : widget.record.type == "Expense" ? "-${widget.record.amount}" : "",
+                    style: TextStyle(
+                      color: widget.record.type == "Income" ? Theme.of(context).colorScheme.success : widget.record.type == "Expense" ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.error,
                     ),
                   ),
                 ),

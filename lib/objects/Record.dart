@@ -35,10 +35,6 @@ class Record {
     );
   }
 
-  String getFormattedAmount() {
-    return amount.toStringAsFixed(2);
-  }
-
   Map<String, dynamic> toMap() {
     final map = <String, dynamic> {
       'TRANSACTION_CATEGORY_ID': transactionCategoryId,

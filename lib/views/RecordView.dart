@@ -1,4 +1,5 @@
 import 'package:coin_log/constants/IconMap.dart';
+import 'package:coin_log/main.dart';
 import 'package:coin_log/objects/Account.dart';
 import 'package:coin_log/objects/TransactionCategory.dart';
 import 'package:coin_log/services/AccountService.dart';
@@ -9,7 +10,9 @@ import 'package:flutter/material.dart';
 
 import 'package:coin_log/objects/Record.dart';
 
+import '../router/RouterUtils.dart';
 import '../widgets/showConfirmationDialog.dart';
+import 'RecordDetails.dart';
 
 class RecordView extends StatefulWidget {
   final int identifier;
@@ -106,7 +109,7 @@ class _RecordViewState extends State<RecordView> {
                                   ],
                                 ),
                               ),
-                              Text(_record.getFormattedAmount())
+                              Text( _record.type == "Income" ? "+${_record.amount.toStringAsFixed(2)}" : "-${_record.amount.toStringAsFixed(2)}", style: TextStyle(color: _record.type == "Income" ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.error),)
                             ],
                           ),
                         ],
@@ -125,7 +128,7 @@ class _RecordViewState extends State<RecordView> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Text("From:"),
+                                child: Text("${_record.type == "Income" ? "To" : "From"}:"),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -177,7 +180,7 @@ class _RecordViewState extends State<RecordView> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Expanded(
-                  child: GestureDetector(
+                  child: InkWell(
                     onTap: () {
                       showConfirmationDialog(
                           context,
@@ -203,9 +206,9 @@ class _RecordViewState extends State<RecordView> {
                   ),
                 ),
                 Expanded(
-                  child: GestureDetector(
+                  child: InkWell(
                     onTap: () {
-                      //
+                      Navigator.of(context).push(RouterUtils.createRoute(RecordDetails(identifier: _record.identifier)));
                     },
                     child: Container(
                       height: double.infinity,

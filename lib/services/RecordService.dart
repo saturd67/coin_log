@@ -15,7 +15,11 @@ class RecordService {
   Future<int?> update(Record record) async {
     final db = await DatabaseService().database;
 
-    return await db.update(TABLE_NAME, record.toMap());
+    return await db.update(
+      TABLE_NAME,
+      record.toMap(),
+      where: 'identifier = ?',
+      whereArgs: [record.identifier]);
   }
 
   Future<int?> delete(int identifier) async {
