@@ -62,8 +62,6 @@ class _RecordDetailsState extends State<RecordDetails> {
       });
     });
 
-
-
     if (widget.identifier != null) {
       load(widget.identifier!);
     }
@@ -75,6 +73,19 @@ class _RecordDetailsState extends State<RecordDetails> {
   }
 
   void load(int identifier) async {
+    await loadRecord(identifier);
+
+    await Future.wait([
+      loadTransactionCategories(),
+      loadAccounts()
+    ]);
+
+    setState(() {
+      _selectedAccountId = _record.accountId;
+    });
+  }
+
+  Future<void> loadRecord(int identifier) async {
     final _record = await _recordService.findById(identifier);
 
     if (_record != null) {
@@ -82,15 +93,11 @@ class _RecordDetailsState extends State<RecordDetails> {
         this._record = _record;
         _amount = _record.amount.toStringAsFixed(2);
         _selectedTransactionCategoryId = _record.transactionCategoryId;
-        _selectedAccountId = _record.accountId;
       });
     }
-
-    loadTransactionCategories();
-    loadAccounts();
   }
 
-  void loadTransactionCategories() async {
+  Future<void> loadTransactionCategories() async {
     final _transactionCategories = await _transactionCategoryService.listByType(_record.type);
 
     setState(() {
@@ -98,10 +105,14 @@ class _RecordDetailsState extends State<RecordDetails> {
     });
   }
 
-  void loadAccounts() async {
+  Future<void> loadAccounts() async {
     final _accounts = await _accountService.list();
-    List<Account> defaultAccounts = _accounts.where((account) => account.isDefault == true).toList();
-    _selectedAccountId =defaultAccounts[0].identifier;
+
+    if (widget.identifier == null) {
+      Account defaultAccount = _accounts.where((account) => account.isDefault == true).toList().first;
+      _selectedAccountId = defaultAccount.identifier;
+    }
+
     setState(() {
       this._accounts = _accounts;
     });
@@ -236,8 +247,8 @@ class _RecordDetailsState extends State<RecordDetails> {
                                 )
                             ),
                           ),
-                        },
-                        if (_record.type == "Transfer") ... {
+                        }
+                        else if (_record.type == "Transfer") ... {
                           Padding(padding: EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold))),
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),

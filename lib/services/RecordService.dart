@@ -1,19 +1,27 @@
 import 'package:coin_log/objects/Account.dart';
 import 'package:coin_log/objects/Record.dart';
+import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/services/DatabaseService.dart';
+import 'package:coin_log/utils/BalanceManager.dart';
 
 class RecordService {
 
   final String TABLE_NAME = "CL_RECORD";
 
+  final AccountService accountService = AccountService();
+
   Future<int?> save(Record record) async {
     final db = await DatabaseService().database;
+
+    await BalanceManager.updateBalanceOnSaveRecord(record);
 
     return await db.insert(TABLE_NAME, record.toMap());
   }
 
   Future<int?> update(Record record) async {
     final db = await DatabaseService().database;
+
+    await BalanceManager.updateBalanceOnUpdateRecord(record);
 
     return await db.update(
       TABLE_NAME,
@@ -22,12 +30,15 @@ class RecordService {
       whereArgs: [record.identifier]);
   }
 
-  Future<int?> delete(int identifier) async {
+  Future<int?> delete(Record record) async {
     final db = await DatabaseService().database;
+
+    await BalanceManager.updateBalanceOnDeleteRecord(record);
+
     return await db.delete(
         TABLE_NAME,
         where: 'identifier = ?',
-        whereArgs: [identifier]
+        whereArgs: [record.identifier]
     );
   }
 

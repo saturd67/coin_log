@@ -26,11 +26,9 @@ Future<void> showConfirmationDialog(BuildContext context, String message, Functi
 
   if (result == true) {
     await onYes();
-    print("Yes");
   }
 
   else {
     await onNo();
-    print("Yes");
   }
 }

@@ -186,7 +186,7 @@ class _RecordViewState extends State<RecordView> {
                           context,
                           "Are you sure you want to delete?",
                               () async {
-                            await _recordService.delete(_record.identifier!);
+                            await _recordService.delete(_record);
                             Navigator.of(context).pop("reload");
                           },
                               () {});
