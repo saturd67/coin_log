@@ -60,15 +60,17 @@ class DatabaseService {
     await db.execute('''
           CREATE TABLE CL_RECORD (
             IDENTIFIER              INTEGER PRIMARY KEY AUTOINCREMENT,
-            TRANSACTION_CATEGORY_ID INTEGER NOT NULL,
-            ACCOUNT_ID              INTEGER NOT NULL,
+            TRANSACTION_CATEGORY_ID INTEGER,
+            SOURCE_ACCOUNT_ID       INTEGER,
+            DESTINATION_ACCOUNT_ID  INTEGER,
             DATE                    DATE NOT NULL,
             DESCRIPTION             VARCHAR(50),
-            TYPE              VARCHAR(5) NOT NULL,
+            TYPE                    VARCHAR(8) NOT NULL,
             AMOUNT                  DOUBLE NOT NULL,
             
             FOREIGN KEY (TRANSACTION_CATEGORY_ID) REFERENCES CL_TRANSACTION_CATEGORY(identifier),
-            FOREIGN KEY (ACCOUNT_ID) REFERENCES CL_ACCOUNT(identifier)
+            FOREIGN KEY (SOURCE_ACCOUNT_ID) REFERENCES CL_ACCOUNT(identifier),
+            FOREIGN KEY (DESTINATION_ACCOUNT_ID) REFERENCES CL_ACCOUNT(identifier)
           );
         ''');
   }
@@ -95,9 +97,9 @@ class DatabaseService {
   
   Future<void> insertRecords(Database db) async {
     await db.execute('''
-      INSERT INTO CL_RECORD (TRANSACTION_CATEGORY_ID, ACCOUNT_ID, DATE, DESCRIPTION, TYPE, AMOUNT) VALUES
-        (1, 2, "2025-05-24 10:07:36.085738", null, "Expense", 5.0),
-        (2, 2, "2025-05-25 10:07:36.085738", null, "Expense", 15.0);
+      INSERT INTO CL_RECORD (TRANSACTION_CATEGORY_ID, SOURCE_ACCOUNT_ID, DATE, DESCRIPTION, TYPE, AMOUNT) VALUES
+        (1, 2, "2025-06-01 10:07:36.085738", null, "Expense", 5.0),
+        (2, 2, "2025-06-01 10:07:36.085738", null, "Expense", 15.0);
     ''');
   }
 

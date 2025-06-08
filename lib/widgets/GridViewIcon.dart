@@ -5,13 +5,15 @@ class GridViewIcon extends StatelessWidget {
   final double? containerSize;
   final double? iconSize;
   final bool? isSelected;
+  final bool? isDisabled;
 
   GridViewIcon ({
     super.key,
     this.iconData,
     this.containerSize,
     this.iconSize,
-    this.isSelected
+    this.isSelected,
+    this.isDisabled
   });
 
   @override
@@ -23,7 +25,13 @@ class GridViewIcon extends StatelessWidget {
         shape: BoxShape.circle,
         color: isSelected != null && isSelected! ? Theme.of(context).colorScheme.primary :  Theme.of(context).colorScheme.tertiary
       ),
-      child: iconData != null ? Icon(iconData, color: isSelected != null && isSelected! ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).iconTheme.color, size: iconSize ?? Theme.of(context).iconTheme.size) : Icon(Icons.picture_in_picture, size: iconSize ?? Theme.of(context).iconTheme.size),
+      child: iconData != null ?
+        Icon(iconData,
+            color: isDisabled != null && isDisabled == true ? Colors.white : (isSelected != null && isSelected! ?
+              Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).iconTheme.color),
+            size: iconSize ?? Theme.of(context).iconTheme.size)
+        : Icon(Icons.picture_in_picture, size: iconSize ?? Theme.of(context).iconTheme.size),
     );
   }
 }

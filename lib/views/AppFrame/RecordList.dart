@@ -42,16 +42,27 @@ class RecordListState extends State<RecordList> {
     double totalIncome = 0;
     double totalExpense = 0;
     for (Record record in records) {
-      record.transactionCategory = await _transactionCategoryService.findById(record.transactionCategoryId);
-      record.account = await _accountService.findById(record.accountId);
-
       String formattedDate = "${DateTimeFormatter.toDayMonth(record.date)}  ${weekMap[record.date.weekday.toString()]}";
 
-      double income = record.type == "Income" ? record.amount : 0;
-      totalIncome += income;
+      double income = 0;
+      double expense = 0;
 
-      double expense = record.type == "Expense" ? record.amount : 0;
-      totalExpense += expense;
+      if (["Income", "Expense"].contains(record.type)) {
+        record.transactionCategory = await _transactionCategoryService.findById(record.transactionCategoryId!);
+        record.sourceAccount = await _accountService.findById(record.sourceAccountId!);
+
+
+        income = record.type == "Income" ? record.amount : 0;
+        totalIncome += income;
+
+        expense = record.type == "Expense" ? record.amount : 0;
+        totalExpense += expense;
+      }
+
+      else if (record.type == "Transfer") {
+        record.sourceAccount = await _accountService.findById(record.sourceAccountId!);
+        record.destinationAccount = await _accountService.findById(record.destinationAccountId!);
+      }
 
       if (!groupedRecords.keys.contains(formattedDate)) {
         groupedRecords.putIfAbsent(formattedDate, () => GroupedRecordItem(income, expense, [record]));
@@ -300,7 +311,13 @@ class _RecordDayState extends State<RecordDay> {
               Column(
                 children: [
                   for (var record in widget.groupedRecordItem.records) ... {
-                      RecordDayBodyItem(record: record, load: widget.load)
+                    if (["Expense", "Income"].contains(record.type)) ... {
+                      TransactionRecordDayBodyItem(record: record, load: widget.load)
+                    }
+
+                    else if (record.type == "Transfer") ... {
+                      TransferRecordDayBodyItem(record: record, load: widget.load)
+                    }
                   }
                 ]
               )
@@ -384,21 +401,21 @@ class _RecordDayHeaderState extends State<RecordDayHeader> {
   }
 }
 
-class RecordDayBodyItem extends StatefulWidget {
+class TransactionRecordDayBodyItem extends StatefulWidget {
   Record record;
   void Function(DateTime) load;
 
-  RecordDayBodyItem({
+  TransactionRecordDayBodyItem({
     super.key,
     required this.record,
     required this.load
   });
 
   @override
-  State<RecordDayBodyItem> createState() => _RecordDayBodyItemState();
+  State<TransactionRecordDayBodyItem> createState() => _TransactionRecordDayBodyItemState();
 }
 
-class _RecordDayBodyItemState extends State<RecordDayBodyItem> {
+class _TransactionRecordDayBodyItemState extends State<TransactionRecordDayBodyItem> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -448,6 +465,89 @@ class _RecordDayBodyItemState extends State<RecordDayBodyItem> {
                     style: TextStyle(
                       color: widget.record.type == "Income" ? Theme.of(context).colorScheme.success : widget.record.type == "Expense" ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.error,
                     ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class TransferRecordDayBodyItem extends StatefulWidget {
+  Record record;
+  void Function(DateTime) load;
+
+  TransferRecordDayBodyItem({
+    super.key,
+    required this.record,
+    required this.load
+  });
+  
+  @override
+  State<TransferRecordDayBodyItem> createState() => _TransferRecordDayBodyItemState();
+}
+
+class _TransferRecordDayBodyItemState extends State<TransferRecordDayBodyItem> {
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () async {
+        // final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordView(identifier: widget.record.identifier!,)));
+        // if (result == "reload") {
+        //   widget.load(widget.record.date);
+        // }
+      },
+      child: Align(
+        alignment: AlignmentDirectional(0, 0),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Container(
+                  width:
+                  MediaQuery.sizeOf(context).width * 0.63,
+                  height: 50,
+                  decoration: BoxDecoration(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            0, 0, 10, 0),
+                        child: Icon(
+                          coinLogAccountIconMap[widget.record.sourceAccount!.icon]!.icon,
+                          color: Color(0xFFFFD700),
+                          size: 30,
+                        ),
+                      ),
+                      Text(widget.record.sourceAccount!.name),
+                      Icon(Icons.arrow_forward),
+                      Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            0, 0, 10, 0),
+                        child: Icon(
+                          coinLogAccountIconMap[widget.record.destinationAccount!.icon]!.icon,
+                          color: Color(0xFFFFD700),
+                          size: 30,
+                        ),
+                      ),
+                      Text(widget.record.destinationAccount!.name),
+                    ],
+                  ),
+                ),
+                Container(
+                  width:
+                  MediaQuery.sizeOf(context).width * 0.32,
+                  height: 50,
+                  decoration: BoxDecoration(),
+                  alignment: AlignmentDirectional(1, 0),
+                  child: Text(
+                    widget.record.amount.toStringAsFixed(2),
                   ),
                 ),
               ],

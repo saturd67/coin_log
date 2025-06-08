@@ -3,20 +3,23 @@ import 'package:coin_log/objects/TransactionCategory.dart';
 
 class Record {
   int? identifier;
-  int transactionCategoryId;
-  int accountId;
+  int? transactionCategoryId;
+  int? sourceAccountId;
+  int? destinationAccountId;
   DateTime date;
   String? description;
   String type;
   double amount;
 
   TransactionCategory? transactionCategory;
-  Account? account;
+  Account? sourceAccount;
+  Account? destinationAccount;
 
   Record({
     this.identifier,
-    required this.transactionCategoryId,
-    required this.accountId,
+    this.transactionCategoryId,
+    this.sourceAccountId,
+    this.destinationAccountId,
     required this.date,
     this.description,
     required this.type,
@@ -27,7 +30,8 @@ class Record {
     return Record(
       identifier: map['IDENTIFIER'],
       transactionCategoryId: map['TRANSACTION_CATEGORY_ID'],
-      accountId: map['ACCOUNT_ID'],
+      sourceAccountId: map['SOURCE_ACCOUNT_ID'],
+      destinationAccountId: map['DESTINATION_ACCOUNT_ID'],
       date: DateTime.parse(map['DATE']),
       description: map['DESCRIPTION'],
       type: map['TYPE'],
@@ -38,7 +42,8 @@ class Record {
   Map<String, dynamic> toMap() {
     final map = <String, dynamic> {
       'TRANSACTION_CATEGORY_ID': transactionCategoryId,
-      'ACCOUNT_ID': accountId,
+      'SOURCE_ACCOUNT_ID': sourceAccountId,
+      'DESTINATION_ACCOUNT_ID': destinationAccountId,
       'DATE': date.toString(),
       'DESCRIPTION': description,
       'TYPE': type,

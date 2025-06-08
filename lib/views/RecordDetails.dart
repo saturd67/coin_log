@@ -38,7 +38,7 @@ class _RecordDetailsState extends State<RecordDetails> {
   AccountService _accountService = AccountService();
   RecordService _recordService = RecordService();
 
-  Record _record = Record(transactionCategoryId: 0, accountId: 0, date: DateTime.now(), type: "Expense", amount: 0.0);
+  Record _record = Record(transactionCategoryId: 0, sourceAccountId: 0, date: DateTime.now(), type: "Expense", amount: 0.0);
   List<TransactionCategory> _transactionCategories = [];
   List<Account> _accounts = [];
   int? _selectedTransactionCategoryId;
@@ -81,7 +81,7 @@ class _RecordDetailsState extends State<RecordDetails> {
     ]);
 
     setState(() {
-      _selectedAccountId = _record.accountId;
+      _selectedAccountId = _record.sourceAccountId;
     });
   }
 
@@ -167,19 +167,20 @@ class _RecordDetailsState extends State<RecordDetails> {
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
                             child: SizedBox(
-                              height: 265,
+                              height: 175,
                               child: PageView.builder(
-                                itemCount: (_transactionCategories.length / 12).ceil(), // Number of pages
+                                itemCount: (_transactionCategories.length / 8).ceil(), // Number of pages
                                 itemBuilder: (context, pageIndex) {
+                                  int itemPerPage = 8;
                                   return GridView.builder(
                                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 4,
                                       childAspectRatio: 1.25,
-                                      mainAxisSpacing: 8,
+                                      mainAxisSpacing: itemPerPage.toDouble(),
                                     ),
-                                    itemCount: 12, // 4 items per page
+                                    itemCount: itemPerPage,
                                     itemBuilder: (context, index) {
-                                      int itemIndex = pageIndex * 4 + index;
+                                      int itemIndex = pageIndex * itemPerPage + index;
                                       return GestureDetector(
                                         onTap: () {
                                           setState(() {
@@ -266,23 +267,21 @@ class _RecordDetailsState extends State<RecordDetails> {
                                       itemCount: 4,
                                       itemBuilder: (context, index) {
                                         int itemIndex = pageIndex * 4 + index;
-                                        return GestureDetector(
-                                          onTap: () {
+                                        return  (itemIndex < _accounts.length) ? GestureDetector(
+                                          onTap: _accounts[itemIndex].identifier == _selectedDestinationAccountId ? () {} : () {
                                             setState(() {
-                                              _selectedSourceAccountId = _accounts[itemIndex].identifier!;
+                                            _selectedSourceAccountId = _accounts[itemIndex].identifier!;
                                             });
                                           },
                                           child: Column(
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              if (itemIndex < _accounts.length) ... {
-                                                GridViewIcon(iconData: coinLogAccountIconMap[_accounts[itemIndex].icon]!.icon, isSelected: _accounts[itemIndex].identifier == _selectedSourceAccountId),
-                                                Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13),)
-                                              }
+                                              GridViewIcon(iconData: coinLogAccountIconMap[_accounts[itemIndex].icon]!.icon, isSelected: _accounts[itemIndex].identifier == _selectedSourceAccountId, isDisabled: _accounts[itemIndex].identifier == _selectedDestinationAccountId,),
+                                              Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13),)
                                             ],
                                           ),
-                                        );
+                                        ) : null;
                                       },
                                       physics: NeverScrollableScrollPhysics(),
                                     );
@@ -307,8 +306,8 @@ class _RecordDetailsState extends State<RecordDetails> {
                                       itemCount: 4,
                                       itemBuilder: (context, index) {
                                         int itemIndex = pageIndex * 4 + index;
-                                        return GestureDetector(
-                                          onTap: () {
+                                        return (itemIndex < _accounts.length) ? GestureDetector(
+                                          onTap: _accounts[itemIndex].identifier == _selectedSourceAccountId ? () {} : () {
                                             setState(() {
                                               _selectedDestinationAccountId = _accounts[itemIndex].identifier;
                                             });
@@ -317,13 +316,11 @@ class _RecordDetailsState extends State<RecordDetails> {
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              if (itemIndex < _accounts.length) ... {
-                                                GridViewIcon(iconData: coinLogAccountIconMap[_accounts[itemIndex].icon]!.icon, isSelected: _accounts[itemIndex].identifier == _selectedDestinationAccountId),
-                                                Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13))
-                                              }
+                                              GridViewIcon(iconData: coinLogAccountIconMap[_accounts[itemIndex].icon]!.icon, isSelected: _accounts[itemIndex].identifier == _selectedDestinationAccountId, isDisabled: _accounts[itemIndex].identifier == _selectedSourceAccountId),
+                                              Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13))
                                             ],
                                           ),
-                                        );
+                                        ) : null;
                                       },
                                       physics: NeverScrollableScrollPhysics(),
                                     );
@@ -395,7 +392,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                         }
 
                         _record.transactionCategoryId = _selectedTransactionCategoryId!;
-                        _record.accountId = _selectedAccountId!;
+                        _record.sourceAccountId = _selectedAccountId!;
 
                         Calculator calculator = Calculator(_amount);
                         setState(() {
@@ -404,14 +401,14 @@ class _RecordDetailsState extends State<RecordDetails> {
                         _record.amount = double.parse(_amount);
 
                         if (widget.identifier == null) {
-                          int? identifier = await _recordService.save(_record);
+                          int? identifier = await _recordService.saveTransaction(_record);
                           _log.info("Saved ${_record.toMap()}");
 
                           Navigator.of(context).pop(["reload", _record.date]);
                         }
 
                         else {
-                          int? identifier = await _recordService.update(_record);
+                          int? identifier = await _recordService.updateTransaction(_record);
                           _log.info("Updated ${_record.toMap()}");
 
                           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => AppFramePage()), (Route<dynamic> route) => false);
@@ -420,7 +417,37 @@ class _RecordDetailsState extends State<RecordDetails> {
                       }
 
                       else if (_record.type == "Transfer") {
-                        //
+                        if (_selectedSourceAccountId == null) {
+                          return ThemedToast.showToast("Invalid Source Account");
+                        }
+
+                        if (_selectedDestinationAccountId == null) {
+                          return ThemedToast.showToast("Invalid Destination Account");
+                        }
+
+                        Calculator calculator = Calculator(_amount);
+                        setState(() {
+                          _amount = calculator.onCalculate();
+                        });
+
+                        _record.sourceAccountId = _selectedSourceAccountId;
+                        _record.destinationAccountId = _selectedDestinationAccountId;
+
+                        _record.amount = double.parse(_amount);
+
+                        if (widget.identifier == null) {
+                          int? identifier = await _recordService.saveTransfer(_record);
+                          _log.info("Saved ${_record.toMap()}");
+
+                          Navigator.of(context).pop(["reload", _record.date]);
+                        }
+
+                        else {
+                          int? identifier = await _recordService.updateTransfer(_record);
+                          _log.info("Updated ${_record.toMap()}");
+
+                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => AppFramePage()), (Route<dynamic> route) => false);
+                        }
                       }
                     }
                   )

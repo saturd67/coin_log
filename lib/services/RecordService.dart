@@ -10,18 +10,18 @@ class RecordService {
 
   final AccountService accountService = AccountService();
 
-  Future<int?> save(Record record) async {
+  Future<int?> saveTransaction(Record record) async {
     final db = await DatabaseService().database;
 
-    await BalanceManager.updateBalanceOnSaveRecord(record);
+    await BalanceManager.updateBalanceOnSaveTransactionRecord(record);
 
     return await db.insert(TABLE_NAME, record.toMap());
   }
 
-  Future<int?> update(Record record) async {
+  Future<int?> updateTransaction(Record record) async {
     final db = await DatabaseService().database;
 
-    await BalanceManager.updateBalanceOnUpdateRecord(record);
+    await BalanceManager.updateBalanceOnUpdateTransactionRecord(record);
 
     return await db.update(
       TABLE_NAME,
@@ -30,10 +30,42 @@ class RecordService {
       whereArgs: [record.identifier]);
   }
 
-  Future<int?> delete(Record record) async {
+  Future<int?> deleteTransaction(Record record) async {
     final db = await DatabaseService().database;
 
-    await BalanceManager.updateBalanceOnDeleteRecord(record);
+    await BalanceManager.updateBalanceOnDeleteTransactionRecord(record);
+
+    return await db.delete(
+        TABLE_NAME,
+        where: 'identifier = ?',
+        whereArgs: [record.identifier]
+    );
+  }
+
+  Future<int?> saveTransfer(Record record) async {
+    final db = await DatabaseService().database;
+
+    await BalanceManager.updateBalanceOnSaveTransferRecord(record);
+
+    return await db.insert(TABLE_NAME, record.toMap());
+  }
+
+  Future<int?> updateTransfer(Record record) async {
+    final db = await DatabaseService().database;
+
+    await BalanceManager.updateBalanceOnUpdateTransferRecord(record);
+
+    return await db.update(
+        TABLE_NAME,
+        record.toMap(),
+        where: 'identifier = ?',
+        whereArgs: [record.identifier]);
+  }
+
+  Future<int?> deleteTransfer(Record record) async {
+    final db = await DatabaseService().database;
+
+    await BalanceManager.updateBalanceOnDeleteTransferRecord(record);
 
     return await db.delete(
         TABLE_NAME,

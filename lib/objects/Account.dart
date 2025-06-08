@@ -29,6 +29,14 @@ class Account {
     );
   }
 
+  void addBalance(double amount) {
+    balance += amount;
+  }
+
+  void deductBalance(double amount) {
+    balance -= amount;
+  }
+
   Map<String, dynamic> toMap() {
     final map = <String, dynamic> {
       'NAME': name,

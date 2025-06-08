@@ -31,14 +31,14 @@ class _RecordViewState extends State<RecordView> {
   final TransactionCategoryService _transactionCategoryService = TransactionCategoryService();
   final AccountService _accountService = AccountService();
 
-  Record _record = Record(transactionCategoryId: 0, accountId: 0, date: DateTime.now(), type: "", amount: 0.0);
+  Record _record = Record(transactionCategoryId: 0, sourceAccountId: 0, date: DateTime.now(), type: "", amount: 0.0);
 
   @override
   void initState() {
     super.initState();
 
     _record.transactionCategory = TransactionCategory(name: "", icon: "", type: "", sequence: 0, isDeleted: false);
-    _record.account = Account(name: "", icon: "", sequence: 0, balance: 0.0, isDefault: false, isDeleted: false);
+    _record.sourceAccount = Account(name: "", icon: "", sequence: 0, balance: 0.0, isDefault: false, isDeleted: false);
 
     load();
   }
@@ -46,14 +46,14 @@ class _RecordViewState extends State<RecordView> {
   void load() async {
     Record? record = await _recordService.findById(widget.identifier);
     if (record != null) {
-      TransactionCategory? transactionCategory = await _transactionCategoryService.findById(record.transactionCategoryId);
+      TransactionCategory? transactionCategory = await _transactionCategoryService.findById(record.transactionCategoryId!);
       if (transactionCategory != null) {
         record.transactionCategory = transactionCategory;
       }
 
-      Account? account = await _accountService.findById(record.accountId);
+      Account? account = await _accountService.findById(record.sourceAccountId!);
       if (account != null) {
-        record.account = account;
+        record.sourceAccount = account;
       }
 
       setState(() {
@@ -132,7 +132,7 @@ class _RecordViewState extends State<RecordView> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Text(_record.account!.name),
+                                child: Text(_record.sourceAccount!.name),
                               )
                             ]
                         ),
@@ -186,10 +186,16 @@ class _RecordViewState extends State<RecordView> {
                           context,
                           "Are you sure you want to delete?",
                               () async {
-                            await _recordService.delete(_record);
+                            if (["Expense", "Income"].contains(_record.type)) {
+                              await _recordService.deleteTransaction(_record);
+                            }
+
+                            else if (_record.type == "Transfer") {
+                              await _recordService.deleteTransfer(_record);
+                            }
+
                             Navigator.of(context).pop("reload");
-                          },
-                              () {});
+                          }, () {});
                     },
                     child: Container(
                       height: double.infinity,
