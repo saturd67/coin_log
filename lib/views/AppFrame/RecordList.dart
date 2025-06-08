@@ -495,10 +495,10 @@ class _TransferRecordDayBodyItemState extends State<TransferRecordDayBodyItem> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        // final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordView(identifier: widget.record.identifier!,)));
-        // if (result == "reload") {
-        //   widget.load(widget.record.date);
-        // }
+        final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordView(identifier: widget.record.identifier!,)));
+        if (result == "reload") {
+          widget.load(widget.record.date);
+        }
       },
       child: Align(
         alignment: AlignmentDirectional(0, 0),

@@ -39,6 +39,7 @@ class _RecordViewState extends State<RecordView> {
 
     _record.transactionCategory = TransactionCategory(name: "", icon: "", type: "", sequence: 0, isDeleted: false);
     _record.sourceAccount = Account(name: "", icon: "", sequence: 0, balance: 0.0, isDefault: false, isDeleted: false);
+    _record.destinationAccount = Account(name: "", icon: "", sequence: 0, balance: 0.0, isDefault: false, isDeleted: false);
 
     load();
   }
@@ -46,14 +47,20 @@ class _RecordViewState extends State<RecordView> {
   void load() async {
     Record? record = await _recordService.findById(widget.identifier);
     if (record != null) {
-      TransactionCategory? transactionCategory = await _transactionCategoryService.findById(record.transactionCategoryId!);
-      if (transactionCategory != null) {
+      if (["Expense", "Income"].contains(record.type)) {
+        TransactionCategory transactionCategory = (await _transactionCategoryService.findById(record.transactionCategoryId!))!;
         record.transactionCategory = transactionCategory;
+
+        Account account = (await _accountService.findById(record.sourceAccountId!))!;
+        record.sourceAccount = account;
       }
 
-      Account? account = await _accountService.findById(record.sourceAccountId!);
-      if (account != null) {
-        record.sourceAccount = account;
+      else if (record.type == "Transfer") {
+        Account sourceAccount = (await _accountService.findById(record.sourceAccountId!))!;
+        record.sourceAccount = sourceAccount;
+
+        Account destinationAccount = (await _accountService.findById(record.destinationAccountId!))!;
+        record.destinationAccount = destinationAccount;
       }
 
       setState(() {
@@ -90,25 +97,62 @@ class _RecordViewState extends State<RecordView> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Container(
-                                child: Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
-                                      child: Container(
-                                        width: 45,
-                                        height: 45,
-                                        decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Theme.of(context).colorScheme.tertiary
+                              if (["Expense", "Income"].contains(_record.type)) ... {
+                                Container(
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
+                                        child: Container(
+                                          width: 45,
+                                          height: 45,
+                                          decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Theme.of(context).colorScheme.tertiary
+                                          ),
+                                          child: Icon(coinLogTransactionCategoryIconMap[_record.transactionCategory!.icon]?.icon, size: Theme.of(context).iconTheme.size),
                                         ),
-                                        child: Icon(coinLogTransactionCategoryIconMap[_record.transactionCategory!.icon]?.icon, size: Theme.of(context).iconTheme.size),
                                       ),
-                                    ),
-                                    Text(_record.transactionCategory!.name)
-                                  ],
+                                      Text(_record.transactionCategory!.name)
+                                    ],
+                                  ),
                                 ),
-                              ),
+                              },
+                              if (_record.type == "Transfer") ... {
+                                Container(
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
+                                        child: Container(
+                                          width: 45,
+                                          height: 45,
+                                          decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Theme.of(context).colorScheme.tertiary
+                                          ),
+                                          child: Icon(coinLogAccountIconMap[_record.sourceAccount!.icon]?.icon, size: Theme.of(context).iconTheme.size),
+                                        ),
+                                      ),
+                                      Text(_record.sourceAccount!.name),
+                                      Icon(Icons.arrow_forward),
+                                      Padding(
+                                        padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
+                                        child: Container(
+                                          width: 45,
+                                          height: 45,
+                                          decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Theme.of(context).colorScheme.tertiary
+                                          ),
+                                          child: Icon(coinLogAccountIconMap[_record.destinationAccount!.icon]?.icon, size: Theme.of(context).iconTheme.size),
+                                        ),
+                                      ),
+                                      Text(_record.destinationAccount!.name),
+                                    ],
+                                  ),
+                                ),
+                              },
                               Text( _record.type == "Income" ? "+${_record.amount.toStringAsFixed(2)}" : "-${_record.amount.toStringAsFixed(2)}", style: TextStyle(color: _record.type == "Income" ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.error),)
                             ],
                           ),

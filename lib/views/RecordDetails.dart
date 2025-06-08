@@ -81,7 +81,14 @@ class _RecordDetailsState extends State<RecordDetails> {
     ]);
 
     setState(() {
-      _selectedAccountId = _record.sourceAccountId;
+      if (["Expense", "Income"].contains(_record.type)) {
+        _selectedAccountId = _record.sourceAccountId;
+      }
+
+      else if (_record.type == "Transfer") {
+        _selectedSourceAccountId = _record.sourceAccountId;
+        _selectedDestinationAccountId = _record.destinationAccountId;
+      }
     });
   }
 
