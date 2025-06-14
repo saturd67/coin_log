@@ -153,7 +153,7 @@ class _RecordViewState extends State<RecordView> {
                                   ),
                                 ),
                               },
-                              Text( _record.type == "Income" ? "+${_record.amount.toStringAsFixed(2)}" : "-${_record.amount.toStringAsFixed(2)}", style: TextStyle(color: _record.type == "Income" ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.error),)
+                              Text( _record.type == "Income" ? "+${_record.amount.toStringAsFixed(2)}" : "-${_record.amount.toStringAsFixed(2)}", style: TextStyle(color: _record.type == "Income" ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.danger),)
                             ],
                           ),
                         ],
@@ -247,9 +247,9 @@ class _RecordViewState extends State<RecordView> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
+                          Icon(Icons.delete, color: Theme.of(context).colorScheme.danger),
                           SizedBox(width:4),
-                          Text("Delete", style: TextStyle(color: Theme.of(context).colorScheme.error),)
+                          Text("Delete", style: TextStyle(color: Theme.of(context).colorScheme.danger),)
                         ],
                       ),
                     ),

@@ -1,3 +1,4 @@
+import 'package:coin_log/main.dart';
 import 'package:coin_log/objects/Account.dart';
 import 'package:coin_log/objects/TransactionCategory.dart';
 import 'package:coin_log/services/AccountService.dart';
@@ -156,7 +157,7 @@ class _TransactionDetailsState extends State<AccountDetails> {
                                         },
                                             () {});
                                   },
-                                  icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error)
+                                  icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.danger)
                               )
                           ],
                         )

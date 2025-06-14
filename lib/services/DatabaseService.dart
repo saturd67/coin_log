@@ -17,7 +17,7 @@ class DatabaseService {
     if (_db != null) {
       return _db!;
     }
-    _db = await _initDB(true);
+    _db = await _initDB(false);
     return _db!;
   }
 

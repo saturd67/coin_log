@@ -38,9 +38,9 @@ class MyApp extends StatelessWidget {
             ),
             textTheme: const TextTheme(
                 displayLarge: TextStyle(
-                    fontSize: 20,
+                    fontSize: 25,
                     fontWeight: FontWeight.normal,
-                    color: Color(0xffa8a8a8)
+                    color: Color(0xff3b3b3b)
                 ),
                 displayMedium: TextStyle(
                     fontSize: 16,
@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
                     color: Color(0xff3b3b3b)
                 ),
                 bodyLarge: TextStyle(
-                    fontSize: 20,
+                    fontSize: 25,
                     fontWeight: FontWeight.normal,
                     color: Color(0xff14181b)
                 ),
@@ -104,5 +104,6 @@ class MyApp extends StatelessWidget {
 
 extension CustomColorScheme on ColorScheme {
   Color get success => const Color(0xff249689);
+  Color get danger => const Color(0xffff2c2c);
 }
 

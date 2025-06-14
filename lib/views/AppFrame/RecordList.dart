@@ -3,7 +3,9 @@ import 'package:coin_log/constants/MonthMap.dart';
 import 'package:coin_log/router/RouterUtils.dart';
 import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
+import 'package:coin_log/views/AppFrame/RecordCalendar.dart';
 import 'package:coin_log/views/RecordView.dart';
+import 'package:coin_log/widgets/ThemedShowMonthPicker.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/main.dart';
 import 'package:coin_log/objects/Record.dart';
@@ -25,14 +27,14 @@ class RecordListState extends State<RecordList> {
   RecordService _recordService = RecordService();
 
   Map<String, GroupedRecordItem> _groupedRecords = <String, GroupedRecordItem>{};
-  DateTime _selectedDate = DateTime.now();
+  DateTime selectedDateTime = DateTime.now();
   double _totalIncome = 0;
   double _totalExpense = 0;
 
   @override
   void initState() {
     super.initState();
-    load(_selectedDate);
+    load(selectedDateTime);
   }
 
   void load(DateTime selectedDateTime) async {
@@ -76,7 +78,7 @@ class RecordListState extends State<RecordList> {
     }
 
     setState(() {
-      _selectedDate = selectedDateTime;
+      selectedDateTime = selectedDateTime;
       _totalIncome = totalIncome;
       _totalExpense = totalExpense;
       _groupedRecords = groupedRecords;
@@ -84,50 +86,29 @@ class RecordListState extends State<RecordList> {
   }
 
   void onDateTimeChange() async {
-    DateTime? selectedDate = await showMonthPicker(
-      context: context,
-      monthPickerDialogSettings: MonthPickerDialogSettings(
-          dialogSettings: PickerDialogSettings(
-              dialogBackgroundColor: Theme.of(context).colorScheme.secondary
-          ),
-          headerSettings: PickerHeaderSettings(
-              headerBackgroundColor: Theme.of(context).colorScheme.primary,
-              headerCurrentPageTextStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: Theme.of(context).textTheme.headlineLarge!.fontSize
-              )
-          ),
-          dateButtonsSettings: PickerDateButtonsSettings(
-              currentYearTextColor: Theme.of(context).colorScheme.onSecondary,
-              currentMonthTextColor: Theme.of(context).colorScheme.onSecondary,
-              unselectedYearsTextColor: Theme.of(context).textTheme.bodyMedium!.color,
-              unselectedMonthsTextColor: Theme.of(context).textTheme.bodyMedium!.color,
-              selectedYearTextColor: Theme.of(context).colorScheme.primary,
-              selectedMonthTextColor: Theme.of(context).colorScheme.primary
-          )
-      ),
-      initialDate: _selectedDate,
-      firstDate: DateTime(2001),
-      lastDate: DateTime(2100),
-    );
+    DateTime? selectedDate = await themedShowMonthPicker(context, selectedDateTime);
 
     if (selectedDate != null) {
       setState(() {
-        _selectedDate = selectedDate;
+        selectedDateTime = selectedDate;
       });
 
-      load(_selectedDate);
+      load(selectedDateTime);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          shadowColor: Theme.of(context).colorScheme.surface,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          title: RecordsAppBar(selectedDateTime: _selectedDate, totalIncome: _totalIncome, totalExpense: _totalExpense, onDateTimeChange: onDateTimeChange)
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100.0),
+        child: RecordsAppBar(selectedDateTime: selectedDateTime, totalIncome: _totalIncome, totalExpense: _totalExpense, onDateTimeChange: onDateTimeChange, load: load)
       ),
+      // appBar: AppBar(
+      //     shadowColor: Theme.of(context).colorScheme.surface,
+      //     backgroundColor: Theme.of(context).colorScheme.primary,
+      //     title: RecordsAppBar(selectedDateTime: selectedDateTime, totalIncome: _totalIncome, totalExpense: _totalExpense, onDateTimeChange: onDateTimeChange)
+      // ),
       body: ListView(
         children: [
           for (var record in _groupedRecords.entries) ... {
@@ -144,13 +125,15 @@ class RecordsAppBar extends StatefulWidget {
   double totalIncome;
   double totalExpense;
   Function() onDateTimeChange;
+  Function(DateTime) load;
 
   RecordsAppBar({
     super.key,
     required this.selectedDateTime,
     required this.totalIncome,
     required this.totalExpense,
-    required this.onDateTimeChange
+    required this.onDateTimeChange,
+    required this.load
   });
 
   @override
@@ -160,99 +143,146 @@ class RecordsAppBar extends StatefulWidget {
 class _RecordsAppBarState extends State<RecordsAppBar> {
   @override
   Widget build(BuildContext context) {
-    return IntrinsicHeight(
-      child: Row(
+    return Container(
+      color: Theme.of(context).colorScheme.primary,
+      padding: EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
+      child: Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: widget.onDateTimeChange,
-            child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.selectedDateTime.year.toString(),
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500
-                    ),
-                  ),
-                  Text(
-                    monthMap[widget.selectedDateTime.month.toString()]!,
-                    style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.w500
-                    ),
-                  )
-                ]
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Coin Log",
+                style: TextStyle(
+                    fontSize: 25,
+                    color: Theme.of(context).colorScheme.onPrimary),
+              ),
+              InkWell(
+                onTap: () async {
+                  final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordCalendar(selectedDateTime: widget.selectedDateTime,)));
+                  if (result == "reload") {
+                    widget.load(widget.selectedDateTime);
+                  }
+                },
+                child: Icon(
+                  Icons.calendar_month,
+                  color: Theme.of(context).colorScheme.onPrimary,)
+              )
+            ],
           ),
-          Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Income:',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500
-                  ),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: widget.onDateTimeChange,
+                child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.selectedDateTime.year.toString(),
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onPrimary
+                        ),
+                      ),
+                      Text(
+                        monthMap[widget.selectedDateTime.month.toString()]!,
+                        style: TextStyle(
+                            fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onPrimary
+                        ),
+                      )
+                    ]
                 ),
-                Text(
-                  '+${widget.totalIncome.toStringAsFixed(2)}',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500
-                  ),
-                )
-              ]
+              ),
+              SizedBox(
+                height: 55,
+                child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Income:',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onPrimary
+                        ),
+                      ),
+                      Text(
+                        '+${widget.totalIncome.toStringAsFixed(2)}',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onPrimary
+                        ),
+                      )
+                    ]
+                ),
+              ),
+              SizedBox(
+                height: 55,
+                child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Expenses:',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onPrimary
+                        ),
+                      ),
+                      Text(
+                        '-${widget.totalExpense.toStringAsFixed(2)}',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onPrimary
+                        ),
+                      )
+                    ]
+                ),
+              ),
+              SizedBox(
+                height: 55,
+                child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Balance:',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onPrimary
+                        ),
+                      ),
+                      Text(
+                        (widget.totalIncome - widget.totalExpense).toStringAsFixed(2),
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onPrimary
+                        ),
+                      )
+                    ]
+                ),
+              )
+            ],
           ),
-          Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Expenses:',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500
-                  ),
-                ),
-                Text(
-                  '-${widget.totalExpense.toStringAsFixed(2)}',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500
-                  ),
-                )
-              ]
-          ),
-          Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Balance:',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500
-                  ),
-                ),
-                Text(
-                  (widget.totalIncome - widget.totalExpense).toStringAsFixed(2),
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500
-                  ),
-                )
-              ]
-          )
         ],
       ),
     );
@@ -363,8 +393,7 @@ class _RecordDayHeaderState extends State<RecordDayHeader> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
+                    padding: EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
                     child: Text(widget.date),
                   )
                 ],
@@ -390,7 +419,7 @@ class _RecordDayHeaderState extends State<RecordDayHeader> {
               child: Text(
                 '-${widget.sumExpense}',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.error
+                  color: Theme.of(context).colorScheme.danger
                 ),
               ),
             ),
@@ -434,8 +463,7 @@ class _TransactionRecordDayBodyItemState extends State<TransactionRecordDayBodyI
               mainAxisSize: MainAxisSize.max,
               children: [
                 Container(
-                  width:
-                      MediaQuery.sizeOf(context).width * 0.63,
+                  width: MediaQuery.sizeOf(context).width * 0.63,
                   height: 50,
                   decoration: BoxDecoration(),
                   child: Row(
@@ -463,7 +491,7 @@ class _TransactionRecordDayBodyItemState extends State<TransactionRecordDayBodyI
                   child: Text(
                     widget.record.type == "Income" ? "+${widget.record.amount}" : widget.record.type == "Expense" ? "-${widget.record.amount}" : "",
                     style: TextStyle(
-                      color: widget.record.type == "Income" ? Theme.of(context).colorScheme.success : widget.record.type == "Expense" ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.error,
+                      color: widget.record.type == "Income" ? Theme.of(context).colorScheme.success : widget.record.type == "Expense" ? Theme.of(context).colorScheme.danger : Theme.of(context).colorScheme.danger,
                     ),
                   ),
                 ),
