@@ -18,8 +18,10 @@ class RecordCalendar extends StatefulWidget {
 }
 
 class _RecordCalendarState extends State<RecordCalendar> {
-  List<List<DateTime?>> datesInMonth = [];
   RecordService _recordService = RecordService();
+
+  List<List<DateTime?>> datesInMonth = [];
+  Map<int, GroupedRecordItem> groupedRecordItemsWithDay = {};
 
   List<List<DateTime?>> getDateListByYearMonth(int year, int month) {
     List<List<DateTime?>> datesInMonth = [];
@@ -60,16 +62,35 @@ class _RecordCalendarState extends State<RecordCalendar> {
 
   void load() async {
     final List<Record> records = await _recordService.listByYearMonth(widget.selectedDateTime.year.toString(), widget.selectedDateTime.month.toString().padLeft(2, "0"));
-    // for(Record record in records) {
-    //
-    // }
+    Map<int, GroupedRecordItem> groupedRecordItemsWithDay = {};
+    double sumIncome = 0;
+    double sumExpense = 0;
+    for(Record record in records) {
+      if (["Income", "Expense"].contains(record.type)) {
+        if (!groupedRecordItemsWithDay.keys.contains(record.date.day)) {
+          sumIncome = record.type == "Income" ? record.amount : 0;
+          sumExpense = record.type == "Expense" ? record.amount : 0;
+          groupedRecordItemsWithDay.putIfAbsent(record.date.day, () => GroupedRecordItem(sumIncome, sumExpense, [record]));
+        }
+
+        else {
+          groupedRecordItemsWithDay[record.date.day]!.sumIncome += record.type == "Income" ? record.amount : 0;
+          groupedRecordItemsWithDay[record.date.day]!.sumExpense += record.type == "Expense" ? record.amount : 0;
+          groupedRecordItemsWithDay[record.date.day]!.records.add(record);
+        }
+      }
+    }
+
+    setState(() {
+      this.groupedRecordItemsWithDay = groupedRecordItemsWithDay;
+    });
   }
 
   @override
   void initState() {
     super.initState();
     datesInMonth = getDateListByYearMonth(widget.selectedDateTime.year, widget.selectedDateTime.month);
-
+    load();
   }
 
   @override
@@ -131,7 +152,7 @@ class _RecordCalendarState extends State<RecordCalendar> {
                   ),
                 ),
                 RecordCalendarHeader(columnWidth: columnWidth,),
-                RecordCalendarBody(columnWidth: columnWidth, datesInMonth: datesInMonth)
+                RecordCalendarBody(columnWidth: columnWidth, datesInMonth: datesInMonth, groupedRecordItemsWithDay: groupedRecordItemsWithDay)
               ],
             ),
           ),
@@ -174,11 +195,13 @@ class RecordCalendarHeader extends StatelessWidget {
 class RecordCalendarBody extends StatefulWidget {
   final double columnWidth;
   List<List<DateTime?>> datesInMonth;
+  Map<int, GroupedRecordItem> groupedRecordItemsWithDay;
 
   RecordCalendarBody({
     super.key,
     required this.columnWidth,
-    required this.datesInMonth
+    required this.datesInMonth,
+    required this.groupedRecordItemsWithDay
   });
 
   @override
@@ -201,7 +224,7 @@ class _RecordCalendarBodyState extends State<RecordCalendarBody> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   for (DateTime? date in datesInWeek) ... {
-                    RecordCalendarBodyCell(width: widget.columnWidth, day: date?.day)
+                    RecordCalendarBodyCell(width: widget.columnWidth, day: date?.day, sumExpend: date == null ? null : widget.groupedRecordItemsWithDay[date.day]?.sumExpense, sumIncome: date == null ? null : widget.groupedRecordItemsWithDay[date.day]?.sumIncome)
                   }
                 ],
               ),
@@ -217,15 +240,15 @@ class RecordCalendarBodyCell extends StatelessWidget {
 
   final double width;
   final int? day;
-  final double? expend;
-  final double? income;
+  final double? sumExpend;
+  final double? sumIncome;
 
   RecordCalendarBodyCell({
     super.key,
     required this.width,
     this.day,
-    this.expend,
-    this.income
+    this.sumExpend,
+    this.sumIncome
   });
 
   @override
@@ -249,35 +272,48 @@ class RecordCalendarBodyCell extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(day.toString()),
-              Column(
-                children: [
-                  if (expend != null) ... {
-                    Text(
-                      expend!.toStringAsFixed(2),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.danger,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )
-                  },
-                  if (income != null) ... {
-                    Text(
-                      income!.toStringAsFixed(2),
-                      style: TextStyle(
+              SizedBox(
+                height: 35,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    if (sumExpend != null && sumExpend != 0) ... {
+                      Text(
+                        sumExpend!.toStringAsFixed(2),
+                        style: TextStyle(
                           fontSize: 12,
-                        color: Theme.of(context).colorScheme.success
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )
-                  }
-                ],
+                          color: Theme.of(context).colorScheme.danger,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    },
+                    if (sumIncome != null && sumIncome != 0) ... {
+                      Text(
+                        sumIncome!.toStringAsFixed(2),
+                        style: TextStyle(
+                            fontSize: 12,
+                          color: Theme.of(context).colorScheme.success
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    }
+                  ],
+                ),
               )
             ],
           ),
       ),
     );
   }
+}
+
+class GroupedRecordItem {
+  late double sumIncome;
+  late double sumExpense;
+  late List<Record> records;
+
+  GroupedRecordItem(this.sumIncome, this.sumExpense, this.records);
 }
