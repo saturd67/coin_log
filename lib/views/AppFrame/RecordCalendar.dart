@@ -1,9 +1,12 @@
 import 'package:coin_log/main.dart';
+import 'package:coin_log/views/RecordDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/widgets/ThemedShowMonthPicker.dart';
 import 'package:coin_log/constants/MonthMap.dart';
 import 'package:coin_log/objects/Record.dart';
 import 'package:coin_log/services/RecordService.dart';
+
+import '../../router/RouterUtils.dart';
 
 class RecordCalendar extends StatefulWidget {
   DateTime selectedDateTime;
@@ -152,7 +155,7 @@ class _RecordCalendarState extends State<RecordCalendar> {
                   ),
                 ),
                 RecordCalendarHeader(columnWidth: columnWidth,),
-                RecordCalendarBody(columnWidth: columnWidth, datesInMonth: datesInMonth, groupedRecordItemsWithDay: groupedRecordItemsWithDay)
+                RecordCalendarBody(columnWidth: columnWidth, datesInMonth: datesInMonth, groupedRecordItemsWithDay: groupedRecordItemsWithDay, load: load)
               ],
             ),
           ),
@@ -194,6 +197,7 @@ class RecordCalendarHeader extends StatelessWidget {
 
 class RecordCalendarBody extends StatefulWidget {
   final double columnWidth;
+  final Function() load;
   List<List<DateTime?>> datesInMonth;
   Map<int, GroupedRecordItem> groupedRecordItemsWithDay;
 
@@ -201,7 +205,8 @@ class RecordCalendarBody extends StatefulWidget {
     super.key,
     required this.columnWidth,
     required this.datesInMonth,
-    required this.groupedRecordItemsWithDay
+    required this.groupedRecordItemsWithDay,
+    required this.load
   });
 
   @override
@@ -224,7 +229,7 @@ class _RecordCalendarBodyState extends State<RecordCalendarBody> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   for (DateTime? date in datesInWeek) ... {
-                    RecordCalendarBodyCell(width: widget.columnWidth, day: date?.day, sumExpend: date == null ? null : widget.groupedRecordItemsWithDay[date.day]?.sumExpense, sumIncome: date == null ? null : widget.groupedRecordItemsWithDay[date.day]?.sumIncome)
+                    RecordCalendarBodyCell(width: widget.columnWidth, date: date, load: widget.load, sumExpend: date == null ? null : widget.groupedRecordItemsWithDay[date.day]?.sumExpense, sumIncome: date == null ? null : widget.groupedRecordItemsWithDay[date.day]?.sumIncome)
                   }
                 ],
               ),
@@ -239,23 +244,30 @@ class _RecordCalendarBodyState extends State<RecordCalendarBody> {
 class RecordCalendarBodyCell extends StatelessWidget {
 
   final double width;
-  final int? day;
+  final Function() load;
+  final DateTime? date;
   final double? sumExpend;
   final double? sumIncome;
 
   RecordCalendarBodyCell({
     super.key,
     required this.width,
-    this.day,
+    required this.load,
+    this.date,
     this.sumExpend,
-    this.sumIncome
+    this.sumIncome,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-
+      onTap: () async {
+        if (date != null) {
+          final results = await Navigator.of(context).push(RouterUtils.createRoute(RecordDetails(defaultDateTime: date!,)));
+          if (results.length > 0 && results[0] == "reload") {
+            load();
+          }
+        }
       },
       child: Container(
         decoration: BoxDecoration(
@@ -265,13 +277,13 @@ class RecordCalendarBodyCell extends StatelessWidget {
         width: width,
         height: 65,
         alignment: Alignment.center,
-        child: day == null ?
+        child: date == null ?
           null :
           Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(day.toString()),
+              Text(date!.day.toString()),
               SizedBox(
                 height: 35,
                 child: Column(

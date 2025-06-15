@@ -21,10 +21,12 @@ import 'package:logging/logging.dart';
 
 class RecordDetails extends StatefulWidget {
   int? identifier;
+  DateTime? defaultDateTime;
 
   RecordDetails({
     super.key,
-    this.identifier
+    this.identifier,
+    this.defaultDateTime
   });
 
   @override
@@ -61,6 +63,12 @@ class _RecordDetailsState extends State<RecordDetails> {
         _isKeyboardVisible = isVisible;
       });
     });
+
+    if (widget.defaultDateTime != null) {
+      setState(() {
+        _record.date = widget.defaultDateTime!;
+      });
+    }
 
     if (widget.identifier != null) {
       load(widget.identifier!);
