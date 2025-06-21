@@ -165,7 +165,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), 
                           child: SwitchButton(
-                            labels: ["Expense", "Income", "Transfer"],
+                            labels: widget.identifier == null ? ["Expense", "Income", "Transfer"] : ["Expense", "Income"].contains(_record.type) ? ["Expense", "Income"] : ["Transfer"],
                             selectedValue: _record.type,
                             onChanged: (String value) {
                               setState(() {

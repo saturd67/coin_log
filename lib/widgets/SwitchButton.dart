@@ -61,7 +61,10 @@ class _SwitchButtonState extends State<SwitchButton> {
                   color: Color(0xff000000), 
                   width: 1.0
                 ),
-                borderRadius: i == 0
+                borderRadius:
+                widget.labels.length == 1
+                ? BorderRadius.circular(6)
+                : i == 0
                 ? BorderRadius.only(
                   topLeft: Radius.circular(6),
                   bottomLeft: Radius.circular(6)
