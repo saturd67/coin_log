@@ -11,7 +11,6 @@ import 'package:coin_log/main.dart';
 import 'package:coin_log/objects/Record.dart';
 import 'package:coin_log/services/RecordService.dart';
 import 'package:coin_log/constants/WeekMap.dart';
-import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:coin_log/utils/DateTimeFormatter.dart';
 
 class RecordList extends StatefulWidget {
