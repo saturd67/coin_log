@@ -20,6 +20,7 @@ dependencies:
   reorderables: ^0.4.2
   month_picker_dialog: ^6.2.2
   math_expressions: ^2.7.0
+  intl: 0.20.2
   pie_chart: 5.4.0
   fl_chart: 1.0.0
 
