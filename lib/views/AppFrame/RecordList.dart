@@ -103,11 +103,6 @@ class RecordListState extends State<RecordList> {
         preferredSize: Size.fromHeight(100.0),
         child: RecordsAppBar(selectedDateTime: selectedDateTime, totalIncome: _totalIncome, totalExpense: _totalExpense, onDateTimeChange: onDateTimeChange, load: load)
       ),
-      // appBar: AppBar(
-      //     shadowColor: Theme.of(context).colorScheme.surface,
-      //     backgroundColor: Theme.of(context).colorScheme.primary,
-      //     title: RecordsAppBar(selectedDateTime: selectedDateTime, totalIncome: _totalIncome, totalExpense: _totalExpense, onDateTimeChange: onDateTimeChange)
-      // ),
       body: ListView(
         children: [
           for (var record in _groupedRecords.entries) ... {
