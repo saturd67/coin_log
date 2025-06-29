@@ -103,7 +103,7 @@ class MyApp extends StatelessWidget {
 }
 
 extension CustomColorScheme on ColorScheme {
-  Color get success => const Color(0xff249689);
+  Color get success => const Color(0xff3DC13C);
   Color get danger => const Color(0xffff2c2c);
 }
 
