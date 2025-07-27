@@ -1,10 +1,15 @@
 import 'package:coin_log/constants/MonthMap.dart';
 import 'package:coin_log/main.dart';
 import 'package:coin_log/widgets/ThemedShowMonthPicker.dart';
+import 'package:coin_log/widgets/ThemedShowYearPicker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:fl_chart/fl_chart.dart' hide PieChart;
+
+class SharedSelectedSummaryType extends ValueNotifier<String> {
+  SharedSelectedSummaryType(String value) : super(value);
+}
 
 class Summary extends StatefulWidget {
   @override
@@ -12,7 +17,7 @@ class Summary extends StatefulWidget {
 }
 
 class _SummaryState extends State<Summary> {
-  String selectedSummaryType = "Monthly";
+  final sharedSelectedSummaryType = SharedSelectedSummaryType("Monthly");
   DateTime selectedDateTime = DateTime.now();
 
   @override
@@ -31,13 +36,13 @@ class _SummaryState extends State<Summary> {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            SummaryType(selectedSummaryType: selectedSummaryType, selectedDateTime: selectedDateTime),
+            SummaryType(selectedSummaryType: sharedSelectedSummaryType, selectedDateTime: selectedDateTime),
             Expanded(
               child: ListView(
                 children: [
                   SizedBox(
                       height: 100,
-                      child: BalanceSummary(selectedSummaryType: selectedSummaryType)
+                      child: BalanceSummary(selectedSummaryType: sharedSelectedSummaryType)
                   ),
                   Divider(
                     height: 5,
@@ -64,7 +69,7 @@ class _SummaryState extends State<Summary> {
 }
 
 class SummaryType extends StatefulWidget {
-  String selectedSummaryType;
+  SharedSelectedSummaryType selectedSummaryType;
   DateTime selectedDateTime;
 
   SummaryType({
@@ -89,7 +94,7 @@ class _SummaryTypeState extends State<SummaryType> {
             InkWell(
               onTap: () {
                 setState(() {
-                  widget.selectedSummaryType = "Monthly";
+                  widget.selectedSummaryType.value = "Monthly";
                 });
               },
               child: Container(
@@ -98,7 +103,7 @@ class _SummaryTypeState extends State<SummaryType> {
                 alignment: Alignment.center,
                 child: Text("Monthly",
                     style: TextStyle(
-                      fontWeight: widget.selectedSummaryType == "Monthly" ? FontWeight.bold : FontWeight.normal
+                      fontWeight: widget.selectedSummaryType.value == "Monthly" ? FontWeight.bold : FontWeight.normal
                     ),
                   ),
               ),
@@ -106,7 +111,7 @@ class _SummaryTypeState extends State<SummaryType> {
             InkWell(
               onTap: () {
                 setState(() {
-                  widget.selectedSummaryType = "Yearly";
+                  widget.selectedSummaryType.value = "Yearly";
                 });
               },
               child: Container(
@@ -115,7 +120,7 @@ class _SummaryTypeState extends State<SummaryType> {
                 alignment: Alignment.center,
                 child: Text("Yearly",
                   style: TextStyle(
-                      fontWeight: widget.selectedSummaryType == "Yearly" ? FontWeight.bold : FontWeight.normal
+                      fontWeight: widget.selectedSummaryType.value == "Yearly" ? FontWeight.bold : FontWeight.normal
                   ),
                 ),
               ),
@@ -126,6 +131,7 @@ class _SummaryTypeState extends State<SummaryType> {
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
           child: Row(
             children: [
+              widget.selectedSummaryType.value == "Monthly" ?
               InkWell(
                 onTap: () async {
                   DateTime? tempDateTime = await themedShowMonthPicker(context, widget.selectedDateTime);
@@ -137,6 +143,17 @@ class _SummaryTypeState extends State<SummaryType> {
                 },
                 child: Text("${monthMap[widget.selectedDateTime.month.toString()]!} ${widget.selectedDateTime.year}"),
               )
+              : InkWell(
+                onTap: () async {
+                  int? tempYear = await themedShowYearPicker(context, widget.selectedDateTime);
+                  if (tempYear != null) {
+                    setState(() {
+                      widget.selectedDateTime = DateTime(tempYear);
+                    });
+                  }
+                },
+                child: Text("${widget.selectedDateTime.year}"),
+              )
             ],
           ),
         ),
@@ -146,7 +163,7 @@ class _SummaryTypeState extends State<SummaryType> {
 }
 
 class BalanceSummary extends StatefulWidget {
-  final String selectedSummaryType;
+  final SharedSelectedSummaryType selectedSummaryType;
 
   BalanceSummary({
     required this.selectedSummaryType
@@ -157,33 +174,58 @@ class BalanceSummary extends StatefulWidget {
 }
 
 class _BalanceSummaryState extends State<BalanceSummary> {
+
+  late VoidCallback listener;
+
+  @override
+  void initState() {
+    super.initState();
+    print("init Listener");
+    listener = () {
+      print("Do Something");
+
+      // Optionally force UI update
+      setState(() {});
+    };
+
+    widget.selectedSummaryType.addListener(listener);
+  }
+
+  @override
+  void dispose() {
+    widget.selectedSummaryType.removeListener(listener);
+    print("Listener Disposed");
+    super.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-          child: Stack(
-            alignment: AlignmentDirectional.topStart,
-            children: [
-              Container(height: 25, width: double.infinity, color: Theme.of(context).colorScheme.success),
-              Container(height: 25, width: 150, color: Theme.of(context).colorScheme.error)
-            ],
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+            child: Stack(
+              alignment: AlignmentDirectional.topStart,
+              children: [
+                Text(widget.selectedSummaryType.value)
+                // Container(height: 25, width: double.infinity, color: Theme.of(context).colorScheme.success),
+                // Container(height: 25, width: 150, color: Theme.of(context).colorScheme.error)
+              ],
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error], label: "Expenses: ", balance: 2500,),
-              BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Income: ", balance: 4500,),
-              BalanceSummaryRemark(label: "Balance: ", balance: 2500),
-            ],
-          ),
-        )
-      ],
-    );
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error], label: "Expenses: ", balance: 2500,),
+                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Income: ", balance: 4500,),
+                BalanceSummaryRemark(label: "Balance: ", balance: 2500),
+              ],
+            ),
+          )
+        ],
+      );
   }
 }
 
