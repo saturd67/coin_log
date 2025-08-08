@@ -1,5 +1,6 @@
 import 'package:coin_log/constants/MonthMap.dart';
 import 'package:coin_log/main.dart';
+import 'package:coin_log/services/RecordService.dart';
 import 'package:coin_log/widgets/ThemedShowMonthPicker.dart';
 import 'package:coin_log/widgets/ThemedShowYearPicker.dart';
 import 'package:flutter/material.dart';
@@ -11,14 +12,18 @@ class SharedSelectedSummaryType extends ValueNotifier<String> {
   SharedSelectedSummaryType(String value) : super(value);
 }
 
+class SharedSelectedDateTime extends ValueNotifier<DateTime> {
+  SharedSelectedDateTime(DateTime value) : super(value);
+}
+
 class Summary extends StatefulWidget {
   @override
   State<Summary> createState() => _SummaryState();
 }
 
 class _SummaryState extends State<Summary> {
-  final sharedSelectedSummaryType = SharedSelectedSummaryType("Monthly");
-  DateTime selectedDateTime = DateTime.now();
+  final sharedSelectedSummaryType = SharedSelectedSummaryType('Monthly');
+  final sharedSelectedDateTime = SharedSelectedDateTime(DateTime.now());
 
   @override
   Widget build(BuildContext context) {
@@ -36,13 +41,13 @@ class _SummaryState extends State<Summary> {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            SummaryType(selectedSummaryType: sharedSelectedSummaryType, selectedDateTime: selectedDateTime),
+            SummaryType(sharedSelectedSummaryType: sharedSelectedSummaryType, sharedSelectedDateTime: sharedSelectedDateTime),
             Expanded(
               child: ListView(
                 children: [
                   SizedBox(
                       height: 100,
-                      child: BalanceSummary(selectedSummaryType: sharedSelectedSummaryType)
+                      child: BalanceSummary(sharedSelectedSummaryType: sharedSelectedSummaryType, sharedSelectedDateTime: sharedSelectedDateTime)
                   ),
                   Divider(
                     height: 5,
@@ -69,12 +74,12 @@ class _SummaryState extends State<Summary> {
 }
 
 class SummaryType extends StatefulWidget {
-  SharedSelectedSummaryType selectedSummaryType;
-  DateTime selectedDateTime;
+  SharedSelectedSummaryType sharedSelectedSummaryType;
+  SharedSelectedDateTime sharedSelectedDateTime;
 
   SummaryType({
-    required this.selectedSummaryType,
-    required this.selectedDateTime
+    required this.sharedSelectedSummaryType,
+    required this.sharedSelectedDateTime
   });
 
   @override
@@ -83,8 +88,11 @@ class SummaryType extends StatefulWidget {
 
 class _SummaryTypeState extends State<SummaryType> {
 
+
+
   @override
   Widget build(BuildContext context) {
+
     return Column(
       children: [
         Row(
@@ -94,7 +102,7 @@ class _SummaryTypeState extends State<SummaryType> {
             InkWell(
               onTap: () {
                 setState(() {
-                  widget.selectedSummaryType.value = "Monthly";
+                  widget.sharedSelectedSummaryType.value = "Monthly";
                 });
               },
               child: Container(
@@ -103,7 +111,7 @@ class _SummaryTypeState extends State<SummaryType> {
                 alignment: Alignment.center,
                 child: Text("Monthly",
                     style: TextStyle(
-                      fontWeight: widget.selectedSummaryType.value == "Monthly" ? FontWeight.bold : FontWeight.normal
+                      fontWeight: widget.sharedSelectedSummaryType.value == "Monthly" ? FontWeight.bold : FontWeight.normal
                     ),
                   ),
               ),
@@ -111,7 +119,7 @@ class _SummaryTypeState extends State<SummaryType> {
             InkWell(
               onTap: () {
                 setState(() {
-                  widget.selectedSummaryType.value = "Yearly";
+                  widget.sharedSelectedSummaryType.value = "Yearly";
                 });
               },
               child: Container(
@@ -120,7 +128,7 @@ class _SummaryTypeState extends State<SummaryType> {
                 alignment: Alignment.center,
                 child: Text("Yearly",
                   style: TextStyle(
-                      fontWeight: widget.selectedSummaryType.value == "Yearly" ? FontWeight.bold : FontWeight.normal
+                      fontWeight: widget.sharedSelectedSummaryType.value == "Yearly" ? FontWeight.bold : FontWeight.normal
                   ),
                 ),
               ),
@@ -131,28 +139,28 @@ class _SummaryTypeState extends State<SummaryType> {
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
           child: Row(
             children: [
-              widget.selectedSummaryType.value == "Monthly" ?
+              widget.sharedSelectedSummaryType.value == "Monthly" ?
               InkWell(
                 onTap: () async {
-                  DateTime? tempDateTime = await themedShowMonthPicker(context, widget.selectedDateTime);
+                  DateTime? tempDateTime = await themedShowMonthPicker(context, widget.sharedSelectedDateTime.value);
                   if (tempDateTime != null) {
                     setState(() {
-                      widget.selectedDateTime = tempDateTime;
+                      widget.sharedSelectedDateTime.value = tempDateTime;
                     });
                   }
                 },
-                child: Text("${monthMap[widget.selectedDateTime.month.toString()]!} ${widget.selectedDateTime.year}"),
+                child: Text("${monthMap[widget.sharedSelectedDateTime.value.month.toString()]!} ${widget.sharedSelectedDateTime.value.year}"),
               )
               : InkWell(
                 onTap: () async {
-                  int? tempYear = await themedShowYearPicker(context, widget.selectedDateTime);
+                  int? tempYear = await themedShowYearPicker(context, widget.sharedSelectedDateTime.value);
                   if (tempYear != null) {
                     setState(() {
-                      widget.selectedDateTime = DateTime(tempYear);
+                      widget.sharedSelectedDateTime.value = DateTime(tempYear);
                     });
                   }
                 },
-                child: Text("${widget.selectedDateTime.year}"),
+                child: Text("${widget.sharedSelectedDateTime.value.year}"),
               )
             ],
           ),
@@ -163,10 +171,12 @@ class _SummaryTypeState extends State<SummaryType> {
 }
 
 class BalanceSummary extends StatefulWidget {
-  final SharedSelectedSummaryType selectedSummaryType;
+  final SharedSelectedSummaryType sharedSelectedSummaryType;
+  final SharedSelectedDateTime sharedSelectedDateTime;
 
   BalanceSummary({
-    required this.selectedSummaryType
+    required this.sharedSelectedSummaryType,
+    required this.sharedSelectedDateTime
   });
 
   @override
@@ -175,31 +185,55 @@ class BalanceSummary extends StatefulWidget {
 
 class _BalanceSummaryState extends State<BalanceSummary> {
 
+  RecordService _recordService = RecordService();
+
   late VoidCallback listener;
+
+  double incomeAmount = 0;
+  double expenseAmount = 0;
+
+  double numerator = 0;
+  double balance = 0;
 
   @override
   void initState() {
     super.initState();
-    print("init Listener");
+    loadBalance();
     listener = () {
-      print("Do Something");
 
+      loadBalance();
       // Optionally force UI update
       setState(() {});
     };
 
-    widget.selectedSummaryType.addListener(listener);
+    widget.sharedSelectedSummaryType.addListener(listener);
+    widget.sharedSelectedDateTime.addListener(listener);
   }
 
   @override
   void dispose() {
-    widget.selectedSummaryType.removeListener(listener);
-    print("Listener Disposed");
+    widget.sharedSelectedSummaryType.removeListener(listener);
+    widget.sharedSelectedDateTime.removeListener(listener);
     super.dispose();
+  }
+
+  void loadBalance() async {
+    DateTime selectedDateTime = widget.sharedSelectedDateTime.value;
+    final tempIncomeAmount = await _recordService.sumByTypeYearMonth("Income", selectedDateTime.year.toString(), selectedDateTime.month.toString().padLeft(2, "0"));
+    final tempExpenseAmount = await _recordService.sumByTypeYearMonth("Expense", selectedDateTime.year.toString(), selectedDateTime.month.toString().padLeft(2, "0"));
+
+
+    setState(() {
+      incomeAmount = tempIncomeAmount;
+      expenseAmount = tempExpenseAmount;
+    });
   }
   
   @override
   Widget build(BuildContext context) {
+
+    Color balanceColor = incomeAmount > expenseAmount ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.error;
+    Color numeratorColor = incomeAmount > expenseAmount ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.success;
     return Column(
         children: [
           Padding(
@@ -207,9 +241,8 @@ class _BalanceSummaryState extends State<BalanceSummary> {
             child: Stack(
               alignment: AlignmentDirectional.topStart,
               children: [
-                Text(widget.selectedSummaryType.value)
-                // Container(height: 25, width: double.infinity, color: Theme.of(context).colorScheme.success),
-                // Container(height: 25, width: 150, color: Theme.of(context).colorScheme.error)
+                Container(height: 25, width: double.infinity, color: balanceColor),
+                Container(height: 25, width: incomeAmount == 0 ? 0 :(MediaQuery.of(context).size.width * expenseAmount / incomeAmount), color: numeratorColor)
               ],
             ),
           ),
@@ -218,9 +251,9 @@ class _BalanceSummaryState extends State<BalanceSummary> {
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
-                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error], label: "Expenses: ", balance: 2500,),
-                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Income: ", balance: 4500,),
-                BalanceSummaryRemark(label: "Balance: ", balance: 2500),
+                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error], label: "Expenses: ", balance: expenseAmount,),
+                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Income: ", balance: incomeAmount,),
+                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.success], label: "Balance: ", balance: incomeAmount - expenseAmount),
               ],
             ),
           )

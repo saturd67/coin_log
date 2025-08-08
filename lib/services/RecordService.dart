@@ -110,4 +110,18 @@ class RecordService {
     );
     return maps.map((e) => Record.fromMap(e)).toList();
   }
+
+  Future<double> sumByTypeYearMonth(String type, String year, String month) async {
+    print(year);
+    print(month);
+    final db = await DatabaseService().database;
+    List<Map<String, dynamic>> maps = await db.rawQuery(
+      'SELECT SUM(amount) as total FROM $TABLE_NAME '
+          + 'WHERE type = ? '
+          + 'AND strftime("%Y", date) = ? '
+          + 'AND strftime("%m", date) = ?',
+      [type, year, month]
+    );
+    return maps[0]["total"] ?? 0;
+  }
 }
