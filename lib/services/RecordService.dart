@@ -106,22 +106,108 @@ class RecordService {
       TABLE_NAME,
       where: 'strftime("%Y", date) = ? and strftime("%m", date) = ?',
       orderBy: 'date desc',
-      whereArgs: [year, month]
+      whereArgs: [year, month.padLeft(2, "0")]
     );
     return maps.map((e) => Record.fromMap(e)).toList();
   }
 
-  Future<double> sumByTypeYearMonth(String type, String year, String month) async {
-    print(year);
-    print(month);
+  Future<double> sumByTypeYearMonth(String? type, String? year, String? month) async {
+
+    String query = 'SELECT SUM(amount) as TOTAL FROM $TABLE_NAME WHERE 1=1 ';
+
+    query += type != null ? 'AND type = ? ' : '';
+    query += year != null ? 'AND strftime("%Y", date) = ? ' : '';
+    query += month != null ? 'AND strftime("%m", date) = ? ' : '';
+
+    List<Object?> arguments = [];
+    if (type != null) {
+      arguments.add(type);
+    }
+
+    if (year != null) {
+      arguments.add(year);
+    }
+
+    if (month != null) {
+      arguments.add(month.padLeft(2, "0"));
+    }
+
     final db = await DatabaseService().database;
-    List<Map<String, dynamic>> maps = await db.rawQuery(
-      'SELECT SUM(amount) as total FROM $TABLE_NAME '
-          + 'WHERE type = ? '
-          + 'AND strftime("%Y", date) = ? '
-          + 'AND strftime("%m", date) = ?',
-      [type, year, month]
-    );
-    return maps[0]["total"] ?? 0;
+    List<Map<String, dynamic>> maps = await db.rawQuery(query, arguments);
+
+    return maps[0]["TOTAL"] ?? 0;
+  }
+
+  Future<List<Map<String, dynamic>>> listTransactionCategoryAmountByTypeYearMonth(String? type, String? year, String? month) async {
+    String query = 'SELECT tc.name, SUM(x.amount) as TOTAL FROM $TABLE_NAME x '
+        'JOIN CL_TRANSACTION_CATEGORY tc ON x.transaction_category_id = tc.identifier '
+        'WHERE 1=1 ';
+    query += type != null ? 'AND x.type = ? ' : '';
+    query += year != null ? 'AND strftime("%Y", x.date) = ? ' : '';
+    query += month != null ? 'AND strftime("%m", x.date) = ? ' : '';
+    query += 'GROUP BY(tc.name)'
+        'ORDER BY SUM(x.amount) DESC';
+
+    List<Object?> arguments = [];
+    if (type != null) {
+      arguments.add(type);
+    }
+
+    if (year != null) {
+      arguments.add(year);
+    }
+
+    if (month != null) {
+      arguments.add(month.padLeft(2, "0"));
+    }
+
+    final db = await DatabaseService().database;
+
+    return await db.rawQuery(query, arguments);
+  }
+
+  Future<List<Map<String, dynamic>>> listDailyTransactionCategoryAmountByYearMonthTransactionType(String transactionType, String year, String month) async {
+
+    String query = 'SELECT strftime(%d, date) as day, SUM(amount) as total $TABLE_NAME '
+        'WHERE 1=1 '
+        'AND x.type = ?'
+        'AND strftime("%Y", x.date) = ? '
+        'AND strftime("%m", x.date) = ? '
+        'GROUP BY strftime(%d, date)'
+        'ORDER BY strftime(%d, date)';
+
+    List<Object?> arguments = [transactionType, year, month.padLeft(2, "0")];
+
+    final db = await DatabaseService().database;
+
+    List<Map<String, dynamic>> maps = await db.rawQuery(query, arguments);
+    List<Map<String, dynamic>> results = [];
+
+    int lastDay = DateTime(year as int, month as int).subtract(Duration(days: 1)).day;
+    for (int day=1; day <= lastDay; day++) {
+
+      Map<String, dynamic> map = maps.firstWhere((map) => map.keys.first == day.toString(), orElse: () => {});
+      if (map.keys.isNotEmpty) {
+
+        results.add({day.toString(): map.values.first});
+      }
+
+      else {
+        results.add({day.toString(): 0});
+      }
+    }
+
+    return results;
+  }
+
+  Future<List<Map<String, dynamic>>> listMonthlyTransactionCategoryAmountByYearMonthTransactionType(String transactionType, String year) async {
+
+    String query = "";
+
+    List<Object?> arguments = [];
+
+    final db = await DatabaseService().database;
+
+    return await db.rawQuery(query, arguments);
   }
 }

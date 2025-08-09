@@ -37,7 +37,7 @@ class RecordListState extends State<RecordList> {
   }
 
   void load(DateTime selectedDateTime) async {
-    final List<Record> records = await _recordService.listByYearMonth(selectedDateTime.year.toString(), selectedDateTime.month.toString().padLeft(2, "0"));
+    final List<Record> records = await _recordService.listByYearMonth(selectedDateTime.year.toString(), selectedDateTime.month.toString());
     Map<String, GroupedRecordItem> groupedRecords = <String, GroupedRecordItem>{};
 
     double totalIncome = 0;

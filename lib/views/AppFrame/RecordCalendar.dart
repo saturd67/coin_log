@@ -64,7 +64,7 @@ class _RecordCalendarState extends State<RecordCalendar> {
   }
 
   void load() async {
-    final List<Record> records = await _recordService.listByYearMonth(widget.selectedDateTime.year.toString(), widget.selectedDateTime.month.toString().padLeft(2, "0"));
+    final List<Record> records = await _recordService.listByYearMonth(widget.selectedDateTime.year.toString(), widget.selectedDateTime.month.toString());
     Map<int, GroupedRecordItem> groupedRecordItemsWithDay = {};
     double sumIncome = 0;
     double sumExpense = 0;

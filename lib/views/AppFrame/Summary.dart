@@ -1,12 +1,17 @@
 import 'package:coin_log/constants/MonthMap.dart';
 import 'package:coin_log/main.dart';
 import 'package:coin_log/services/RecordService.dart';
+import 'package:coin_log/widgets/SwitchButton.dart';
 import 'package:coin_log/widgets/ThemedShowMonthPicker.dart';
 import 'package:coin_log/widgets/ThemedShowYearPicker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:fl_chart/fl_chart.dart' hide PieChart;
+
+class SharedSelectedTransactionType extends ValueNotifier<String> {
+  SharedSelectedTransactionType(String value) : super(value);
+}
 
 class SharedSelectedSummaryType extends ValueNotifier<String> {
   SharedSelectedSummaryType(String value) : super(value);
@@ -22,6 +27,8 @@ class Summary extends StatefulWidget {
 }
 
 class _SummaryState extends State<Summary> {
+
+  final sharedSelectedTransactionType = SharedSelectedTransactionType('Expense');
   final sharedSelectedSummaryType = SharedSelectedSummaryType('Monthly');
   final sharedSelectedDateTime = SharedSelectedDateTime(DateTime.now());
 
@@ -53,15 +60,27 @@ class _SummaryState extends State<Summary> {
                     height: 5,
                   ),
                   SizedBox(
-                    height: 230,
-                    child: TransactionTypeSummary(),
+                    height: 40,
+                    child: SwitchButton(
+                      labels: ['Expense', 'Income'],
+                      selectedValue: sharedSelectedTransactionType.value,
+                      onChanged: (String value) {
+                        setState(() {
+                          sharedSelectedTransactionType.value = value;
+                        });
+                      },
+                    )
+                  ),
+                  SizedBox(
+                    height: 180,
+                    child: TransactionTypeSummary(sharedSelectedTransactionType: sharedSelectedTransactionType, sharedSelectedSummaryType: sharedSelectedSummaryType, sharedSelectedDateTime: sharedSelectedDateTime),
                   ),
                   Divider(
                     height: 5,
                   ),
                   SizedBox(
                     height: 250,
-                    child: DailyTransactionSummary(),
+                    child: PeriodSummary(sharedSelectedTransactionType: sharedSelectedTransactionType, sharedSelectedSummaryType: sharedSelectedSummaryType, sharedSelectedDateTime: sharedSelectedDateTime),
                   )
                 ],
               ),
@@ -198,10 +217,10 @@ class _BalanceSummaryState extends State<BalanceSummary> {
   @override
   void initState() {
     super.initState();
-    loadBalance();
+    load();
     listener = () {
 
-      loadBalance();
+      load();
       // Optionally force UI update
       setState(() {});
     };
@@ -217,10 +236,12 @@ class _BalanceSummaryState extends State<BalanceSummary> {
     super.dispose();
   }
 
-  void loadBalance() async {
-    DateTime selectedDateTime = widget.sharedSelectedDateTime.value;
-    final tempIncomeAmount = await _recordService.sumByTypeYearMonth("Income", selectedDateTime.year.toString(), selectedDateTime.month.toString().padLeft(2, "0"));
-    final tempExpenseAmount = await _recordService.sumByTypeYearMonth("Expense", selectedDateTime.year.toString(), selectedDateTime.month.toString().padLeft(2, "0"));
+  void load() async {
+    String selectedSummaryType = widget.sharedSelectedSummaryType.value;
+    String selectedYear = widget.sharedSelectedDateTime.value.year.toString();
+    String? selectedMonth = selectedSummaryType == "Monthly" ? widget.sharedSelectedDateTime.value.month.toString() : null;
+    final tempIncomeAmount = await _recordService.sumByTypeYearMonth("Income", selectedYear, selectedMonth);
+    final tempExpenseAmount = await _recordService.sumByTypeYearMonth("Expense", selectedYear, selectedMonth);
 
 
     setState(() {
@@ -336,56 +357,175 @@ class BalanceSummaryRemark extends StatelessWidget {
   }
 }
 
-class TransactionTypeSummary extends StatelessWidget {
+class TransactionTypeSummary extends StatefulWidget {
+  final SharedSelectedTransactionType sharedSelectedTransactionType;
+  final SharedSelectedSummaryType sharedSelectedSummaryType;
+  final SharedSelectedDateTime sharedSelectedDateTime;
 
-  final dataMap = <String, double>{
-    "Red": 40,
-    "Green": 30,
-    "Blue": 30,
+  TransactionTypeSummary({
+    required this.sharedSelectedTransactionType,
+    required this.sharedSelectedSummaryType,
+    required this.sharedSelectedDateTime
+  });
+
+  @override
+  State<TransactionTypeSummary> createState() => _TransactionTypeSummaryState();
+}
+
+class _TransactionTypeSummaryState extends State<TransactionTypeSummary> {
+
+  RecordService _recordService = RecordService();
+
+  late VoidCallback listener;
+
+  late double total = 0;
+
+  late Map<String, double> transactionCategoryAmountMaps = {
+    "": 0
   };
 
   @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        //
-      },
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-            child: Row(
-              children: [
-                Text("Expenses")
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-            child: PieChart(
-              dataMap: dataMap,
-              colorList: [Colors.red, Colors.green, Colors.blue],
-              chartRadius: 150,
-              chartType: ChartType.ring
-            ),
-          )
-        ],
-      ),
+  void initState() {
+    super.initState();
+    load();
+    listener = () {
+      load();
+      setState(() {});
+    };
+    widget.sharedSelectedTransactionType.addListener(listener);
+    widget.sharedSelectedSummaryType.addListener(listener);
+    widget.sharedSelectedDateTime.addListener(listener);
+  }
 
+  @override
+  void dispose() {
+    widget.sharedSelectedTransactionType.removeListener(listener);
+    widget.sharedSelectedSummaryType.removeListener(listener);
+    widget.sharedSelectedDateTime.removeListener(listener);
+    super.dispose();
+  }
+
+  void load() async {
+    String selectedTransactionType = widget.sharedSelectedTransactionType.value;
+    String selectedSummaryType = widget.sharedSelectedSummaryType.value;
+    String selectedYear = widget.sharedSelectedDateTime.value.year.toString();
+    String? selectedMonth = selectedSummaryType == "Monthly" ? widget.sharedSelectedDateTime.value.month.toString() : null;
+    List<Map<String, dynamic>> maps = await _recordService.listTransactionCategoryAmountByTypeYearMonth(selectedTransactionType, selectedYear, selectedMonth);
+    double tempTotal = 0;
+    // Count Top 5 Transaction Types, the rest in Others
+    Map<String, double> tempTransactionCategoryAmountMaps = {};
+    for (int i = 0; i < maps.length; i++) {
+      if (i < 5) {
+        double tempTotal = maps[i]["TOTAL"] as double;
+        tempTransactionCategoryAmountMaps.putIfAbsent(maps[i]["NAME"] + ": ${tempTotal.toStringAsFixed(2)}", () => tempTotal);
+      }
+
+      else {
+        double othersTotal = 0;
+        if (tempTransactionCategoryAmountMaps.containsKey("Others")) {
+          othersTotal += tempTransactionCategoryAmountMaps["Others"]!;
+        }
+        tempTransactionCategoryAmountMaps.putIfAbsent("Others", () => (maps[i]["TOTAL"] as double) + othersTotal);
+
+        if (i == maps.length - 1) {
+          double othersTotal = tempTransactionCategoryAmountMaps["Others"]!;
+          tempTransactionCategoryAmountMaps.remove("Others");
+          tempTransactionCategoryAmountMaps.putIfAbsent("Others: ${othersTotal.toStringAsFixed(2)}", () => othersTotal);
+        }
+      }
+
+      tempTotal += maps[i]["TOTAL"] as double;
+    }
+
+    setState(() {
+      if (tempTransactionCategoryAmountMaps.keys.isEmpty) {
+        transactionCategoryAmountMaps = {"No Date": 0};
+      }
+
+      else {
+        transactionCategoryAmountMaps = tempTransactionCategoryAmountMaps;
+      }
+
+      total = tempTotal;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: PieChart(
+        initialAngleInDegree: -90,
+        colorList: [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue, Colors.purpleAccent],
+        chartRadius: 120,
+        chartType: ChartType.ring,
+        chartValuesOptions: ChartValuesOptions(
+            showChartValues: false
+        ),
+        dataMap: transactionCategoryAmountMaps,
+      ),
     );
   }
 }
 
-class DailyTransactionSummary extends StatelessWidget {
+class PeriodSummary extends StatefulWidget {
+  final SharedSelectedTransactionType sharedSelectedTransactionType;
+  final SharedSelectedDateTime sharedSelectedDateTime;
+  final SharedSelectedSummaryType sharedSelectedSummaryType;
+
+  PeriodSummary({
+    required this.sharedSelectedTransactionType,
+    required this.sharedSelectedDateTime,
+    required this.sharedSelectedSummaryType
+  });
+
+  @override
+  State<PeriodSummary> createState() => _PeriodSummaryState();
+}
+
+class _PeriodSummaryState extends State<PeriodSummary> {
+
+  RecordService _recordService = RecordService();
+
+  late VoidCallback listener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    listener = () {
+      setState(() {});
+    };
+
+    widget.sharedSelectedTransactionType.addListener(listener);
+    widget.sharedSelectedDateTime.addListener(listener);
+    widget.sharedSelectedSummaryType.addListener(listener);
+  }
+
+  @override
+  void dispose() {
+    widget.sharedSelectedTransactionType.removeListener(listener);
+    widget.sharedSelectedDateTime.removeListener(listener);
+    widget.sharedSelectedSummaryType.removeListener(listener);
+    super.dispose();
+  }
+
+  void load() async {
+
+  }
+
   @override
   Widget build(BuildContext context) {
+    String firstPartTitle = (widget.sharedSelectedSummaryType.value == 'Monthly' ? 'Daily' : 'Monthly');
+    String lastPartTitle = (widget.sharedSelectedTransactionType.value == 'Expense' ? 'Expenses' : 'Income');
+
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
           child: Row(
             children: [
-              Text("Daily Expenses")
+              Text("$firstPartTitle $lastPartTitle")
             ],
           ),
         ),
@@ -451,5 +591,4 @@ class DailyTransactionSummary extends StatelessWidget {
       ],
     );
   }
-
 }
