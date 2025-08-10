@@ -489,11 +489,19 @@ class _PeriodSummaryState extends State<PeriodSummary> {
 
   late VoidCallback listener;
 
+  List<Map<String, dynamic>> periodTransactionAmountMaps = [];
+  double maxAmount = 0;
+  double leftTitlesInterval = 300;
+  double bottomTitlesInterval = 1;
+
   @override
   void initState() {
     super.initState();
 
+    load();
+
     listener = () {
+      load();
       setState(() {});
     };
 
@@ -511,8 +519,30 @@ class _PeriodSummaryState extends State<PeriodSummary> {
   }
 
   void load() async {
+    String selectedTransactionType = widget.sharedSelectedTransactionType.value;
+    String selectedSummaryType = widget.sharedSelectedSummaryType.value;
+    String selectedYear = widget.sharedSelectedDateTime.value.year.toString();
+    String selectedMonth = widget.sharedSelectedDateTime.value.month.toString().padLeft(0, "2");
 
+    List<Map<String, dynamic>> tempPeriodTransactionAmountMaps = [];
+    if  (selectedSummaryType == 'Monthly') {
+      tempPeriodTransactionAmountMaps = await _recordService.listDailyTransactionCategoryAmountByYearMonthTransactionType(selectedTransactionType, selectedYear, selectedMonth);
+    }
+
+    else {
+      tempPeriodTransactionAmountMaps = await _recordService.listMonthlyTransactionCategoryAmountByYearMonthTransactionType(selectedTransactionType, selectedYear);
+      tempPeriodTransactionAmountMaps.forEach((map) => print(map));
+    }
+
+    setState(() {
+      periodTransactionAmountMaps = tempPeriodTransactionAmountMaps;
+      maxAmount = tempPeriodTransactionAmountMaps.reduce((a, b) => a['total'] > b['total'] ? a :b)['total'];
+      bottomTitlesInterval = periodTransactionAmountMaps.length > 12 ? 15 : 1;
+      leftTitlesInterval = maxAmount > 1000 ? 1000 : 300;
+    });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -535,14 +565,16 @@ class _PeriodSummaryState extends State<PeriodSummary> {
           child: LineChart(
             LineChartData(
               minX: 1,
-              maxX: 7, // 7 days
+              maxX: periodTransactionAmountMaps.length.toDouble(), // 7 days
               minY: 0,
-              maxY: 1000,
+              maxY: maxAmount,
               titlesData: FlTitlesData(
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: 1,
+                    interval: bottomTitlesInterval,
+                    minIncluded: true,
+                    maxIncluded: bottomTitlesInterval == 1,
                     getTitlesWidget: (value, meta) {
                       return Text('${value.toInt()}', style: const TextStyle(fontSize: 11));
                     },
@@ -551,7 +583,7 @@ class _PeriodSummaryState extends State<PeriodSummary> {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: 300,
+                    interval: leftTitlesInterval,
                     getTitlesWidget: (value, meta) {
                       final formattedValue = NumberFormat.compact().format(value);
                       return Text(formattedValue, style: const TextStyle(fontSize: 11));
@@ -575,13 +607,9 @@ class _PeriodSummaryState extends State<PeriodSummary> {
                   color: Colors.blue,
                   dotData: FlDotData(show: true),
                   spots: [
-                    FlSpot(1, 50), // Day 1: $50
-                    FlSpot(2, 30), // Day 2: $30
-                    FlSpot(3, 70), // Day 3: $70
-                    FlSpot(4, 20), // ...
-                    FlSpot(5, 90),
-                    FlSpot(6, 60),
-                    FlSpot(7, 80),
+                    for  (Map<String, dynamic> periodTransactionAmountMap in periodTransactionAmountMaps) ... {
+                      FlSpot(periodTransactionAmountMap['x_date'].toDouble(), periodTransactionAmountMap['total'].toDouble()),
+                    }
                   ],
                 ),
               ],
