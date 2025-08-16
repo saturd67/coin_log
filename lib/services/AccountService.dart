@@ -1,4 +1,4 @@
-import 'package:coin_log/objects/Account.dart';
+import 'package:coin_log/models/Account.dart';
 import 'package:coin_log/services/DatabaseService.dart';
 import 'package:sqflite/sqflite.dart';
 

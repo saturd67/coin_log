@@ -1,9 +1,9 @@
-import 'package:coin_log/objects/TransactionCategory.dart';
+import 'package:coin_log/models/TransactionCategory.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:flutter/material.dart';
-import 'package:coin_log/views/Settings/transaction_details.dart';
-import 'package:coin_log/widgets/grid_view_icon.dart';
-import 'package:coin_log/widgets/switch_button.dart';
+import 'package:coin_log/features/settings/transaction_details.dart';
+import 'package:coin_log/shared/grid_view_icon.dart';
+import 'package:coin_log/shared/switch_button.dart';
 
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:reorderables/reorderables.dart';
@@ -28,9 +28,9 @@ class _TransactionListState extends State<TransactionList> {
   }
 
   void load() async {
-    final _transactionCategories = await _transactionCategoryService.listByType(_selectedType);
+    final transactionCategories = await _transactionCategoryService.listByType(_selectedType);
     setState(() {
-      this._transactionCategories = _transactionCategories;
+      _transactionCategories = transactionCategories;
     });
   }
 

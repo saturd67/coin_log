@@ -1,5 +1,5 @@
-import 'package:coin_log/objects/Account.dart';
-import 'package:coin_log/objects/TransactionCategory.dart';
+import 'package:coin_log/models/Account.dart';
+import 'package:coin_log/models/TransactionCategory.dart';
 
 class Record {
   int? identifier;

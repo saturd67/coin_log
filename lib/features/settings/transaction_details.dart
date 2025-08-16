@@ -1,11 +1,11 @@
-import 'package:coin_log/objects/TransactionCategory.dart';
+import 'package:coin_log/models/TransactionCategory.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
-import 'package:coin_log/widgets/themed_text_field.dart';
-import 'package:coin_log/widgets/themed_toast.dart';
-import 'package:coin_log/widgets/showConfirmationDialog.dart';
+import 'package:coin_log/shared/themed_text_field.dart';
+import 'package:coin_log/shared/themed_toast.dart';
+import 'package:coin_log/shared/showConfirmationDialog.dart';
 import 'package:flutter/material.dart';
-import 'package:coin_log/widgets/grid_view_icon.dart';
-import 'package:coin_log/widgets/switch_button.dart';
+import 'package:coin_log/shared/grid_view_icon.dart';
+import 'package:coin_log/shared/switch_button.dart';
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:logging/logging.dart';
 

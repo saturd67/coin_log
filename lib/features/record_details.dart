@@ -1,22 +1,22 @@
 import 'dart:async';
 
 import 'package:coin_log/constants/WeekMap.dart';
-import 'package:coin_log/objects/Account.dart';
-import 'package:coin_log/objects/TransactionCategory.dart';
+import 'package:coin_log/models/Account.dart';
+import 'package:coin_log/models/TransactionCategory.dart';
 import 'package:coin_log/services/RecordService.dart';
 import 'package:coin_log/utils/Calculator.dart';
-import 'package:coin_log/views/app_frame/app_frame.dart';
-import 'package:coin_log/widgets/themed_text_field.dart';
-import 'package:coin_log/widgets/themed_toast.dart';
+import 'package:coin_log/features/app_frame/app_frame.dart';
+import 'package:coin_log/shared/themed_text_field.dart';
+import 'package:coin_log/shared/themed_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:coin_log/widgets/switch_button.dart';
-import 'package:coin_log/widgets/grid_view_icon.dart';
+import 'package:coin_log/shared/switch_button.dart';
+import 'package:coin_log/shared/grid_view_icon.dart';
 
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:coin_log/services/AccountService.dart';
-import 'package:coin_log/objects/Record.dart';
+import 'package:coin_log/models/Record.dart';
 import 'package:logging/logging.dart';
 
 class RecordDetails extends StatefulWidget {

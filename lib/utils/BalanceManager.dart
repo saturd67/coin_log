@@ -1,5 +1,5 @@
-import 'package:coin_log/objects/Account.dart';
-import 'package:coin_log/objects/Record.dart';
+import 'package:coin_log/models/Account.dart';
+import 'package:coin_log/models/Record.dart';
 import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/services/RecordService.dart';
 

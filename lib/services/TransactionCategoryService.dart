@@ -1,4 +1,4 @@
-import 'package:coin_log/objects/TransactionCategory.dart';
+import 'package:coin_log/models/TransactionCategory.dart';
 import 'package:coin_log/services/DatabaseService.dart';
 
 class TransactionCategoryService {

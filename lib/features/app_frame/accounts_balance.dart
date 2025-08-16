@@ -1,5 +1,5 @@
 import 'package:coin_log/constants/IconMap.dart';
-import 'package:coin_log/objects/Account.dart';
+import 'package:coin_log/models/Account.dart';
 import 'package:coin_log/router/RouterUtils.dart';
 import 'package:coin_log/services/AccountService.dart';
 import 'package:flutter/material.dart';

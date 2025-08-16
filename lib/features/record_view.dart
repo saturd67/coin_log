@@ -1,17 +1,17 @@
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:coin_log/main.dart';
-import 'package:coin_log/objects/Account.dart';
-import 'package:coin_log/objects/TransactionCategory.dart';
+import 'package:coin_log/models/Account.dart';
+import 'package:coin_log/models/TransactionCategory.dart';
 import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/services/RecordService.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:coin_log/utils/DateTimeFormatter.dart';
 import 'package:flutter/material.dart';
 
-import 'package:coin_log/objects/Record.dart';
+import 'package:coin_log/models/Record.dart';
 
 import '../router/RouterUtils.dart';
-import '../widgets/showConfirmationDialog.dart';
+import '../shared/showConfirmationDialog.dart';
 import 'record_details.dart';
 
 class RecordView extends StatefulWidget {
