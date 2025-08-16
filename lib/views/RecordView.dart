@@ -110,7 +110,7 @@ class _RecordViewState extends State<RecordView> {
                                               shape: BoxShape.circle,
                                               color: Theme.of(context).colorScheme.tertiary
                                           ),
-                                          child: Icon(coinLogTransactionCategoryIconMap[_record.transactionCategory!.icon]?.icon, size: Theme.of(context).iconTheme.size),
+                                          child: Icon(getTransactionCategoryIconData(_record.transactionCategory!.icon), size: Theme.of(context).iconTheme.size),
                                         ),
                                       ),
                                       Text(_record.transactionCategory!.name)
@@ -131,7 +131,7 @@ class _RecordViewState extends State<RecordView> {
                                               shape: BoxShape.circle,
                                               color: Theme.of(context).colorScheme.tertiary
                                           ),
-                                          child: Icon(coinLogAccountIconMap[_record.sourceAccount!.icon]?.icon, size: Theme.of(context).iconTheme.size),
+                                          child: Icon(getAccountIconData(_record.sourceAccount!.icon), size: Theme.of(context).iconTheme.size),
                                         ),
                                       ),
                                       Text(_record.sourceAccount!.name),
@@ -145,7 +145,7 @@ class _RecordViewState extends State<RecordView> {
                                               shape: BoxShape.circle,
                                               color: Theme.of(context).colorScheme.tertiary
                                           ),
-                                          child: Icon(coinLogAccountIconMap[_record.destinationAccount!.icon]?.icon, size: Theme.of(context).iconTheme.size),
+                                          child: Icon(getAccountIconData(_record.destinationAccount!.icon), size: Theme.of(context).iconTheme.size),
                                         ),
                                       ),
                                       Text(_record.destinationAccount!.name),

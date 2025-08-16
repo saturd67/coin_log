@@ -46,7 +46,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
     setState(() {
       this._transactionCategory = _transactionCategory!;
       _controller.text = this._transactionCategory.name;
-      onDisplayIconData = coinLogTransactionCategoryIconMap[this._transactionCategory.icon]!.icon;
+      onDisplayIconData = getTransactionCategoryIconData(this._transactionCategory.icon);
     });
   }
 
@@ -164,7 +164,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
-                    children: getGroupedIcons(coinLogTransactionCategoryIconMap).entries.map((entry) {
+                    children: getGroupedIcons(transactionCategoryIconMap).entries.map((entry) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -190,14 +190,14 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                                 onTap: () {
                                   setState(() {
                                     _transactionCategory.icon = entry.value[index].keys.first;
-                                    onDisplayIconData = coinLogTransactionCategoryIconMap[_transactionCategory.icon]!.icon;
+                                    onDisplayIconData = getTransactionCategoryIconData(_transactionCategory.icon);
                                   });
                                 },
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    GridViewIcon(iconData: entry.value[index].values.first.icon, isSelected: entry.value[index].keys.first == _transactionCategory.icon),
+                                    GridViewIcon(iconData: entry.value[index].values.first.iconData, isSelected: entry.value[index].keys.first == _transactionCategory.icon),
                                     Text(entry.value[index].values.first.name, style: TextStyle(fontSize: 13))
                                   ],
                                 ),

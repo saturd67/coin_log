@@ -78,7 +78,7 @@ class _AccountListState extends State<AccountList> {
                                     mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      GridViewIcon(iconData: coinLogAccountIconMap[_accounts[_reorderIndex!].icon]!.icon, containerSize: 55, iconSize: 26),
+                                      GridViewIcon(iconData: getAccountIconData(_accounts[_reorderIndex!].icon), containerSize: 55, iconSize: 26),
                                     ],
                                   );
                                 },
@@ -111,7 +111,7 @@ class _AccountListState extends State<AccountList> {
                                         mainAxisSize: MainAxisSize.max,
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
-                                          GridViewIcon(iconData: coinLogAccountIconMap[_accounts[index].icon]!.icon),
+                                          GridViewIcon(iconData: getAccountIconData(_accounts[index].icon)),
                                           Text(_accounts[index].name, style: TextStyle(fontSize: 13))
                                         ],
                                       ),

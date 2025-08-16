@@ -87,7 +87,7 @@ class _TransactionListState extends State<TransactionList> {
                                       mainAxisSize: MainAxisSize.max,
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
-                                        GridViewIcon(iconData: coinLogTransactionCategoryIconMap[_transactionCategories[_reorderIndex!].icon]!.icon, containerSize: 55, iconSize: 26),
+                                        GridViewIcon(iconData: getTransactionCategoryIconData(_transactionCategories[_reorderIndex!].icon), containerSize: 55, iconSize: 26),
                                       ],
                                     );
                                   },
@@ -121,7 +121,7 @@ class _TransactionListState extends State<TransactionList> {
                                           mainAxisSize: MainAxisSize.max,
                                           mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
-                                            GridViewIcon(iconData: coinLogTransactionCategoryIconMap[_transactionCategories[index].icon]!.icon),
+                                            GridViewIcon(iconData: getTransactionCategoryIconData(_transactionCategories[index].icon)),
                                             Text(_transactionCategories[index].name, style: TextStyle(fontSize: 13))
                                           ],
                                         ),

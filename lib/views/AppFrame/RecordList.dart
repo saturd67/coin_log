@@ -467,7 +467,7 @@ class _TransactionRecordDayBodyItemState extends State<TransactionRecordDayBodyI
                         padding: EdgeInsetsDirectional.fromSTEB(
                             0, 0, 10, 0),
                         child: Icon(
-                          coinLogTransactionCategoryIconMap[widget.record.transactionCategory!.icon]!.icon,
+                          getTransactionCategoryIconData(widget.record.transactionCategory!.icon),
                           color: Color(0xFFFFD700),
                           size: 30,
                         ),
@@ -542,7 +542,7 @@ class _TransferRecordDayBodyItemState extends State<TransferRecordDayBodyItem> {
                         padding: EdgeInsetsDirectional.fromSTEB(
                             0, 0, 10, 0),
                         child: Icon(
-                          coinLogAccountIconMap[widget.record.sourceAccount!.icon]!.icon,
+                          getAccountIconData(widget.record.sourceAccount!.icon),
                           color: Color(0xFFFFD700),
                           size: 30,
                         ),
@@ -553,7 +553,7 @@ class _TransferRecordDayBodyItemState extends State<TransferRecordDayBodyItem> {
                         padding: EdgeInsetsDirectional.fromSTEB(
                             0, 0, 10, 0),
                         child: Icon(
-                          coinLogAccountIconMap[widget.record.destinationAccount!.icon]!.icon,
+                          getAccountIconData(widget.record.destinationAccount!.icon),
                           color: Color(0xFFFFD700),
                           size: 30,
                         ),

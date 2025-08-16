@@ -207,7 +207,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             if (itemIndex < _transactionCategories.length) ... {
-                                              GridViewIcon(iconData: coinLogTransactionCategoryIconMap[_transactionCategories[itemIndex].icon]!.icon, isSelected: _transactionCategories[itemIndex].identifier == _selectedTransactionCategoryId,),
+                                              GridViewIcon(iconData: getTransactionCategoryIconData(_transactionCategories[itemIndex].icon), isSelected: _transactionCategories[itemIndex].identifier == _selectedTransactionCategoryId,),
                                               Text(_transactionCategories[itemIndex].name, style: TextStyle(
                                                   fontSize: 13
                                               ),)
@@ -250,7 +250,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               if (itemIndex < _accounts.length) ... {
-                                                GridViewIcon(iconData: coinLogAccountIconMap[_accounts[itemIndex].icon]!.icon, isSelected: _selectedAccountId == null ? _accounts[itemIndex].isDefault : _accounts[itemIndex].identifier == _selectedAccountId,),
+                                                GridViewIcon(iconData: getAccountIconData(_accounts[itemIndex].icon), isSelected: _selectedAccountId == null ? _accounts[itemIndex].isDefault : _accounts[itemIndex].identifier == _selectedAccountId,),
                                                 Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13),)
                                               }
                                             ],
@@ -292,7 +292,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              GridViewIcon(iconData: coinLogAccountIconMap[_accounts[itemIndex].icon]!.icon, isSelected: _accounts[itemIndex].identifier == _selectedSourceAccountId, isDisabled: _accounts[itemIndex].identifier == _selectedDestinationAccountId,),
+                                              GridViewIcon(iconData: getAccountIconData(_accounts[itemIndex].icon), isSelected: _accounts[itemIndex].identifier == _selectedSourceAccountId, isDisabled: _accounts[itemIndex].identifier == _selectedDestinationAccountId,),
                                               Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13),)
                                             ],
                                           ),
@@ -331,7 +331,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              GridViewIcon(iconData: coinLogAccountIconMap[_accounts[itemIndex].icon]!.icon, isSelected: _accounts[itemIndex].identifier == _selectedDestinationAccountId, isDisabled: _accounts[itemIndex].identifier == _selectedSourceAccountId),
+                                              GridViewIcon(iconData: getAccountIconData(_accounts[itemIndex].icon), isSelected: _accounts[itemIndex].identifier == _selectedDestinationAccountId, isDisabled: _accounts[itemIndex].identifier == _selectedSourceAccountId),
                                               Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13))
                                             ],
                                           ),

@@ -48,7 +48,7 @@ class _TransactionDetailsState extends State<AccountDetails> {
     setState(() {
       this._account = _account!;
       _controller.text = this._account.name;
-      onDisplayIconData = coinLogAccountIconMap[this._account.icon]!.icon;
+      onDisplayIconData = getAccountIconData(this._account.icon);
     });
   }
 
@@ -165,7 +165,7 @@ class _TransactionDetailsState extends State<AccountDetails> {
                     Expanded(
                       child: SingleChildScrollView(
                           child: Column(
-                            children: getGroupedIcons(coinLogAccountIconMap).entries.map((entry) {
+                            children: getGroupedIcons(accountIconMap).entries.map((entry) {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -191,14 +191,14 @@ class _TransactionDetailsState extends State<AccountDetails> {
                                           onTap: () {
                                             setState(() {
                                               _account.icon = entry.value[index].keys.first;
-                                              onDisplayIconData = coinLogAccountIconMap[_account.icon]!.icon;
+                                              onDisplayIconData = getAccountIconData(_account.icon);
                                             });
                                           },
                                           child: Column(
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              GridViewIcon(iconData: entry.value[index].values.first.icon, isSelected: entry.value[index].keys.first == _account.icon),
+                                              GridViewIcon(iconData: entry.value[index].values.first.iconData, isSelected: entry.value[index].keys.first == _account.icon),
                                               Text(entry.value[index].values.first.name, style: TextStyle(fontSize: 13))
                                             ],
                                           ),

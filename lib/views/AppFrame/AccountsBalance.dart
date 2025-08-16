@@ -38,7 +38,7 @@ class _AccountsBalanceState extends State<AccountsBalance> {
       ),
       body: ListView(
         children: List.generate(_accounts.length, (index) {
-          return AccountsBalanceItem(icon: coinLogAccountIconMap[_accounts[index].icon]!.icon, name: _accounts[index].name, balance: _accounts[index].balance);
+          return AccountsBalanceItem(icon: getAccountIconData(_accounts[index].icon), name: _accounts[index].name, balance: _accounts[index].balance);
         })
       ),
     );

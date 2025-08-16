@@ -2,7 +2,7 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 
-enum CoinLogIconCategory {
+enum IconCategory {
   food(name: "food", value: "Food"),
   shopping(name: "shopping", value: "Shopping"),
   transportation(name: "transportation", value: "Transportation"),
@@ -12,93 +12,106 @@ enum CoinLogIconCategory {
   final String name;
   final Object value;
 
-  const CoinLogIconCategory({required this.name, required this.value});
-
+  const IconCategory({required this.name, required this.value});
 }
 
-Map<String, CoinLogIcon> coinLogTransactionCategoryIconMap = {
-  "lunch_dining": CoinLogIcon(category: CoinLogIconCategory.food, name: "Lunch Dining", icon: Icons.lunch_dining),
-  "restaurant": CoinLogIcon(category: CoinLogIconCategory.food, name: "Restaurant", icon: Icons.restaurant),
-  "coffee": CoinLogIcon(category: CoinLogIconCategory.food, name: "Coffee", icon: Icons.local_cafe),
-  "fastfood": CoinLogIcon(category: CoinLogIconCategory.food, name: "Fast Food", icon: Icons.fastfood),
-  "icecream": CoinLogIcon(category: CoinLogIconCategory.food, name: "Ice Cream", icon: Icons.icecream),
-  "cake": CoinLogIcon(category: CoinLogIconCategory.food, name: "Cake", icon: Icons.cake),
-  "local_bar": CoinLogIcon(category: CoinLogIconCategory.food, name: "Bar", icon: Icons.local_bar),
-  "grocery": CoinLogIcon(category: CoinLogIconCategory.food, name: "Grocery", icon: Icons.local_grocery_store),
-  "food_bank": CoinLogIcon(category: CoinLogIconCategory.food, name: "Food Bank", icon: Icons.food_bank),
-  "bakery_dining": CoinLogIcon(category: CoinLogIconCategory.food, name: "Bakery", icon: Icons.bakery_dining),
-  "taco": CoinLogIcon(category: CoinLogIconCategory.food, name: "Taco", icon: Icons.restaurant_menu),
-  "burger": CoinLogIcon(category: CoinLogIconCategory.food, name: "Burger", icon: Icons.local_dining),
-  "wine_bar": CoinLogIcon(category: CoinLogIconCategory.food, name: "Wine Bar", icon: Icons.wine_bar),
-  "local_pizza": CoinLogIcon(category: CoinLogIconCategory.food, name: "Pizza", icon: Icons.local_pizza),
-
-  "shopping_cart": CoinLogIcon(category: CoinLogIconCategory.shopping, name: "Shopping Cart", icon: Icons.shopping_cart),
-  "store": CoinLogIcon(category: CoinLogIconCategory.shopping, name: "Store", icon: Icons.store),
-  "local_mall": CoinLogIcon(category: CoinLogIconCategory.shopping, name: "Mall", icon: Icons.local_mall),
-  "card_giftcard": CoinLogIcon(category: CoinLogIconCategory.shopping, name: "Gift Card", icon: Icons.card_giftcard),
-  "add_shopping_cart": CoinLogIcon(category: CoinLogIconCategory.shopping, name: "Add to Cart", icon: Icons.add_shopping_cart),
-  "business_center": CoinLogIcon(category: CoinLogIconCategory.shopping, name: "Business", icon: Icons.business_center),
-  "credit_card": CoinLogIcon(category: CoinLogIconCategory.shopping, name: "Credit Card", icon: Icons.credit_card),
-  "shopping_basket": CoinLogIcon(category: CoinLogIconCategory.shopping, name: "Basket", icon: Icons.shopping_basket),
-  "shopping_bag": CoinLogIcon(category: CoinLogIconCategory.shopping, name: "Shopping Bag", icon: Icons.shopping_bag),
-  "toys": CoinLogIcon(category: CoinLogIconCategory.shopping, name: "Toys", icon: Icons.toys),
-  "clothing": CoinLogIcon(category: CoinLogIconCategory.shopping, name: "Clothing", icon: Icons.checkroom),
-  "watch": CoinLogIcon(category: CoinLogIconCategory.shopping, name: "Watch", icon: Icons.watch),
-  "sports_esports": CoinLogIcon(category: CoinLogIconCategory.shopping, name: "Electronics", icon: Icons.sports_esports),
-
-  "directions_car": CoinLogIcon(category: CoinLogIconCategory.transportation, name: "Car", icon: Icons.directions_car),
-  "directions_bus": CoinLogIcon(category: CoinLogIconCategory.transportation, name: "Bus", icon: Icons.directions_bus),
-  "directions_bike": CoinLogIcon(category: CoinLogIconCategory.transportation, name: "Bicycle", icon: Icons.directions_bike),
-  "flight_takeoff": CoinLogIcon(category: CoinLogIconCategory.transportation, name: "Flight", icon: Icons.flight_takeoff),
-  "train": CoinLogIcon(category: CoinLogIconCategory.transportation, name: "Train", icon: Icons.train),
-  "directions_boat": CoinLogIcon(category: CoinLogIconCategory.transportation, name: "Boat", icon: Icons.directions_boat),
-  "airport_shuttle": CoinLogIcon(category: CoinLogIconCategory.transportation, name: "Shuttle", icon: Icons.airport_shuttle),
-  "directions_subway": CoinLogIcon(category: CoinLogIconCategory.transportation, name: "Subway", icon: Icons.directions_subway),
-  "commute": CoinLogIcon(category: CoinLogIconCategory.transportation, name: "Commute", icon: Icons.commute),
-  "electric_car": CoinLogIcon(category: CoinLogIconCategory.transportation, name: "Electric Car", icon: Icons.electric_car),
-  
-  "pets": CoinLogIcon(category: CoinLogIconCategory.other, name: "Pets", icon: Icons.pets),
-  "accessibility": CoinLogIcon(category: CoinLogIconCategory.other, name: "Accessibility", icon: Icons.accessibility),
-  "alarm": CoinLogIcon(category: CoinLogIconCategory.other, name: "Alarm", icon: Icons.alarm),
-  "event": CoinLogIcon(category: CoinLogIconCategory.other, name: "Event", icon: Icons.event),
-  "help": CoinLogIcon(category: CoinLogIconCategory.other, name: "Help", icon: Icons.help),
-  "info": CoinLogIcon(category: CoinLogIconCategory.other, name: "Information", icon: Icons.info),
-  "language": CoinLogIcon(category: CoinLogIconCategory.other, name: "Language", icon: Icons.language),
-  "lock": CoinLogIcon(category: CoinLogIconCategory.other, name: "Lock", icon: Icons.lock),
-  "location_on": CoinLogIcon(category: CoinLogIconCategory.other, name: "Location", icon: Icons.location_on),
-  "notifications": CoinLogIcon(category: CoinLogIconCategory.other, name: "Notifications", icon: Icons.notifications),
-  "phone": CoinLogIcon(category: CoinLogIconCategory.other, name: "Phone", icon: Icons.phone),
-  "public": CoinLogIcon(category: CoinLogIconCategory.other, name: "Public", icon: Icons.public),
-  "settings": CoinLogIcon(category: CoinLogIconCategory.other, name: "Settings", icon: Icons.settings),
-  "star": CoinLogIcon(category: CoinLogIconCategory.other, name: "Favorites", icon: Icons.star),
-  "visibility": CoinLogIcon(category: CoinLogIconCategory.other, name: "Visibility", icon: Icons.visibility),
-};
-
-Map<String, CoinLogIcon> coinLogAccountIconMap = {
-  "account_balance": CoinLogIcon(category: CoinLogIconCategory.account, name: "Bank", icon: Icons.account_balance),
-  "account_balance_wallet_rounded": CoinLogIcon(category: CoinLogIconCategory.account, name: "Wallet", icon: Icons.account_balance_wallet_rounded),
-  "credit_card": CoinLogIcon(category: CoinLogIconCategory.account, name: "Card", icon: Icons.credit_card),
-  "monetization_on": CoinLogIcon(category: CoinLogIconCategory.account, name: "E-Wallet", icon: Icons.monetization_on),
-  "money": CoinLogIcon(category: CoinLogIconCategory.account, name: "Cash", icon: Icons.money),
-  "phonelink_ring": CoinLogIcon(category: CoinLogIconCategory.account, name: "E-Wallet", icon: Icons.phonelink_ring),
-};
-
 class CoinLogIcon {
-  final CoinLogIconCategory category;
+  final IconCategory category;
   final String name;
-  final IconData icon;
+  final IconData iconData;
 
   CoinLogIcon({
     required this.category,
     required this.name,
-    required this.icon
+    required this.iconData
   });
 }
 
-Map<CoinLogIconCategory, List<Map<String,CoinLogIcon>>> getGroupedIcons(Map<String, CoinLogIcon> coinLogIconMap) {
-  Map<CoinLogIconCategory, List<Map<String,CoinLogIcon>>> groupedIcons = {};
+Map<String, CoinLogIcon> transactionCategoryIconMap = {
+  "lunch_dining": CoinLogIcon(category: IconCategory.food, name: "Lunch Dining", iconData: Icons.lunch_dining),
+  "restaurant": CoinLogIcon(category: IconCategory.food, name: "Restaurant", iconData: Icons.restaurant),
+  "coffee": CoinLogIcon(category: IconCategory.food, name: "Coffee", iconData: Icons.local_cafe),
+  "fastfood": CoinLogIcon(category: IconCategory.food, name: "Fast Food", iconData: Icons.fastfood),
+  "icecream": CoinLogIcon(category: IconCategory.food, name: "Ice Cream", iconData: Icons.icecream),
+  "cake": CoinLogIcon(category: IconCategory.food, name: "Cake", iconData: Icons.cake),
+  "local_bar": CoinLogIcon(category: IconCategory.food, name: "Bar", iconData: Icons.local_bar),
+  "grocery": CoinLogIcon(category: IconCategory.food, name: "Grocery", iconData: Icons.local_grocery_store),
+  "food_bank": CoinLogIcon(category: IconCategory.food, name: "Food Bank", iconData: Icons.food_bank),
+  "bakery_dining": CoinLogIcon(category: IconCategory.food, name: "Bakery", iconData: Icons.bakery_dining),
+  "taco": CoinLogIcon(category: IconCategory.food, name: "Taco", iconData: Icons.restaurant_menu),
+  "burger": CoinLogIcon(category: IconCategory.food, name: "Burger", iconData: Icons.local_dining),
+  "wine_bar": CoinLogIcon(category: IconCategory.food, name: "Wine Bar", iconData: Icons.wine_bar),
+  "local_pizza": CoinLogIcon(category: IconCategory.food, name: "Pizza", iconData: Icons.local_pizza),
+
+  "shopping_cart": CoinLogIcon(category: IconCategory.shopping, name: "Shopping Cart", iconData: Icons.shopping_cart),
+  "store": CoinLogIcon(category: IconCategory.shopping, name: "Store", iconData: Icons.store),
+  "local_mall": CoinLogIcon(category: IconCategory.shopping, name: "Mall", iconData: Icons.local_mall),
+  "card_giftcard": CoinLogIcon(category: IconCategory.shopping, name: "Gift Card", iconData: Icons.card_giftcard),
+  "add_shopping_cart": CoinLogIcon(category: IconCategory.shopping, name: "Add to Cart", iconData: Icons.add_shopping_cart),
+  "business_center": CoinLogIcon(category: IconCategory.shopping, name: "Business", iconData: Icons.business_center),
+  "credit_card": CoinLogIcon(category: IconCategory.shopping, name: "Credit Card", iconData: Icons.credit_card),
+  "shopping_basket": CoinLogIcon(category: IconCategory.shopping, name: "Basket", iconData: Icons.shopping_basket),
+  "shopping_bag": CoinLogIcon(category: IconCategory.shopping, name: "Shopping Bag", iconData: Icons.shopping_bag),
+  "toys": CoinLogIcon(category: IconCategory.shopping, name: "Toys", iconData: Icons.toys),
+  "clothing": CoinLogIcon(category: IconCategory.shopping, name: "Clothing", iconData: Icons.checkroom),
+  "watch": CoinLogIcon(category: IconCategory.shopping, name: "Watch", iconData: Icons.watch),
+  "sports_esports": CoinLogIcon(category: IconCategory.shopping, name: "Electronics", iconData: Icons.sports_esports),
+
+  "directions_car": CoinLogIcon(category: IconCategory.transportation, name: "Car", iconData: Icons.directions_car),
+  "directions_bus": CoinLogIcon(category: IconCategory.transportation, name: "Bus", iconData: Icons.directions_bus),
+  "directions_bike": CoinLogIcon(category: IconCategory.transportation, name: "Bicycle", iconData: Icons.directions_bike),
+  "flight_takeoff": CoinLogIcon(category: IconCategory.transportation, name: "Flight", iconData: Icons.flight_takeoff),
+  "train": CoinLogIcon(category: IconCategory.transportation, name: "Train", iconData: Icons.train),
+  "directions_boat": CoinLogIcon(category: IconCategory.transportation, name: "Boat", iconData: Icons.directions_boat),
+  "airport_shuttle": CoinLogIcon(category: IconCategory.transportation, name: "Shuttle", iconData: Icons.airport_shuttle),
+  "directions_subway": CoinLogIcon(category: IconCategory.transportation, name: "Subway", iconData: Icons.directions_subway),
+  "commute": CoinLogIcon(category: IconCategory.transportation, name: "Commute", iconData: Icons.commute),
+  "electric_car": CoinLogIcon(category: IconCategory.transportation, name: "Electric Car", iconData: Icons.electric_car),
+  
+  "pets": CoinLogIcon(category: IconCategory.other, name: "Pets", iconData: Icons.pets),
+  "accessibility": CoinLogIcon(category: IconCategory.other, name: "Accessibility", iconData: Icons.accessibility),
+  "alarm": CoinLogIcon(category: IconCategory.other, name: "Alarm", iconData: Icons.alarm),
+  "event": CoinLogIcon(category: IconCategory.other, name: "Event", iconData: Icons.event),
+  "help": CoinLogIcon(category: IconCategory.other, name: "Help", iconData: Icons.help),
+  "info": CoinLogIcon(category: IconCategory.other, name: "Information", iconData: Icons.info),
+  "language": CoinLogIcon(category: IconCategory.other, name: "Language", iconData: Icons.language),
+  "lock": CoinLogIcon(category: IconCategory.other, name: "Lock", iconData: Icons.lock),
+  "location_on": CoinLogIcon(category: IconCategory.other, name: "Location", iconData: Icons.location_on),
+  "notifications": CoinLogIcon(category: IconCategory.other, name: "Notifications", iconData: Icons.notifications),
+  "phone": CoinLogIcon(category: IconCategory.other, name: "Phone", iconData: Icons.phone),
+  "public": CoinLogIcon(category: IconCategory.other, name: "Public", iconData: Icons.public),
+  "settings": CoinLogIcon(category: IconCategory.other, name: "Settings", iconData: Icons.settings),
+  "star": CoinLogIcon(category: IconCategory.other, name: "Favorites", iconData: Icons.star),
+  "visibility": CoinLogIcon(category: IconCategory.other, name: "Visibility", iconData: Icons.visibility),
+};
+
+Map<String, CoinLogIcon> accountIconMap = {
+  "account_balance": CoinLogIcon(category: IconCategory.account, name: "Bank", iconData: Icons.account_balance),
+  "account_balance_wallet_rounded": CoinLogIcon(category: IconCategory.account, name: "Wallet", iconData: Icons.account_balance_wallet_rounded),
+  "credit_card": CoinLogIcon(category: IconCategory.account, name: "Card", iconData: Icons.credit_card),
+  "monetization_on": CoinLogIcon(category: IconCategory.account, name: "E-Wallet", iconData: Icons.monetization_on),
+  "money": CoinLogIcon(category: IconCategory.account, name: "Cash", iconData: Icons.money),
+  "phonelink_ring": CoinLogIcon(category: IconCategory.account, name: "E-Wallet", iconData: Icons.phonelink_ring),
+};
+
+IconData getTransactionCategoryIconData(String iconKey) {
+  if (transactionCategoryIconMap[iconKey] != null) {
+    return transactionCategoryIconMap[iconKey]!.iconData;
+  }
+  return Icons.image_not_supported;
+}
+
+IconData getAccountIconData(String iconKey) {
+  if (accountIconMap[iconKey] != null) {
+    return accountIconMap[iconKey]!.iconData;
+  }
+  return Icons.image_not_supported;
+}
+
+Map<IconCategory, List<Map<String,CoinLogIcon>>> getGroupedIcons(Map<String, CoinLogIcon> coinLogIconMap) {
+  Map<IconCategory, List<Map<String,CoinLogIcon>>> groupedIcons = {};
   coinLogIconMap.forEach((key, value) {
     groupedIcons.putIfAbsent(value.category, () => []).add({key: value});
   });
   return groupedIcons;
-} 
+}
