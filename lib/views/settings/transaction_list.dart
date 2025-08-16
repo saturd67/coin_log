@@ -1,9 +1,9 @@
 import 'package:coin_log/objects/TransactionCategory.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:flutter/material.dart';
-import 'package:coin_log/views/Settings/TransactionDetails.dart';
-import 'package:coin_log/widgets/GridViewIcon.dart';
-import 'package:coin_log/widgets/SwitchButton.dart';
+import 'package:coin_log/views/Settings/transaction_details.dart';
+import 'package:coin_log/widgets/grid_view_icon.dart';
+import 'package:coin_log/widgets/switch_button.dart';
 
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:reorderables/reorderables.dart';

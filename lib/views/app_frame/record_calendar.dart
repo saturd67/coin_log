@@ -1,7 +1,7 @@
 import 'package:coin_log/main.dart';
-import 'package:coin_log/views/RecordDetails.dart';
+import 'package:coin_log/views/record_details.dart';
 import 'package:flutter/material.dart';
-import 'package:coin_log/widgets/ThemedShowMonthPicker.dart';
+import 'package:coin_log/widgets/themedShowMonthPicker.dart';
 import 'package:coin_log/constants/MonthMap.dart';
 import 'package:coin_log/objects/Record.dart';
 import 'package:coin_log/services/RecordService.dart';

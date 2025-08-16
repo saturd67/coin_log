@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:coin_log/router/RouterUtils.dart';
-import 'package:coin_log/views/Settings/TransactionList.dart';
-import 'package:coin_log/views/Settings/AccountList.dart';
+import 'package:coin_log/views/Settings/transaction_list.dart';
+import 'package:coin_log/views/Settings/account_list.dart';
 
 class Settings extends StatelessWidget {
   @override

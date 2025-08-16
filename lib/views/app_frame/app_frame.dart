@@ -1,10 +1,10 @@
-import 'package:coin_log/views/AppFrame/AccountsBalance.dart';
+import 'package:coin_log/views/app_frame/accounts_balance.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/router/RouterUtils.dart';
-import 'package:coin_log/views/AppFrame/RecordList.dart';
-import 'package:coin_log/views/AppFrame/Summary.dart';
-import 'package:coin_log/views/AppFrame/Settings.dart';
-import 'package:coin_log/views/RecordDetails.dart';
+import 'package:coin_log/views/app_frame/record_list.dart';
+import 'package:coin_log/views/app_frame/summary.dart';
+import 'package:coin_log/views/app_frame/settings.dart';
+import 'package:coin_log/views/record_details.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 class AppFramePage extends StatefulWidget {

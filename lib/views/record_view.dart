@@ -12,7 +12,7 @@ import 'package:coin_log/objects/Record.dart';
 
 import '../router/RouterUtils.dart';
 import '../widgets/showConfirmationDialog.dart';
-import 'RecordDetails.dart';
+import 'record_details.dart';
 
 class RecordView extends StatefulWidget {
   final int identifier;
