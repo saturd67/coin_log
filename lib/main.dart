@@ -1,6 +1,6 @@
 import 'package:coin_log/services/DatabaseService.dart';
 import 'package:flutter/material.dart';
-import 'package:coin_log/features/app_frame/app_frame.dart';
+import 'package:coin_log/views/app_frame/app_frame.dart';
 import 'package:logging/logging.dart';
 
 void main() async {

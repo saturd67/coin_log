@@ -1,9 +1,9 @@
 import 'package:coin_log/constants/MonthMap.dart';
 import 'package:coin_log/main.dart';
 import 'package:coin_log/services/RecordService.dart';
-import 'package:coin_log/shared/switch_button.dart';
-import 'package:coin_log/shared/themedShowMonthPicker.dart';
-import 'package:coin_log/shared/themedShowYearPicker.dart';
+import 'package:coin_log/shared_widgets/switch_button.dart';
+import 'package:coin_log/shared_widgets/themedShowMonthPicker.dart';
+import 'package:coin_log/shared_widgets/themedShowYearPicker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';

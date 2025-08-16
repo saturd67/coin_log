@@ -1,7 +1,7 @@
 import 'package:coin_log/models/Account.dart';
-import 'package:coin_log/features/settings/account_details.dart';
+import 'package:coin_log/views/settings/account_details.dart';
 import 'package:flutter/material.dart';
-import 'package:coin_log/shared/grid_view_icon.dart';
+import 'package:coin_log/shared_widgets/grid_view_icon.dart';
 import 'package:logging/logging.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:coin_log/constants/IconMap.dart';

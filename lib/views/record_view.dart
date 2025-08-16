@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:coin_log/models/Record.dart';
 
 import '../router/RouterUtils.dart';
-import '../shared/showConfirmationDialog.dart';
+import '../shared_widgets/showConfirmationDialog.dart';
 import 'record_details.dart';
 
 class RecordView extends StatefulWidget {
