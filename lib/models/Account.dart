@@ -1,4 +1,8 @@
-class Account {
+import 'package:coin_log/models/BaseModel.dart';
+
+import '../form_models/AccountFormModel.dart';
+
+class Account implements BaseModel<AccountFormModel>{
   int? identifier;
   String name;
   String icon;
@@ -37,6 +41,7 @@ class Account {
     balance -= amount;
   }
 
+  @override
   Map<String, dynamic> toMap() {
     final map = <String, dynamic> {
       'NAME': name,
@@ -52,5 +57,18 @@ class Account {
     }
 
     return map;
+  }
+
+  @override
+  AccountFormModel toFormModel() {
+    return AccountFormModel(
+      identifier: identifier,
+      name: name,
+      icon: icon,
+      sequence: sequence,
+      balance: balance,
+      isDefault: isDefault,
+      isDeleted: isDeleted
+    );
   }
 }

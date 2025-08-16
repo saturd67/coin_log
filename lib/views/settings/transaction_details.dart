@@ -1,3 +1,4 @@
+import 'package:coin_log/form_models/TransactionCategoryFormModel.dart';
 import 'package:coin_log/models/TransactionCategory.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:coin_log/shared_widgets/themed_text_field.dart';
@@ -27,9 +28,8 @@ class _TransactionDetailsState extends State<TransactionDetails> {
   final TransactionCategoryService transactionCategoryService = TransactionCategoryService();
 
   int? _identifier;
-  late TransactionCategory _transactionCategory = TransactionCategory(name: "", icon: "", type: "Expense", sequence: 1, isDeleted: false);
+  TransactionCategoryFormModel _transactionCategoryFormModel = TransactionCategoryFormModel(type: "Expense", sequence: 1, isDeleted: false);
   IconData? onDisplayIconData;
-  TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -42,17 +42,19 @@ class _TransactionDetailsState extends State<TransactionDetails> {
   }
 
   void load() async {
-    final _transactionCategory = await transactionCategoryService.findById(widget.identifier!);
-    setState(() {
-      this._transactionCategory = _transactionCategory!;
-      _controller.text = this._transactionCategory.name;
-      onDisplayIconData = getTransactionCategoryIconData(this._transactionCategory.icon);
-    });
+    final transactionCategory = await transactionCategoryService.findById(widget.identifier!);
+
+    if (transactionCategory != null) {
+      setState(() {
+        _transactionCategoryFormModel = transactionCategory.toFormModel();
+        onDisplayIconData = getTransactionCategoryIconData(_transactionCategoryFormModel.icon);
+      });
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _transactionCategoryFormModel.dispose();
     super.dispose();
   }
 
@@ -67,34 +69,28 @@ class _TransactionDetailsState extends State<TransactionDetails> {
           actions: [
             IconButton(
               onPressed: () async {
-                _transactionCategory.name = _controller.text;
 
-                if (_transactionCategory.name == "") {
-                  ThemedToast.showToast("Invalid Name.");
-                  return;
+                TransactionCategory transactionCategory;
+                try {
+                  transactionCategory = _transactionCategoryFormModel.toModel();
                 }
 
-                if (_transactionCategory.type == "") {
-                  ThemedToast.showToast("Invalid Type.");
-                  return;
-                }
-
-                if (_transactionCategory.icon == "") {
-                  ThemedToast.showToast("Invalid Icon.");
+                catch (e) {
+                  ThemedToast.showToast(e as String);
                   return;
                 }
 
                 if (_identifier == null) {
-                  int? identifier = await transactionCategoryService.save(_transactionCategory);
-                  _transactionCategory.identifier = identifier;
+                  int? identifier = await transactionCategoryService.save(transactionCategory);
+                  transactionCategory.identifier = identifier;
 
-                  _log.info("Saved ${_transactionCategory.toMap()}");
+                  _log.info("Saved ${transactionCategory.toMap()}");
                 }
 
                 else {
-                  int? identifier = await transactionCategoryService.update(_transactionCategory);
+                  int? identifier = await transactionCategoryService.update(transactionCategory);
 
-                  _log.info("Updated ${_transactionCategory.toMap()}");
+                  _log.info("Updated ${transactionCategory.toMap()}");
                 }
 
                 Navigator.of(context).pop("reload");
@@ -124,7 +120,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                       child: ThemedTextField(
                         placeholder: "Name",
                         maxLenght: 10,
-                        controller: _controller,
+                        controller: _transactionCategoryFormModel.nameController,
                       )
                     ),
                   ],
@@ -137,9 +133,9 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                   children: [
                     SwitchButton(
                       labels: ["Expense", "Income"],
-                      selectedValue: _transactionCategory.type,
+                      selectedValue: _transactionCategoryFormModel.type!,
                       onChanged: (value) {
-                        _transactionCategory.type = value;
+                        _transactionCategoryFormModel.type = value;
                       }
                     ),
                     if (_identifier != null)
@@ -189,15 +185,15 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                               return GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    _transactionCategory.icon = entry.value[index].keys.first;
-                                    onDisplayIconData = getTransactionCategoryIconData(_transactionCategory.icon);
+                                    _transactionCategoryFormModel.icon = entry.value[index].keys.first;
+                                    onDisplayIconData = getTransactionCategoryIconData(_transactionCategoryFormModel.icon);
                                   });
                                 },
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    GridViewIcon(iconData: entry.value[index].values.first.iconData, isSelected: entry.value[index].keys.first == _transactionCategory.icon),
+                                    GridViewIcon(iconData: entry.value[index].values.first.iconData, isSelected: entry.value[index].keys.first == _transactionCategoryFormModel.icon),
                                     Text(entry.value[index].values.first.name, style: TextStyle(fontSize: 13))
                                   ],
                                 ),

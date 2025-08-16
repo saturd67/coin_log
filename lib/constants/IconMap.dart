@@ -94,7 +94,7 @@ Map<String, CoinLogIcon> accountIconMap = {
   "phonelink_ring": CoinLogIcon(category: IconCategory.account, name: "E-Wallet", iconData: Icons.phonelink_ring),
 };
 
-IconData getTransactionCategoryIconData(String iconKey) {
+IconData getTransactionCategoryIconData(String? iconKey) {
   if (transactionCategoryIconMap[iconKey] != null) {
     return transactionCategoryIconMap[iconKey]!.iconData;
   }
