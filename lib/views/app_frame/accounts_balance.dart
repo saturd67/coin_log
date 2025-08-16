@@ -22,9 +22,9 @@ class _AccountsBalanceState extends State<AccountsBalance> {
   }
 
   void load() async {
-    final _accounts = await _accountService.list();
+    final accounts = await _accountService.list();
     setState(() {
-      this._accounts = _accounts;
+      _accounts = accounts;
     });
   }
 

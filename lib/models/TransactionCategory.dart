@@ -1,4 +1,8 @@
-class TransactionCategory {
+import 'package:coin_log/form_models/TransactionCategoryFormModel.dart';
+
+import 'BaseModel.dart';
+
+class TransactionCategory implements BaseModel<TransactionCategoryFormModel>{
   int? identifier;
   String name;
   String icon;
@@ -26,6 +30,7 @@ class TransactionCategory {
     );
   }
 
+  @override
   Map<String, dynamic> toMap() {
     final map = <String, dynamic> {
       'NAME': name,
@@ -40,5 +45,17 @@ class TransactionCategory {
     }
 
     return map;
+  }
+
+  @override
+  TransactionCategoryFormModel toFormModel() {
+    return TransactionCategoryFormModel(
+      identifier: identifier,
+      name: name,
+      icon: icon,
+      type: type,
+      sequence: sequence,
+      isDeleted: isDeleted
+    );
   }
 }

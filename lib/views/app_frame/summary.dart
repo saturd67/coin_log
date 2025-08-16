@@ -10,15 +10,15 @@ import 'package:pie_chart/pie_chart.dart';
 import 'package:fl_chart/fl_chart.dart' hide PieChart;
 
 class SharedSelectedTransactionType extends ValueNotifier<String> {
-  SharedSelectedTransactionType(String value) : super(value);
+  SharedSelectedTransactionType(super.value);
 }
 
 class SharedSelectedSummaryType extends ValueNotifier<String> {
-  SharedSelectedSummaryType(String value) : super(value);
+  SharedSelectedSummaryType(super.value);
 }
 
 class SharedSelectedDateTime extends ValueNotifier<DateTime> {
-  SharedSelectedDateTime(DateTime value) : super(value);
+  SharedSelectedDateTime(super.value);
 }
 
 class Summary extends StatefulWidget {
@@ -531,7 +531,9 @@ class _PeriodSummaryState extends State<PeriodSummary> {
 
     else {
       tempPeriodTransactionAmountMaps = await _recordService.listMonthlyTransactionCategoryAmountByYearMonthTransactionType(selectedTransactionType, selectedYear);
-      tempPeriodTransactionAmountMaps.forEach((map) => print(map));
+      for (var map in tempPeriodTransactionAmountMaps) {
+        print(map);
+      }
     }
 
     setState(() {

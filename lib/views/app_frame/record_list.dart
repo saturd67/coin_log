@@ -14,7 +14,7 @@ import 'package:coin_log/constants/WeekMap.dart';
 import 'package:coin_log/utils/DateTimeFormatter.dart';
 
 class RecordList extends StatefulWidget {
-  const RecordList({Key? key}) : super(key: key);
+  const RecordList({super.key});
 
   @override
   State<RecordList> createState() => RecordListState();

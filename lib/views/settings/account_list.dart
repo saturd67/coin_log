@@ -26,12 +26,12 @@ class _AccountListState extends State<AccountList> {
   }
 
   void load() async {
-    final _accounts = await _accountService.list();
-    for (Account account in _accounts) {
+    final accounts = await _accountService.list();
+    for (Account account in accounts) {
       print(account.toMap());
     }
     setState(() {
-      this._accounts = _accounts;
+      _accounts = accounts;
     });
   }
 

@@ -1,4 +1,3 @@
-import 'package:coin_log/form_models/BaseFormModel.dart';
 import 'package:coin_log/form_models/TransactionCategoryFormModel.dart';
 import 'package:coin_log/form_models/AccountFormModel.dart';
 

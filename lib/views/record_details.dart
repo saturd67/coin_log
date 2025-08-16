@@ -101,35 +101,35 @@ class _RecordDetailsState extends State<RecordDetails> {
   }
 
   Future<void> loadRecord(int identifier) async {
-    final _record = await _recordService.findById(identifier);
+    final record = await _recordService.findById(identifier);
 
-    if (_record != null) {
+    if (record != null) {
       setState(() {
-        this._record = _record;
-        _amount = _record.amount.toStringAsFixed(2);
-        _selectedTransactionCategoryId = _record.transactionCategoryId;
+        _record = record;
+        _amount = record.amount.toStringAsFixed(2);
+        _selectedTransactionCategoryId = record.transactionCategoryId;
       });
     }
   }
 
   Future<void> loadTransactionCategories() async {
-    final _transactionCategories = await _transactionCategoryService.listByType(_record.type);
+    final transactionCategories = await _transactionCategoryService.listByType(_record.type);
 
     setState(() {
-      this._transactionCategories = _transactionCategories;
+      _transactionCategories = transactionCategories;
     });
   }
 
   Future<void> loadAccounts() async {
-    final _accounts = await _accountService.list();
+    final accounts = await _accountService.list();
 
     if (widget.identifier == null) {
-      Account defaultAccount = _accounts.where((account) => account.isDefault == true).toList().first;
+      Account defaultAccount = accounts.where((account) => account.isDefault == true).toList().first;
       _selectedAccountId = defaultAccount.identifier;
     }
 
     setState(() {
-      this._accounts = _accounts;
+      _accounts = accounts;
     });
   }
 

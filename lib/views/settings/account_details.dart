@@ -1,6 +1,5 @@
 import 'package:coin_log/main.dart';
 import 'package:coin_log/models/Account.dart';
-import 'package:coin_log/models/TransactionCategory.dart';
 import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/shared_widgets/themed_switch.dart';
 import 'package:coin_log/shared_widgets/themed_text_field.dart';
@@ -44,11 +43,11 @@ class _TransactionDetailsState extends State<AccountDetails> {
   }
 
   void load() async {
-    final _account = await accountService.findById(widget.identifier!);
+    final account = await accountService.findById(widget.identifier!);
     setState(() {
-      this._account = _account!;
-      _controller.text = this._account.name;
-      onDisplayIconData = getAccountIconData(this._account.icon);
+      _account = account!;
+      _controller.text = _account.name;
+      onDisplayIconData = getAccountIconData(_account.icon);
     });
   }
 

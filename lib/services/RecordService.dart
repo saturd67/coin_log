@@ -1,4 +1,3 @@
-import 'package:coin_log/models/Account.dart';
 import 'package:coin_log/models/Record.dart';
 import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/services/DatabaseService.dart';
