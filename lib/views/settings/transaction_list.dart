@@ -8,6 +8,8 @@ import 'package:coin_log/shared_widgets/switch_button.dart';
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:reorderables/reorderables.dart';
 
+import '../../models/Record.dart';
+
 class TransactionList extends StatefulWidget {
   @override
   State<TransactionList> createState() => _TransactionListState();
@@ -18,7 +20,7 @@ class _TransactionListState extends State<TransactionList> {
   TransactionCategoryService _transactionCategoryService = TransactionCategoryService();
 
   List<TransactionCategory> _transactionCategories = [];
-  String _selectedType = "Expense";
+  String _selectedType = RecordType.expense.name;
   int? _reorderIndex;
 
   @override
@@ -62,7 +64,7 @@ class _TransactionListState extends State<TransactionList> {
                     Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
                         child: SwitchButton(
-                          labels: ["Expense", "Income"],
+                          labels: [RecordType.expense.name, RecordType.income.name],
                           selectedValue: _selectedType,
                           onChanged: (String value) {
                             setState(() {

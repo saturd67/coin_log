@@ -47,7 +47,7 @@ class _RecordViewState extends State<RecordView> {
   void load() async {
     Record? record = await _recordService.findById(widget.identifier);
     if (record != null) {
-      if (["Expense", "Income"].contains(record.type)) {
+      if ([RecordType.expense.name, RecordType.income.name].contains(record.type)) {
         TransactionCategory transactionCategory = (await _transactionCategoryService.findById(record.transactionCategoryId!))!;
         record.transactionCategory = transactionCategory;
 
@@ -55,7 +55,7 @@ class _RecordViewState extends State<RecordView> {
         record.sourceAccount = account;
       }
 
-      else if (record.type == "Transfer") {
+      else if (record.type == RecordType.transfer.name) {
         Account sourceAccount = (await _accountService.findById(record.sourceAccountId!))!;
         record.sourceAccount = sourceAccount;
 
@@ -97,7 +97,7 @@ class _RecordViewState extends State<RecordView> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              if (["Expense", "Income"].contains(_record.type)) ... {
+                              if ([RecordType.expense.name, RecordType.income.name].contains(_record.type)) ... {
                                 Container(
                                   child: Row(
                                     children: [
@@ -118,7 +118,7 @@ class _RecordViewState extends State<RecordView> {
                                   ),
                                 ),
                               },
-                              if (_record.type == "Transfer") ... {
+                              if (_record.type == RecordType.transfer.name) ... {
                                 Container(
                                   child: Row(
                                     children: [
@@ -153,7 +153,7 @@ class _RecordViewState extends State<RecordView> {
                                   ),
                                 ),
                               },
-                              Text( _record.type == "Income" ? "+${_record.amount.toStringAsFixed(2)}" : "-${_record.amount.toStringAsFixed(2)}", style: TextStyle(color: _record.type == "Income" ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.danger),)
+                              Text( _record.type == RecordType.income.name ? "+${_record.amount.toStringAsFixed(2)}" : "-${_record.amount.toStringAsFixed(2)}", style: TextStyle(color: _record.type == RecordType.income.name ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.danger),)
                             ],
                           ),
                         ],
@@ -172,7 +172,7 @@ class _RecordViewState extends State<RecordView> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Text("${_record.type == "Income" ? "To" : "From"}:"),
+                                child: Text("${_record.type == RecordType.income.name ? "To" : "From"}:"),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -230,11 +230,11 @@ class _RecordViewState extends State<RecordView> {
                           context,
                           "Are you sure you want to delete?",
                               () async {
-                            if (["Expense", "Income"].contains(_record.type)) {
+                            if ([RecordType.expense.name, RecordType.income.name].contains(_record.type)) {
                               await _recordService.deleteTransaction(_record);
                             }
 
-                            else if (_record.type == "Transfer") {
+                            else if (_record.type == RecordType.transfer.name) {
                               await _recordService.deleteTransfer(_record);
                             }
 

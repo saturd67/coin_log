@@ -48,19 +48,19 @@ class RecordListState extends State<RecordList> {
       double income = 0;
       double expense = 0;
 
-      if (["Income", "Expense"].contains(record.type)) {
+      if ([RecordType.income.name, RecordType.expense.name].contains(record.type)) {
         record.transactionCategory = await _transactionCategoryService.findById(record.transactionCategoryId!);
         record.sourceAccount = await _accountService.findById(record.sourceAccountId!);
 
 
-        income = record.type == "Income" ? record.amount : 0;
+        income = record.type == RecordType.income.name ? record.amount : 0;
         totalIncome += income;
 
-        expense = record.type == "Expense" ? record.amount : 0;
+        expense = record.type == RecordType.expense.name ? record.amount : 0;
         totalExpense += expense;
       }
 
-      else if (record.type == "Transfer") {
+      else if (record.type == RecordType.transfer.name) {
         record.sourceAccount = await _accountService.findById(record.sourceAccountId!);
         record.destinationAccount = await _accountService.findById(record.destinationAccountId!);
       }
@@ -335,11 +335,11 @@ class _RecordDayState extends State<RecordDay> {
               Column(
                 children: [
                   for (var record in widget.groupedRecordItem.records) ... {
-                    if (["Expense", "Income"].contains(record.type)) ... {
+                    if ([RecordType.expense.name, RecordType.income.name].contains(record.type)) ... {
                       TransactionRecordDayBodyItem(record: record, load: widget.load)
                     }
 
-                    else if (record.type == "Transfer") ... {
+                    else if (record.type == RecordType.transfer.name) ... {
                       TransferRecordDayBodyItem(record: record, load: widget.load)
                     }
                   }
@@ -483,9 +483,9 @@ class _TransactionRecordDayBodyItemState extends State<TransactionRecordDayBodyI
                   decoration: BoxDecoration(),
                   alignment: AlignmentDirectional(1, 0),
                   child: Text(
-                    widget.record.type == "Income" ? "+${widget.record.amount}" : widget.record.type == "Expense" ? "-${widget.record.amount}" : "",
+                    widget.record.type == RecordType.income.name ? "+${widget.record.amount}" : widget.record.type == RecordType.expense.name ? "-${widget.record.amount}" : "",
                     style: TextStyle(
-                      color: widget.record.type == "Income" ? Theme.of(context).colorScheme.success : widget.record.type == "Expense" ? Theme.of(context).colorScheme.danger : Theme.of(context).colorScheme.danger,
+                      color: widget.record.type == RecordType.income.name ? Theme.of(context).colorScheme.success : widget.record.type == RecordType.expense.name ? Theme.of(context).colorScheme.danger : Theme.of(context).colorScheme.danger,
                     ),
                   ),
                 ),

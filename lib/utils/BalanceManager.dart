@@ -10,11 +10,11 @@ class BalanceManager {
 
   static Future<void> updateBalanceOnSaveTransactionRecord(Record record) async {
     Account account = (await _accountService.findById(record.sourceAccountId!))!;
-    if (record.type == "Income") {
+    if (record.type == RecordType.income.name) {
       account.balance += record.amount;
     }
 
-    else if (record.type == "Expense") {
+    else if (record.type == RecordType.expense.name) {
       account.balance -= record.amount;
     }
 
@@ -25,11 +25,11 @@ class BalanceManager {
     Record oriRecord = (await _recordService.findById(newRecord.identifier!))!;
     Account oriAccount = (await _accountService.findById(oriRecord.sourceAccountId!))!;
 
-    if (oriRecord.type == "Income") {
+    if (oriRecord.type == RecordType.income.name) {
       oriAccount.balance -= oriRecord.amount;
     }
 
-    else if (oriRecord.type == "Expense") {
+    else if (oriRecord.type == RecordType.expense.name) {
       oriAccount.balance += oriRecord.amount;
     }
 
@@ -37,11 +37,11 @@ class BalanceManager {
 
     Account newAccount = (await _accountService.findById(newRecord.sourceAccountId!))!;
 
-    if (newRecord.type == "Income") {
+    if (newRecord.type == RecordType.income.name) {
       newAccount.balance += newRecord.amount;
     }
 
-    else if (newRecord.type == "Expense") {
+    else if (newRecord.type == RecordType.expense.name) {
       newAccount.balance -= newRecord.amount;
     }
 
@@ -51,11 +51,11 @@ class BalanceManager {
   static Future<void> updateBalanceOnDeleteTransactionRecord(Record record) async {
     Account account = (await _accountService.findById(record.sourceAccountId!))!;
 
-    if (record.type == "Income") {
+    if (record.type == RecordType.income.name) {
       account.balance -= record.amount;
     }
 
-    else if (record.type == "Expense") {
+    else if (record.type == RecordType.expense.name) {
       account.balance += record.amount;
     }
 

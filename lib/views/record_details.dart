@@ -41,8 +41,8 @@ class _RecordDetailsState extends State<RecordDetails> {
   AccountService _accountService = AccountService();
   RecordService _recordService = RecordService();
 
-  RecordFormModel _recordFormModel = RecordFormModel(date: DateTime.now(), type: "Expense");
-  // Record _record = Record(transactionCategoryId: 0, sourceAccountId: 0, date: DateTime.now(), type: "Expense", amount: 0.0);
+  RecordFormModel _recordFormModel = RecordFormModel(date: DateTime.now(), type: RecordType.expense.name);
+  // Record _record = Record(transactionCategoryId: 0, sourceAccountId: 0, date: DateTime.now(), type: RecordType.expense.name, amount: 0.0);
   List<TransactionCategory> _transactionCategories = [];
   List<Account> _accounts = [];
   int? _selectedTransactionCategoryId;
@@ -91,11 +91,11 @@ class _RecordDetailsState extends State<RecordDetails> {
     ]);
 
     setState(() {
-      if (["Expense", "Income"].contains(_recordFormModel.type)) {
+      if ([RecordType.expense.name, RecordType.income.name].contains(_recordFormModel.type)) {
         _selectedAccountId = _recordFormModel.sourceAccountId;
       }
 
-      else if (_recordFormModel.type == "Transfer") {
+      else if (_recordFormModel.type == RecordType.transfer.name) {
         _selectedSourceAccountId = _recordFormModel.sourceAccountId;
         _selectedDestinationAccountId = _recordFormModel.destinationAccountId;
       }
@@ -167,7 +167,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), 
                           child: SwitchButton(
-                            labels: widget.identifier == null ? ["Expense", "Income", "Transfer"] : ["Expense", "Income"].contains(_recordFormModel.type) ? ["Expense", "Income"] : ["Transfer"],
+                            labels: widget.identifier == null ? [RecordType.expense.name, RecordType.income.name, RecordType.transfer.name] : [RecordType.expense.name, RecordType.income.name].contains(_recordFormModel.type) ? [RecordType.expense.name, RecordType.income.name] : [RecordType.transfer.name],
                             selectedValue: _recordFormModel.type!,
                             onChanged: (String value) {
                               setState(() {
@@ -266,7 +266,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                             ),
                           ),
                         }
-                        else if (_recordFormModel.type == "Transfer") ... {
+                        else if (_recordFormModel.type == RecordType.transfer.name) ... {
                           Padding(padding: EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold))),
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
@@ -399,7 +399,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                       }
                     },
                     onSaveButtonPressed: () async {
-                      if (_recordFormModel.type == "Expense" || _recordFormModel.type == "Income") {
+                      if (_recordFormModel.type == RecordType.expense.name || _recordFormModel.type == RecordType.income.name) {
                         Record record;
                         try {
                           _recordFormModel.transactionCategoryId = _selectedTransactionCategoryId;
@@ -443,7 +443,7 @@ class _RecordDetailsState extends State<RecordDetails> {
 
                       }
 
-                      else if (_recordFormModel.type == "Transfer") {
+                      else if (_recordFormModel.type == RecordType.transfer.name) {
                         Record record;
                         try {
                           _recordFormModel.sourceAccountId = _selectedSourceAccountId;

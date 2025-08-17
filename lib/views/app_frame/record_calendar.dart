@@ -69,16 +69,16 @@ class _RecordCalendarState extends State<RecordCalendar> {
     double sumIncome = 0;
     double sumExpense = 0;
     for(Record record in records) {
-      if (["Income", "Expense"].contains(record.type)) {
+      if ([RecordType.income.name, RecordType.expense.name].contains(record.type)) {
         if (!groupedRecordItemsWithDay.keys.contains(record.date.day)) {
-          sumIncome = record.type == "Income" ? record.amount : 0;
-          sumExpense = record.type == "Expense" ? record.amount : 0;
+          sumIncome = record.type == RecordType.income.name ? record.amount : 0;
+          sumExpense = record.type == RecordType.expense.name ? record.amount : 0;
           groupedRecordItemsWithDay.putIfAbsent(record.date.day, () => GroupedRecordItem(sumIncome, sumExpense, [record]));
         }
 
         else {
-          groupedRecordItemsWithDay[record.date.day]!.sumIncome += record.type == "Income" ? record.amount : 0;
-          groupedRecordItemsWithDay[record.date.day]!.sumExpense += record.type == "Expense" ? record.amount : 0;
+          groupedRecordItemsWithDay[record.date.day]!.sumIncome += record.type == RecordType.income.name ? record.amount : 0;
+          groupedRecordItemsWithDay[record.date.day]!.sumExpense += record.type == RecordType.expense.name ? record.amount : 0;
           groupedRecordItemsWithDay[record.date.day]!.records.add(record);
         }
       }

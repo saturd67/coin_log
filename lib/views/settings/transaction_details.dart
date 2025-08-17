@@ -10,6 +10,8 @@ import 'package:coin_log/shared_widgets/switch_button.dart';
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:logging/logging.dart';
 
+import '../../models/Record.dart';
+
 class TransactionDetails extends StatefulWidget {
 
   final int? identifier;
@@ -28,7 +30,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
   final TransactionCategoryService transactionCategoryService = TransactionCategoryService();
 
   int? _identifier;
-  TransactionCategoryFormModel _transactionCategoryFormModel = TransactionCategoryFormModel(type: "Expense", sequence: 1, isDeleted: false);
+  TransactionCategoryFormModel _transactionCategoryFormModel = TransactionCategoryFormModel(type: RecordType.expense.name, sequence: 1, isDeleted: false);
   IconData? onDisplayIconData;
 
   @override
@@ -132,7 +134,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SwitchButton(
-                      labels: ["Expense", "Income"],
+                      labels: [RecordType.expense.name, RecordType.income.name],
                       selectedValue: _transactionCategoryFormModel.type!,
                       onChanged: (value) {
                         _transactionCategoryFormModel.type = value;

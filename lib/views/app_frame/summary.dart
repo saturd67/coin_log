@@ -9,6 +9,8 @@ import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:fl_chart/fl_chart.dart' hide PieChart;
 
+import '../../models/Record.dart';
+
 class SharedSelectedTransactionType extends ValueNotifier<String> {
   SharedSelectedTransactionType(super.value);
 }
@@ -240,8 +242,8 @@ class _BalanceSummaryState extends State<BalanceSummary> {
     String selectedSummaryType = widget.sharedSelectedSummaryType.value;
     String selectedYear = widget.sharedSelectedDateTime.value.year.toString();
     String? selectedMonth = selectedSummaryType == "Monthly" ? widget.sharedSelectedDateTime.value.month.toString() : null;
-    final tempIncomeAmount = await _recordService.sumByTypeYearMonth("Income", selectedYear, selectedMonth);
-    final tempExpenseAmount = await _recordService.sumByTypeYearMonth("Expense", selectedYear, selectedMonth);
+    final tempIncomeAmount = await _recordService.sumByTypeYearMonth(RecordType.income.name, selectedYear, selectedMonth);
+    final tempExpenseAmount = await _recordService.sumByTypeYearMonth(RecordType.expense.name, selectedYear, selectedMonth);
 
 
     setState(() {

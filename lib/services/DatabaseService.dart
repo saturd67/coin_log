@@ -65,7 +65,7 @@ class DatabaseService {
             DESTINATION_ACCOUNT_ID  INTEGER,
             DATE                    DATE NOT NULL,
             DESCRIPTION             VARCHAR(50),
-            TYPE                    VARCHAR(8) NOT NULL,
+            TYPE                    VARCHAR(8) CHECK(TYPE IN ('Expense', 'Income', 'Transfer')) NOT NULL,
             AMOUNT                  DOUBLE NOT NULL,
             
             FOREIGN KEY (TRANSACTION_CATEGORY_ID) REFERENCES CL_TRANSACTION_CATEGORY(identifier),

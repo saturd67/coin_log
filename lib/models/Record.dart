@@ -3,6 +3,16 @@ import 'package:coin_log/models/Account.dart';
 import 'package:coin_log/models/BaseModel.dart';
 import 'package:coin_log/models/TransactionCategory.dart';
 
+enum RecordType {
+  expense(name: "Expense"),
+  income(name: "Income"),
+  transfer(name: "Transfer");
+
+  final String name;
+
+  const RecordType({required this.name});
+}
+
 class Record implements BaseModel<RecordFormModel>{
   int? identifier;
   DateTime date;
