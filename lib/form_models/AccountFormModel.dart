@@ -1,55 +1,61 @@
 import 'package:coin_log/form_models/BaseFormModel.dart';
 import 'package:coin_log/models/Account.dart';
+import 'package:flutter/cupertino.dart';
 
 class AccountFormModel implements BaseFormModel<Account>{
   int? identifier;
-  String? name;
   String? icon;
   int? sequence;
   double? balance;
   bool? isDefault;
   bool? isDeleted;
 
+  TextEditingController nameController = TextEditingController();
+
   AccountFormModel({
     this.identifier,
-    this.name,
     this.icon,
     this.sequence,
     this.balance,
     this.isDefault,
-    this.isDeleted
-  });
+    this.isDeleted,
+    String? name
+  }) : nameController = TextEditingController(text: name ?? "");
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    nameController.dispose();
   }
 
   @override
   Account toModel() {
-    if (name == null) {
-      throw Exception("Name could not be null.");
+    if (nameController.text == "") {
+      throw "Invalid name.";
     }
 
     if (icon == null) {
-      throw Exception("Icon could not be null.");
+      throw "Invalid icon.";
     }
 
     if (sequence == null) {
-      throw Exception("Sequence could not be null.");
+      throw "Invalid sequence.";
+    }
+
+    if (balance == null) {
+      throw "Invalid balance.";
     }
 
     if (isDefault == null) {
-      throw Exception("IsDefault could not be null.");
+      throw "Invalid isDefault.";
     }
 
     if (isDeleted == null) {
-      throw Exception("IsDeleted could not be null.");
+      throw "Invalid isDeleted.";
     }
 
     return Account(
       identifier: identifier,
-      name: name!,
+      name: nameController.text,
       icon: icon!,
       sequence: sequence!,
       balance: balance!,

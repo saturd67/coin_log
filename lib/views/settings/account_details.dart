@@ -1,3 +1,4 @@
+import 'package:coin_log/form_models/AccountFormModel.dart';
 import 'package:coin_log/main.dart';
 import 'package:coin_log/models/Account.dart';
 import 'package:coin_log/services/AccountService.dart';
@@ -28,9 +29,8 @@ class _TransactionDetailsState extends State<AccountDetails> {
   final AccountService accountService = AccountService();
 
   int? _identifier;
-  late Account _account = Account(name: "", icon: "", sequence: 1, balance: 0.0, isDefault: false, isDeleted: false);
+  AccountFormModel _accountFormModel = AccountFormModel(sequence: 1, balance: 0.0, isDefault: false, isDeleted: false);
   IconData? onDisplayIconData;
-  TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -44,16 +44,17 @@ class _TransactionDetailsState extends State<AccountDetails> {
 
   void load() async {
     final account = await accountService.findById(widget.identifier!);
-    setState(() {
-      _account = account!;
-      _controller.text = _account.name;
-      onDisplayIconData = getAccountIconData(_account.icon);
-    });
+    if  (account != null) {
+      setState(() {
+        _accountFormModel = account.toFormModel();
+        onDisplayIconData = getAccountIconData(_accountFormModel.icon!);
+      });
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _accountFormModel.dispose();
     super.dispose();
   }
 
@@ -68,29 +69,28 @@ class _TransactionDetailsState extends State<AccountDetails> {
               actions: [
                 IconButton(
                     onPressed: () async {
-                      _account.name = _controller.text;
 
-                      if (_account.name == "") {
-                        ThemedToast.showToast("Invalid Name.");
-                        return;
+                      Account account;
+                      try {
+                        account = _accountFormModel.toModel();
                       }
 
-                      if (_account.icon == "") {
-                        ThemedToast.showToast("Invalid Icon.");
+                      catch (e) {
+                        ThemedToast.showToast(e.toString());
                         return;
                       }
 
                       if (_identifier == null) {
-                        int? identifier = await accountService.save(_account);
-                        _account.identifier = identifier;
+                        int? identifier = await accountService.save(account);
+                        account.identifier = identifier;
 
-                        _log.info("Saved ${_account.toMap()}");
+                        _log.info("Saved ${account.toMap()}");
                       }
 
                       else {
-                        int? identifier = await accountService.update(_account);
+                        int? identifier = await accountService.update(account);
 
-                        _log.info("Updated ${_account.toMap()}");
+                        _log.info("Updated ${account.toMap()}");
                       }
 
                       Navigator.of(context).pop("reload");
@@ -120,7 +120,7 @@ class _TransactionDetailsState extends State<AccountDetails> {
                               child: ThemedTextField(
                                 placeholder: "Name",
                                 maxLenght: 10,
-                                controller: _controller,
+                                controller: _accountFormModel.nameController,
                               )
                           ),
                         ],
@@ -135,10 +135,10 @@ class _TransactionDetailsState extends State<AccountDetails> {
                               children: [
                                 Text("Default: "),
                                 ThemedSwitch(
-                                  value: _account.isDefault,
+                                  value: _accountFormModel.isDefault!,
                                   onChanged: (bool value) {
                                     setState(() {
-                                      _account.isDefault = value;
+                                      _accountFormModel.isDefault = value;
                                     });
                                   },
                                 ),
@@ -189,15 +189,15 @@ class _TransactionDetailsState extends State<AccountDetails> {
                                         return GestureDetector(
                                           onTap: () {
                                             setState(() {
-                                              _account.icon = entry.value[index].keys.first;
-                                              onDisplayIconData = getAccountIconData(_account.icon);
+                                              _accountFormModel.icon = entry.value[index].keys.first;
+                                              onDisplayIconData = getAccountIconData(_accountFormModel.icon!);
                                             });
                                           },
                                           child: Column(
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              GridViewIcon(iconData: entry.value[index].values.first.iconData, isSelected: entry.value[index].keys.first == _account.icon),
+                                              GridViewIcon(iconData: entry.value[index].values.first.iconData, isSelected: entry.value[index].keys.first == _accountFormModel.icon),
                                               Text(entry.value[index].values.first.name, style: TextStyle(fontSize: 13))
                                             ],
                                           ),
