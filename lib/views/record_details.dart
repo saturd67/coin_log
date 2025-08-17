@@ -411,6 +411,14 @@ class _RecordDetailsState extends State<RecordDetails> {
                           });
                           _recordFormModel.amount = double.parse(_amount);
 
+                          if (_recordFormModel.transactionCategoryId == null) {
+                            throw "Invalid Transaction Category";
+                          }
+
+                          if (_recordFormModel.sourceAccountId == null) {
+                            throw "Invalid Source Account";
+                          }
+
                           record = _recordFormModel.toModel();
                         }
                         catch(e) {
@@ -446,6 +454,14 @@ class _RecordDetailsState extends State<RecordDetails> {
                             _amount = calculator.onCalculate();
                           });
                           _recordFormModel.amount = double.parse(_amount);
+
+                          if (_recordFormModel.sourceAccountId == null) {
+                            throw "Invalid Source Account";
+                          }
+
+                          if (_recordFormModel.destinationAccountId == null) {
+                            throw "Invalid Source Account";
+                          }
 
                           record = _recordFormModel.toModel();
                         } catch(e) {
