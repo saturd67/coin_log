@@ -1,16 +1,21 @@
+import 'package:coin_log/form_models/RecordFormModel.dart';
 import 'package:coin_log/models/Account.dart';
+import 'package:coin_log/models/BaseModel.dart';
 import 'package:coin_log/models/TransactionCategory.dart';
 
-class Record {
+class Record implements BaseModel<RecordFormModel>{
   int? identifier;
-  int? transactionCategoryId;
-  int? sourceAccountId;
-  int? destinationAccountId;
   DateTime date;
   String? description;
   String type;
   double amount;
 
+  // Foreign keys
+  int? transactionCategoryId;
+  int? sourceAccountId;
+  int? destinationAccountId;
+
+  // Linked objects (optional)
   TransactionCategory? transactionCategory;
   Account? sourceAccount;
   Account? destinationAccount;
@@ -55,5 +60,19 @@ class Record {
     }
 
     return map;
+  }
+
+  @override
+  RecordFormModel toFormModel() {
+    return RecordFormModel(
+      identifier: identifier,
+      transactionCategoryId: transactionCategoryId,
+      sourceAccountId: sourceAccountId,
+      destinationAccountId: destinationAccountId,
+      date: date,
+      description: description,
+      type:type,
+      amount: amount
+    );
   }
 }

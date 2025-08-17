@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:coin_log/constants/WeekMap.dart';
+import 'package:coin_log/form_models/RecordFormModel.dart';
 import 'package:coin_log/models/Account.dart';
 import 'package:coin_log/models/TransactionCategory.dart';
 import 'package:coin_log/services/RecordService.dart';
@@ -40,7 +41,8 @@ class _RecordDetailsState extends State<RecordDetails> {
   AccountService _accountService = AccountService();
   RecordService _recordService = RecordService();
 
-  Record _record = Record(transactionCategoryId: 0, sourceAccountId: 0, date: DateTime.now(), type: "Expense", amount: 0.0);
+  RecordFormModel _recordFormModel = RecordFormModel(date: DateTime.now(), type: "Expense");
+  // Record _record = Record(transactionCategoryId: 0, sourceAccountId: 0, date: DateTime.now(), type: "Expense", amount: 0.0);
   List<TransactionCategory> _transactionCategories = [];
   List<Account> _accounts = [];
   int? _selectedTransactionCategoryId;
@@ -58,6 +60,7 @@ class _RecordDetailsState extends State<RecordDetails> {
   void initState() {
     super.initState();
 
+    // Setup keyboard
     _keyboardSubscription = KeyboardVisibilityController().onChange.listen((isVisible) {
       setState(() {
         _isKeyboardVisible = isVisible;
@@ -66,7 +69,7 @@ class _RecordDetailsState extends State<RecordDetails> {
 
     if (widget.defaultDateTime != null) {
       setState(() {
-        _record.date = widget.defaultDateTime!;
+        _recordFormModel.date = widget.defaultDateTime!;
       });
     }
 
@@ -82,20 +85,19 @@ class _RecordDetailsState extends State<RecordDetails> {
 
   void load(int identifier) async {
     await loadRecord(identifier);
-
     await Future.wait([
       loadTransactionCategories(),
       loadAccounts()
     ]);
 
     setState(() {
-      if (["Expense", "Income"].contains(_record.type)) {
-        _selectedAccountId = _record.sourceAccountId;
+      if (["Expense", "Income"].contains(_recordFormModel.type)) {
+        _selectedAccountId = _recordFormModel.sourceAccountId;
       }
 
-      else if (_record.type == "Transfer") {
-        _selectedSourceAccountId = _record.sourceAccountId;
-        _selectedDestinationAccountId = _record.destinationAccountId;
+      else if (_recordFormModel.type == "Transfer") {
+        _selectedSourceAccountId = _recordFormModel.sourceAccountId;
+        _selectedDestinationAccountId = _recordFormModel.destinationAccountId;
       }
     });
   }
@@ -105,7 +107,7 @@ class _RecordDetailsState extends State<RecordDetails> {
 
     if (record != null) {
       setState(() {
-        _record = record;
+        _recordFormModel = record.toFormModel();
         _amount = record.amount.toStringAsFixed(2);
         _selectedTransactionCategoryId = record.transactionCategoryId;
       });
@@ -113,7 +115,7 @@ class _RecordDetailsState extends State<RecordDetails> {
   }
 
   Future<void> loadTransactionCategories() async {
-    final transactionCategories = await _transactionCategoryService.listByType(_record.type);
+    final transactionCategories = await _transactionCategoryService.listByType(_recordFormModel.type!);
 
     setState(() {
       _transactionCategories = transactionCategories;
@@ -165,20 +167,20 @@ class _RecordDetailsState extends State<RecordDetails> {
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), 
                           child: SwitchButton(
-                            labels: widget.identifier == null ? ["Expense", "Income", "Transfer"] : ["Expense", "Income"].contains(_record.type) ? ["Expense", "Income"] : ["Transfer"],
-                            selectedValue: _record.type,
+                            labels: widget.identifier == null ? ["Expense", "Income", "Transfer"] : ["Expense", "Income"].contains(_recordFormModel.type) ? ["Expense", "Income"] : ["Transfer"],
+                            selectedValue: _recordFormModel.type!,
                             onChanged: (String value) {
                               setState(() {
                                 _selectedTransactionCategoryId = null;
                                 _selectedSourceAccountId = null;
                                 _selectedDestinationAccountId = null;
-                                _record.type = value;
+                                _recordFormModel.type = value;
                               });
                               loadTransactionCategories();
                             },
                           )
                         ),
-                        if (['Expense', 'Income'].contains(_record.type)) ... {
+                        if (['Expense', 'Income'].contains(_recordFormModel.type)) ... {
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
                             child: SizedBox(
@@ -264,7 +266,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                             ),
                           ),
                         }
-                        else if (_record.type == "Transfer") ... {
+                        else if (_recordFormModel.type == "Transfer") ... {
                           Padding(padding: EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold))),
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
@@ -354,7 +356,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                     isKeyboardVisible: _isKeyboardVisible,
                     descriptionController: _descriptionController,
                     amount: _amount,
-                    date: _record.date,
+                    date: _recordFormModel.date,
                     onValueButtonPressed: (String input) {
                       Calculator calculator = Calculator(_amount);
                       final tempAmount = calculator.onInput(input);
@@ -392,74 +394,75 @@ class _RecordDetailsState extends State<RecordDetails> {
 
                       if (selectedDate != null) {
                         setState(() {
-                          _record.date = selectedDate;
+                          _recordFormModel.date = selectedDate;
                         });
                       }
                     },
                     onSaveButtonPressed: () async {
-                      if (_record.type == "Expense" || _record.type == "Income") {
-                        if (_selectedTransactionCategoryId == null || _selectedTransactionCategoryId == 0) {
-                          return ThemedToast.showToast("Invalid Transaction Category");
+                      if (_recordFormModel.type == "Expense" || _recordFormModel.type == "Income") {
+                        Record record;
+                        try {
+                          _recordFormModel.transactionCategoryId = _selectedTransactionCategoryId;
+                          _recordFormModel.sourceAccountId = _selectedAccountId;
+
+                          Calculator calculator = Calculator(_amount);
+                          setState(() {
+                            _amount = calculator.onCalculate();
+                          });
+                          _recordFormModel.amount = double.parse(_amount);
+
+                          record = _recordFormModel.toModel();
                         }
-
-                        else if (_selectedAccountId == null || _selectedAccountId == 0) {
-                          return ThemedToast.showToast("Invalid Account");
+                        catch(e) {
+                          ThemedToast.showToast(e.toString());
+                          return;
                         }
-
-                        _record.transactionCategoryId = _selectedTransactionCategoryId!;
-                        _record.sourceAccountId = _selectedAccountId!;
-
-                        Calculator calculator = Calculator(_amount);
-                        setState(() {
-                          _amount = calculator.onCalculate();
-                        });
-                        _record.amount = double.parse(_amount);
 
                         if (widget.identifier == null) {
-                          int? identifier = await _recordService.saveTransaction(_record);
-                          _log.info("Saved ${_record.toMap()}");
+                          int? identifier = await _recordService.saveTransaction(record);
+                          _log.info("Saved ${record.toMap()}");
 
-                          Navigator.of(context).pop(["reload", _record.date]);
+                          Navigator.of(context).pop(["reload", record.date]);
                         }
 
                         else {
-                          int? identifier = await _recordService.updateTransaction(_record);
-                          _log.info("Updated ${_record.toMap()}");
+                          print(record.amount);
+                          int? identifier = await _recordService.updateTransaction(record);
+                          _log.info("Updated ${record.toMap()}");
 
                           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => AppFramePage()), (Route<dynamic> route) => false);
                         }
 
                       }
 
-                      else if (_record.type == "Transfer") {
-                        if (_selectedSourceAccountId == null) {
-                          return ThemedToast.showToast("Invalid Source Account");
+                      else if (_recordFormModel.type == "Transfer") {
+                        Record record;
+                        try {
+                          _recordFormModel.sourceAccountId = _selectedSourceAccountId;
+                          _recordFormModel.destinationAccountId = _selectedDestinationAccountId;
+
+                          Calculator calculator = Calculator(_amount);
+                          setState(() {
+                            _amount = calculator.onCalculate();
+                          });
+                          _recordFormModel.amount = double.parse(_amount);
+
+                          record = _recordFormModel.toModel();
+                        } catch(e) {
+                          ThemedToast.showToast(e.toString());
+                          return;
                         }
-
-                        if (_selectedDestinationAccountId == null) {
-                          return ThemedToast.showToast("Invalid Destination Account");
-                        }
-
-                        Calculator calculator = Calculator(_amount);
-                        setState(() {
-                          _amount = calculator.onCalculate();
-                        });
-
-                        _record.sourceAccountId = _selectedSourceAccountId;
-                        _record.destinationAccountId = _selectedDestinationAccountId;
-
-                        _record.amount = double.parse(_amount);
 
                         if (widget.identifier == null) {
-                          int? identifier = await _recordService.saveTransfer(_record);
-                          _log.info("Saved ${_record.toMap()}");
+                          int? identifier = await _recordService.saveTransfer(record);
+                          _log.info("Saved ${record.toMap()}");
 
-                          Navigator.of(context).pop(["reload", _record.date]);
+                          Navigator.of(context).pop(["reload", record.date]);
                         }
 
                         else {
-                          int? identifier = await _recordService.updateTransfer(_record);
-                          _log.info("Updated ${_record.toMap()}");
+                          int? identifier = await _recordService.updateTransfer(record);
+                          _log.info("Updated ${record.toMap()}");
 
                           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => AppFramePage()), (Route<dynamic> route) => false);
                         }
