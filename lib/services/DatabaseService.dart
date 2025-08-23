@@ -186,11 +186,10 @@ class DatabaseService {
   Future<void> backupDatabaseToDownloads() async {
     final dbPath = await getDatabasesPath();
     final originalDb = join(dbPath, "coin_log.db");
+    final dbFile = File(originalDb);
 
     final directory = Directory('/storage/emulated/0/Download');
     final backupDb = join(directory.path, "coin_log_backup.db");
-
-    final dbFile = File(originalDb);
 
     if (await dbFile.exists()) {
       await dbFile.copy(backupDb);
