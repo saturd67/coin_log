@@ -1,4 +1,5 @@
 import 'package:coin_log/models/Account.dart';
+import 'package:coin_log/models/AccountLog.dart';
 import 'package:coin_log/services/DatabaseService.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -50,6 +51,25 @@ class AccountService {
             where: 'identifier = ?',
             whereArgs: [transactionCategories[i].identifier]);
       }
+    });
+  }
+
+  Future<int?> logUpdateBalance(int accountId, int recordId, RecordAction recordAction, double oldBalance, double newBalance) async {
+    final db = await DatabaseService().database;
+
+    await db.transaction((transaction) async {
+      await transaction.rawUpdate(
+          "UPDATE $TABLE_NAME SET BALANCE = ? WHERE IDENTIFIER = ? ",
+          [newBalance, accountId]
+      );
+
+      await transaction.rawInsert(
+          """
+        INSERT INTO CL_ACCOUNT_LOG (ACCOUNT_ID, RECORD_ID, RECORD_ACTION, OLD_BALANCE, NEW_BALANCE, CREATED_ON) VALUES 
+        (?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
+        """,
+          [accountId, recordId, recordAction.name, oldBalance, newBalance]
+      );
     });
   }
 
@@ -105,6 +125,9 @@ class AccountService {
   }
 
   Future<void> _resetIsDefault(Transaction transaction) async {
-    await transaction.rawUpdate("UPDATE $TABLE_NAME SET IS_DEFAULT = 0 WHERE IS_DEFAULT = 1", []);
+    await transaction.rawUpdate(
+        "UPDATE $TABLE_NAME SET IS_DEFAULT = 0 WHERE IS_DEFAULT = 1",
+        []
+    );
   }
 }

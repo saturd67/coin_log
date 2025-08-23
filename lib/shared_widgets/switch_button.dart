@@ -19,7 +19,6 @@ class SwitchButton extends StatefulWidget {
 class _SwitchButtonState extends State<SwitchButton> {
 
   late String _focusedButton = widget.selectedValue ?? widget.labels[0];
-
   Color getBackgroundColor(bool isFocus) {
     return isFocus ? Color(0xff000000) : Color(0xffffffff);
   }

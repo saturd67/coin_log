@@ -12,9 +12,11 @@ class RecordService {
   Future<int?> saveTransaction(Record record) async {
     final db = await DatabaseService().database;
 
+    record.identifier = await db.insert(TABLE_NAME, record.toMap());
+
     await BalanceManager.updateBalanceOnSaveTransactionRecord(record);
 
-    return await db.insert(TABLE_NAME, record.toMap());
+    return record.identifier;
   }
 
   Future<int?> updateTransaction(Record record) async {
@@ -23,30 +25,34 @@ class RecordService {
     await BalanceManager.updateBalanceOnUpdateTransactionRecord(record);
 
     return await db.update(
-      TABLE_NAME,
-      record.toMap(),
-      where: 'identifier = ?',
-      whereArgs: [record.identifier]);
+        TABLE_NAME,
+        record.toMap(),
+        where: 'identifier = ?',
+        whereArgs: [record.identifier]);
   }
 
   Future<int?> deleteTransaction(Record record) async {
     final db = await DatabaseService().database;
 
-    await BalanceManager.updateBalanceOnDeleteTransactionRecord(record);
-
-    return await db.delete(
+    int effectedRowCount = await db.delete(
         TABLE_NAME,
         where: 'identifier = ?',
         whereArgs: [record.identifier]
     );
+
+    await BalanceManager.updateBalanceOnDeleteTransactionRecord(record);
+
+    return effectedRowCount;
   }
 
   Future<int?> saveTransfer(Record record) async {
     final db = await DatabaseService().database;
 
+    record.identifier = await db.insert(TABLE_NAME, record.toMap());
+
     await BalanceManager.updateBalanceOnSaveTransferRecord(record);
 
-    return await db.insert(TABLE_NAME, record.toMap());
+    return record.identifier;
   }
 
   Future<int?> updateTransfer(Record record) async {
@@ -64,13 +70,15 @@ class RecordService {
   Future<int?> deleteTransfer(Record record) async {
     final db = await DatabaseService().database;
 
-    await BalanceManager.updateBalanceOnDeleteTransferRecord(record);
-
-    return await db.delete(
+    int effectedRowCount = await db.delete(
         TABLE_NAME,
         where: 'identifier = ?',
         whereArgs: [record.identifier]
     );
+
+    await BalanceManager.updateBalanceOnDeleteTransferRecord(record);
+
+    return effectedRowCount;
   }
 
   Future<Record?> findById(int identifier) async {

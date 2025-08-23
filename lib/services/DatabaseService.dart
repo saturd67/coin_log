@@ -17,7 +17,7 @@ class DatabaseService {
     if (_db != null) {
       return _db!;
     }
-    _db = await _initDB(false);
+    _db = await _initDB(true);
     return _db!;
   }
 
@@ -53,6 +53,22 @@ class DatabaseService {
             IS_DEFAULT INTEGER NOT NULL,
             IS_DELETED INTEGER NOT NULL
           );
+    ''');
+  }
+
+  Future<void> createAccountLogTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE CL_ACCOUNT_LOG (
+        IDENTIFIER        INTEGER PRIMARY KEY AUTOINCREMENT,
+        ACCOUNT_ID        INTEGER NOT NULL,
+        RECORD_ID         INTEGER NOT NULL,
+        RECORD_ACTION     VARCHAR(8) CHECK(RECORD_ACTION IN ('insert', 'update', 'delete')) NOT NULL,
+        OLD_BALANCE       DOUBLE NOT NULL,
+        NEW_BALANCE       DOUBLE NOT NULL,
+        CREATED_ON        DATETIME NOT NULL,
+        
+        FOREIGN KEY (ACCOUNT_ID) REFERENCES CL_ACCOUNT(IDENTIFIER)
+      );
     ''');
   }
 
@@ -95,13 +111,13 @@ class DatabaseService {
     ''');
   }
   
-  Future<void> insertRecords(Database db) async {
-    await db.execute('''
-      INSERT INTO CL_RECORD (TRANSACTION_CATEGORY_ID, SOURCE_ACCOUNT_ID, DATE, DESCRIPTION, TYPE, AMOUNT) VALUES
-        (1, 2, "2025-06-01 10:07:36.085738", null, "Expense", 5.0),
-        (2, 2, "2025-06-01 10:07:36.085738", null, "Expense", 15.0);
-    ''');
-  }
+  // Future<void> insertRecords(Database db) async {
+  //   await db.execute('''
+  //     INSERT INTO CL_RECORD (TRANSACTION_CATEGORY_ID, SOURCE_ACCOUNT_ID, DATE, DESCRIPTION, TYPE, AMOUNT) VALUES
+  //       (1, 2, "2025-06-01 10:07:36.085738", null, "Expense", 5.0),
+  //       (2, 2, "2025-06-01 10:07:36.085738", null, "Expense", 15.0);
+  //   ''');
+  // }
 
   Future<Database> _initDB(bool isResetDatabase) async {
     final dbPath = await getDatabasesPath();
@@ -126,10 +142,10 @@ class DatabaseService {
         await configDatabase(database);
         await createTransactionCategoryTable(database);
         await createAccountTable(database);
+        await createAccountLogTable(database);
         await createRecordTable(database);
         await insertTransactionCategory(database);
         await insertAccount(database);
-        await insertRecords(database);
       },
       onUpgrade: (Database database, int oldVersion, int newVersion) async {
         // if (oldVersion < 2) {

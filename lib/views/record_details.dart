@@ -142,6 +142,18 @@ class _RecordDetailsState extends State<RecordDetails> {
     super.dispose();
   }
 
+  Account? getSelectedAccount() {
+    if ([RecordType.income.name, RecordType.expense.name].contains(_recordFormModel.type)) {
+      return _selectedAccountId == null ? null : _accounts.firstWhere((account) => account.identifier == _selectedAccountId);
+    }
+
+    else if (RecordType.transfer.name == _recordFormModel.type) {
+      return _selectedSourceAccountId == null ? null : _accounts.firstWhere((account) => account.identifier == _selectedSourceAccountId);
+    }
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
       return SafeArea(
@@ -287,7 +299,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                         return  (itemIndex < _accounts.length) ? GestureDetector(
                                           onTap: _accounts[itemIndex].identifier == _selectedDestinationAccountId ? () {} : () {
                                             setState(() {
-                                            _selectedSourceAccountId = _accounts[itemIndex].identifier!;
+                                              _selectedSourceAccountId = _accounts[itemIndex].identifier!;
                                             });
                                           },
                                           child: Column(
@@ -354,6 +366,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                   height: _isKeyboardVisible ? 95: 270,
                   child: RecordDetailsKeyboard(
                     isKeyboardVisible: _isKeyboardVisible,
+                    sourceAccount: getSelectedAccount(),
                     descriptionController: _descriptionController,
                     amount: _amount,
                     date: _recordFormModel.date,
@@ -498,6 +511,7 @@ class _RecordDetailsState extends State<RecordDetails> {
 class RecordDetailsKeyboard extends StatefulWidget {
 
   bool isKeyboardVisible;
+  Account? sourceAccount;
   TextEditingController? descriptionController = TextEditingController();
   String? amount = "";
   DateTime? date;
@@ -508,6 +522,7 @@ class RecordDetailsKeyboard extends StatefulWidget {
   RecordDetailsKeyboard({
     super.key,
     required this.isKeyboardVisible,
+    this.sourceAccount,
     this.descriptionController,
     this.amount,
     this.date,
@@ -532,11 +547,17 @@ class _RecordDetailsKeyboardState extends State<RecordDetailsKeyboard> {
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(
+            Container(
               height: 30,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Row(
+                    children: [
+                      Icon(Icons.attach_money),
+                      Text(style: Theme.of(context).textTheme.bodyMedium, widget.sourceAccount == null ? "" : widget.sourceAccount!.balance.toStringAsFixed(2)),
+                    ],
+                  ),
                   Text(style: Theme.of(context).textTheme.bodyLarge, widget.amount ?? widget.amount!),
                 ]
               ),
