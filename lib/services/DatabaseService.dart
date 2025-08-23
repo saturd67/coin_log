@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:logging/logging.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 
 class DatabaseService {
   final _log = Logger('DatabaseService');
@@ -179,6 +180,24 @@ class DatabaseService {
     _log.info('Tables in database:');
     for (final table in tables) {
       _log.info(table['name']);
+    }
+  }
+
+  Future<void> backupDatabaseToDownloads() async {
+    final dbPath = await getDatabasesPath();
+    final originalDb = join(dbPath, "coin_log.db");
+
+    final directory = Directory('/storage/emulated/0/Download');
+    final backupDb = join(directory.path, "coin_log_backup.db");
+
+    final dbFile = File(originalDb);
+
+    if (await dbFile.exists()) {
+      await dbFile.copy(backupDb);
+      print("Exported DB to: $backupDb");
+    }
+    else {
+      print("No database found at $originalDb");
     }
   }
 }

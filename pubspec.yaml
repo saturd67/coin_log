@@ -16,6 +16,7 @@ dependencies:
   flutter_keyboard_visibility: ^5.4.1
   sqflite: ^2.3.0
   path: ^1.9.0
+  path_provider: ^2.1.5
   fluttertoast: ^8.2.12
   reorderables: ^0.4.2
   month_picker_dialog: ^6.2.2
