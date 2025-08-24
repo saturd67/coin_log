@@ -18,7 +18,7 @@ class DatabaseService {
     if (_db != null) {
       return _db!;
     }
-    _db = await _initDB(true);
+    _db = await _initDB(false);
     return _db!;
   }
 
@@ -183,20 +183,37 @@ class DatabaseService {
     }
   }
 
-  Future<void> backupDatabaseToDownloads() async {
+  Future<String> exportDatabase(String directoryPath, String filename) async {
     final dbPath = await getDatabasesPath();
     final originalDb = join(dbPath, "coin_log.db");
     final dbFile = File(originalDb);
 
-    final directory = Directory('/storage/emulated/0/Download');
-    final backupDb = join(directory.path, "coin_log_backup.db");
+    final directory = Directory(directoryPath);
+    final backupDb = join(directory.path, filename);
 
     if (await dbFile.exists()) {
       await dbFile.copy(backupDb);
-      print("Exported DB to: $backupDb");
+      return "Exported database to: $backupDb";
     }
     else {
-      print("No database found at $originalDb");
+      return "No database found at $originalDb";
+    }
+  }
+
+  Future<String> importDatabase(String file) async {
+    if (!file.endsWith(".db")) {
+      return "Invalid file type.";
+    }
+    final sourceFile = File(file);
+
+    final dbPath = await getDatabasesPath();
+    final originalDb = join(dbPath, "coin_log.db");
+    if (await sourceFile.exists()) {
+      sourceFile.copy(originalDb);
+      return "Imported database";
+    }
+    else {
+      return "Unable to import database.";
     }
   }
 }

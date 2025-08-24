@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
                 ),
                 bodySmall: TextStyle(
                     fontSize: 11,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.normal,
                     color: Color(0xff14181b)
                 ),
             ),
@@ -92,7 +92,16 @@ class MyApp extends StatelessWidget {
             dividerTheme: DividerThemeData(
                 thickness: 1,
                 color: Color(0xffe0e3e7),
+            ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xff00e68e),
+              foregroundColor: Color(0xffffffff),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6)
+              )
             )
+          )
         ),
         home: const AppFramePage(),
         routes: {

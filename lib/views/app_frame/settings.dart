@@ -1,8 +1,10 @@
 import 'package:coin_log/services/DatabaseService.dart';
+import 'package:coin_log/views/settings/data_details.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/router/RouterUtils.dart';
 import 'package:coin_log/views/settings/transaction_list.dart';
 import 'package:coin_log/views/settings/account_list.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -10,8 +12,6 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  DatabaseService _databaseService = DatabaseService();
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,9 +24,7 @@ class _SettingsState extends State<Settings> {
         children: [
           SettingItem(icon: Icons.category, name: "Transactions", page: TransactionList()),
           SettingItem(icon: Icons.monetization_on, name: "Accounts", page: AccountList()),
-          SettingItem(icon: Icons.download, name: "Backup", action: () { 
-            _databaseService.backupDatabaseToDownloads();
-          })
+          SettingItem(icon: Icons.dataset_outlined, name: "Data", page: DataDetail())
         ],
       ),
     );
@@ -36,28 +34,20 @@ class _SettingsState extends State<Settings> {
 class SettingItem extends StatelessWidget {
   IconData icon;
   String name;
-  Widget? page;
-  void Function()? action;
+  Widget page;
 
   SettingItem({
     super.key,
     required this.icon,
     required this.name,
-    this.page,
-    this.action
+    required this.page
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (page != null) {
-          Navigator.of(context).push(RouterUtils.createRoute(page!));
-        }
-
-        if (action != null) {
-          action!();
-        }
+        Navigator.of(context).push(RouterUtils.createRoute(page));
       },
       child: Container(
         color: Theme.of(context).colorScheme.secondary,
