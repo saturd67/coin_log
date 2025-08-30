@@ -42,14 +42,12 @@ class _RecordDetailsState extends State<RecordDetails> {
   RecordService _recordService = RecordService();
 
   RecordFormModel _recordFormModel = RecordFormModel(date: DateTime.now(), type: RecordType.expense.name);
-  // Record _record = Record(transactionCategoryId: 0, sourceAccountId: 0, date: DateTime.now(), type: RecordType.expense.name, amount: 0.0);
   List<TransactionCategory> _transactionCategories = [];
   List<Account> _accounts = [];
   int? _selectedTransactionCategoryId;
   int? _selectedAccountId;
   int? _selectedSourceAccountId;
   int? _selectedDestinationAccountId;
-  TextEditingController _descriptionController = TextEditingController();
   String _amount = "0";
 
   bool _isKeyboardVisible = false;
@@ -138,7 +136,7 @@ class _RecordDetailsState extends State<RecordDetails> {
   @override
   void dispose() {
     _keyboardSubscription.cancel();
-    _descriptionController.dispose();
+    _recordFormModel.dispose();
     super.dispose();
   }
 
@@ -171,7 +169,6 @@ class _RecordDetailsState extends State<RecordDetails> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  flex: 1,
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -192,7 +189,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                             },
                           )
                         ),
-                        if (['Expense', 'Income'].contains(_recordFormModel.type)) ... {
+                        if ([RecordType.expense.name, RecordType.income.name].contains(_recordFormModel.type)) ... {
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
                             child: SizedBox(
@@ -218,7 +215,6 @@ class _RecordDetailsState extends State<RecordDetails> {
                                         },
                                         child: Column(
                                           mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             if (itemIndex < _transactionCategories.length) ... {
                                               GridViewIcon(iconData: getTransactionCategoryIconData(_transactionCategories[itemIndex].icon), isSelected: _transactionCategories[itemIndex].identifier == _selectedTransactionCategoryId,),
@@ -261,7 +257,6 @@ class _RecordDetailsState extends State<RecordDetails> {
                                           },
                                           child: Column(
                                             mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               if (itemIndex < _accounts.length) ... {
                                                 GridViewIcon(iconData: getAccountIconData(_accounts[itemIndex].icon), isSelected: _selectedAccountId == null ? _accounts[itemIndex].isDefault : _accounts[itemIndex].identifier == _selectedAccountId,),
@@ -304,7 +299,6 @@ class _RecordDetailsState extends State<RecordDetails> {
                                           },
                                           child: Column(
                                             mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               GridViewIcon(iconData: getAccountIconData(_accounts[itemIndex].icon), isSelected: _accounts[itemIndex].identifier == _selectedSourceAccountId, isDisabled: _accounts[itemIndex].identifier == _selectedDestinationAccountId,),
                                               Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13),)
@@ -343,7 +337,6 @@ class _RecordDetailsState extends State<RecordDetails> {
                                           },
                                           child: Column(
                                             mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               GridViewIcon(iconData: getAccountIconData(_accounts[itemIndex].icon), isSelected: _accounts[itemIndex].identifier == _selectedDestinationAccountId, isDisabled: _accounts[itemIndex].identifier == _selectedSourceAccountId),
                                               Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13))
@@ -367,7 +360,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                   child: RecordDetailsKeyboard(
                     isKeyboardVisible: _isKeyboardVisible,
                     sourceAccount: getSelectedAccount(),
-                    descriptionController: _descriptionController,
+                    descriptionController: _recordFormModel.descriptionController,
                     amount: _amount,
                     date: _recordFormModel.date,
                     onValueButtonPressed: (String input) {
@@ -414,6 +407,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                     onSaveButtonPressed: () async {
                       if (_recordFormModel.type == RecordType.expense.name || _recordFormModel.type == RecordType.income.name) {
                         Record record;
+
                         try {
                           _recordFormModel.transactionCategoryId = _selectedTransactionCategoryId;
                           _recordFormModel.sourceAccountId = _selectedAccountId;

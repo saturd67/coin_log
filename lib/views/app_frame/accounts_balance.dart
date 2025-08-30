@@ -34,7 +34,7 @@ class _AccountsBalanceState extends State<AccountsBalance> {
       appBar:  AppBar(
           shadowColor: Theme.of(context).colorScheme.surface,
           backgroundColor: Theme.of(context).colorScheme.primary,
-          title: Text("Summary")
+          title: Text("Accounts")
       ),
       body: ListView(
         children: List.generate(_accounts.length, (index) {

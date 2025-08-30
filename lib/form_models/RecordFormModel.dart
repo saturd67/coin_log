@@ -66,6 +66,7 @@ class RecordFormModel implements BaseFormModel<Record>{
       date: date!,
       type: type!,
       amount: amount!,
+      description: descriptionController.text
     );
   }
 }

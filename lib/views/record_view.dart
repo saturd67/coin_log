@@ -164,7 +164,7 @@ class _RecordViewState extends State<RecordView> {
                     padding: const EdgeInsetsDirectional.fromSTEB(0,10,0,0),
                     child: Table(
                       columnWidths: const<int, TableColumnWidth> {
-                        0: FixedColumnWidth(110.0),
+                        0: FixedColumnWidth(120.0),
                         1: FlexColumnWidth(),
                       },
                       children: [
