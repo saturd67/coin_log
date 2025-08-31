@@ -6,7 +6,7 @@ import 'package:coin_log/constants/MonthMap.dart';
 import 'package:coin_log/models/Record.dart';
 import 'package:coin_log/services/RecordService.dart';
 
-import '../../router/RouterUtils.dart';
+import '../router/RouterUtils.dart';
 
 class RecordCalendar extends StatefulWidget {
   DateTime selectedDateTime;

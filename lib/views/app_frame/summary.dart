@@ -1,9 +1,11 @@
 import 'package:coin_log/constants/MonthMap.dart';
 import 'package:coin_log/main.dart';
+import 'package:coin_log/router/RouterUtils.dart';
 import 'package:coin_log/services/RecordService.dart';
 import 'package:coin_log/shared_widgets/switch_button.dart';
 import 'package:coin_log/shared_widgets/themedShowMonthPicker.dart';
 import 'package:coin_log/shared_widgets/themedShowYearPicker.dart';
+import 'package:coin_log/views/budget_balance.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
@@ -257,31 +259,38 @@ class _BalanceSummaryState extends State<BalanceSummary> {
 
     Color balanceColor = incomeAmount > expenseAmount ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.error;
     Color numeratorColor = incomeAmount > expenseAmount ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.success;
-    return Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-            child: Stack(
-              alignment: AlignmentDirectional.topStart,
-              children: [
-                Container(height: 25, width: double.infinity, color: balanceColor),
-                Container(height: 25, width: incomeAmount == 0 ? 0 :(MediaQuery.of(context).size.width * expenseAmount / incomeAmount), color: numeratorColor)
-              ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(RouterUtils.createRoute(
+          BudgetBalance()
+        ));
+      },
+      child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Stack(
+                alignment: AlignmentDirectional.topStart,
+                children: [
+                  Container(height: 25, width: double.infinity, color: balanceColor),
+                  Container(height: 25, width: incomeAmount == 0 ? 0 :(MediaQuery.of(context).size.width * expenseAmount / incomeAmount), color: numeratorColor)
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error], label: "Expenses: ", balance: expenseAmount,),
-                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Income: ", balance: incomeAmount,),
-                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.success], label: "Balance: ", balance: incomeAmount - expenseAmount),
-              ],
-            ),
-          )
-        ],
-      );
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error], label: "Expenses: ", balance: expenseAmount,),
+                  BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Income: ", balance: incomeAmount,),
+                  BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.success], label: "Balance: ", balance: incomeAmount - expenseAmount),
+                ],
+              ),
+            )
+          ],
+        ),
+    );
   }
 }
 
@@ -348,8 +357,9 @@ class BalanceSummaryRemark extends StatelessWidget {
             ),
           ),
           Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label),
+              Text(label, style: TextStyle(fontSize: Theme.of(context).textTheme.bodySmall!.fontSize),),
               Text(balance.toStringAsFixed(2))
             ],
           )
