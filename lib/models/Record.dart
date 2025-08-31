@@ -54,6 +54,7 @@ class Record implements BaseModel<RecordFormModel>{
     );
   }
 
+  @override
   Map<String, dynamic> toMap() {
     final map = <String, dynamic> {
       'TRANSACTION_CATEGORY_ID': transactionCategoryId,

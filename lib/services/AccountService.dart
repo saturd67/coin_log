@@ -71,6 +71,7 @@ class AccountService {
           [accountId, recordId, recordAction.name, oldBalance, newBalance]
       );
     });
+    return null;
   }
 
   Future<int?> delete(int identifier) async {

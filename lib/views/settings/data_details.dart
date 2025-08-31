@@ -1,6 +1,5 @@
 import 'package:coin_log/services/DatabaseService.dart';
 import 'package:coin_log/shared_widgets/showConfirmationDialog.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';

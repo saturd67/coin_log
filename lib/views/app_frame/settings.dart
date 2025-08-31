@@ -1,10 +1,8 @@
-import 'package:coin_log/services/DatabaseService.dart';
 import 'package:coin_log/views/settings/data_details.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/router/RouterUtils.dart';
 import 'package:coin_log/views/settings/transaction_list.dart';
 import 'package:coin_log/views/settings/account_list.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class Settings extends StatefulWidget {
   @override
