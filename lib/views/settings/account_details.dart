@@ -28,15 +28,12 @@ class _TransactionDetailsState extends State<AccountDetails> {
   final _log = Logger('AccountDetails');
   final AccountService accountService = AccountService();
 
-  int? _identifier;
-  AccountFormModel _accountFormModel = AccountFormModel(sequence: 1, balance: 0.0, isDefault: false, isDeleted: false);
+  AccountFormModel _accountFormModel = AccountFormModel(sequence: 1, balance: 0.0, isDefault: false, isClosed: false);
   IconData? onDisplayIconData;
 
   @override
   void initState() {
     super.initState();
-    _identifier = widget.identifier;
-
     if (widget.identifier != null) {
       load();
     }
@@ -80,7 +77,7 @@ class _TransactionDetailsState extends State<AccountDetails> {
                         return;
                       }
 
-                      if (_identifier == null) {
+                      if (widget.identifier == null) {
                         int? identifier = await accountService.save(account);
                         account.identifier = identifier;
 
@@ -119,7 +116,7 @@ class _TransactionDetailsState extends State<AccountDetails> {
                           Expanded(
                               child: ThemedTextField(
                                 placeholder: "Name",
-                                maxLenght: 10,
+                                maxLength: 10,
                                 controller: _accountFormModel.nameController,
                               )
                           ),
@@ -144,14 +141,14 @@ class _TransactionDetailsState extends State<AccountDetails> {
                                 ),
                               ],
                             ),
-                            if (_identifier != null)
+                            if (widget.identifier != null)
                               IconButton(
                                   onPressed: () async {
                                     showConfirmationDialog(
                                         context,
                                         "Are you sure you want to delete?",
                                             () async {
-                                          await accountService.delete(_identifier!);
+                                          await accountService.delete(widget.identifier!);
                                           Navigator.of(context).pop("reload");
                                         },
                                             () {});

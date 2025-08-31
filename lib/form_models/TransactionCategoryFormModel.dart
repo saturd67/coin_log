@@ -7,7 +7,7 @@ class TransactionCategoryFormModel implements BaseFormModel<TransactionCategory>
   String? icon;
   String? type;
   int? sequence;
-  bool? isDeleted;
+  bool? isClosed;
 
   TextEditingController nameController = TextEditingController();
 
@@ -16,7 +16,7 @@ class TransactionCategoryFormModel implements BaseFormModel<TransactionCategory>
     this.icon,
     this.type,
     this.sequence,
-    this.isDeleted,
+    this.isClosed,
     String? name
   }): nameController = TextEditingController(text: name ?? "");
 
@@ -43,8 +43,8 @@ class TransactionCategoryFormModel implements BaseFormModel<TransactionCategory>
       throw "Invalid sequence.";
     }
 
-    if (isDeleted == null) {
-      throw "Invalid isDeleted.";
+    if (isClosed == null) {
+      throw "Invalid isClosed.";
     }
 
     return TransactionCategory(
@@ -53,7 +53,7 @@ class TransactionCategoryFormModel implements BaseFormModel<TransactionCategory>
       icon: icon!,
       type: type!,
       sequence: sequence!,
-      isDeleted: isDeleted!
+      isClosed: isClosed!
     );
   }
 

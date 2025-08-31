@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ThemedTextField extends StatefulWidget {
   final String? placeholder;
-  final int? maxLenght;
+  final int? maxLength;
+  final TextInputType? textInputType;
+  final List<TextInputFormatter>? inputFormatters;
   final TextEditingController? controller;
 
   ThemedTextField ({
     super.key,
     this.placeholder,
-    this.maxLenght,
+    this.maxLength,
+    this.textInputType,
+    this.inputFormatters,
     this.controller
   });
 
@@ -32,8 +37,10 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
           )
         )
       ),
+      maxLength: widget.maxLength,
+      keyboardType: widget.textInputType,
+      inputFormatters: widget.inputFormatters,
       controller: widget.controller,
-      maxLength: widget.maxLenght,
       buildCounter: (
           BuildContext context, {
             required int currentLength,

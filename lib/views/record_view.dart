@@ -37,9 +37,9 @@ class _RecordViewState extends State<RecordView> {
   void initState() {
     super.initState();
 
-    _record.transactionCategory = TransactionCategory(name: "", icon: "", type: "", sequence: 0, isDeleted: false);
-    _record.sourceAccount = Account(name: "", icon: "", sequence: 0, balance: 0.0, isDefault: false, isDeleted: false);
-    _record.destinationAccount = Account(name: "", icon: "", sequence: 0, balance: 0.0, isDefault: false, isDeleted: false);
+    _record.transactionCategory = TransactionCategory(name: "", icon: "", type: "", sequence: 0, isClosed: false);
+    _record.sourceAccount = Account(name: "", icon: "", sequence: 0, balance: 0.0, isDefault: false, isClosed: false);
+    _record.destinationAccount = Account(name: "", icon: "", sequence: 0, balance: 0.0, isDefault: false, isClosed: false);
 
     load();
   }

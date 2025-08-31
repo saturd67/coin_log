@@ -17,7 +17,7 @@ class DatabaseService {
     if (_db != null) {
       return _db!;
     }
-    _db = await _initDB(false);
+    _db = await _initDB(true);
     return _db!;
   }
 
@@ -33,9 +33,9 @@ class DatabaseService {
             IDENTIFIER INTEGER PRIMARY KEY AUTOINCREMENT,
             NAME VARCHAR(10) NOT NULL,
             ICON VARCHAR(50) NOT NULL,
-            TYPE VARCHAR(25) NOT NULL,
+            TYPE VARCHAR(8) NOT NULL,
             SEQUENCE INTEGER NOT NULL,
-            IS_DELETED INTEGER NOT NULL
+            IS_CLOSED INTEGER NOT NULL
           );
         ''');
   }
@@ -51,7 +51,7 @@ class DatabaseService {
             SEQUENCE INTEGER NOT NULL,
             BALANCE DOUBLE NOT NULL,
             IS_DEFAULT INTEGER NOT NULL,
-            IS_DELETED INTEGER NOT NULL
+            IS_CLOSED INTEGER NOT NULL
           );
     ''');
   }
@@ -84,16 +84,45 @@ class DatabaseService {
             TYPE                    VARCHAR(8) CHECK(TYPE IN ('Expense', 'Income', 'Transfer')) NOT NULL,
             AMOUNT                  DOUBLE NOT NULL,
             
-            FOREIGN KEY (TRANSACTION_CATEGORY_ID) REFERENCES CL_TRANSACTION_CATEGORY(identifier),
-            FOREIGN KEY (SOURCE_ACCOUNT_ID) REFERENCES CL_ACCOUNT(identifier),
-            FOREIGN KEY (DESTINATION_ACCOUNT_ID) REFERENCES CL_ACCOUNT(identifier)
+            FOREIGN KEY (TRANSACTION_CATEGORY_ID) REFERENCES CL_TRANSACTION_CATEGORY(IDENTIFIER),
+            FOREIGN KEY (SOURCE_ACCOUNT_ID) REFERENCES CL_ACCOUNT(IDENTIFIER),
+            FOREIGN KEY (DESTINATION_ACCOUNT_ID) REFERENCES CL_ACCOUNT(IDENTIFIER)
+          );
+        ''');
+  }
+
+  Future<void> createBudgetTable(Database db) async {
+    await db.execute('''
+          CREATE TABLE CL_BUDGET (
+            IDENTIFIER              INTEGER PRIMARY KEY AUTOINCREMENT,
+            TRANSACTION_CATEGORY_ID INTEGER NOT NULL,
+            PERIOD                  VARCHAR(10) CHECK(PERIOD IN ('Weekly', 'Monthly', 'Yearly')) NOT NULL,
+            AMOUNT                  DOUBLE NOT NULL,
+            
+            FOREIGN KEY (TRANSACTION_CATEGORY_ID) REFERENCES CL_TRANSACTION_CATEGORY(IDENTIFIER)
+          );
+        ''');
+  }
+
+  Future<void> createBudgetTransactionTable(Database db) async {
+    await db.execute('''
+          CREATE TABLE CL_BUDGET_TRANSACTION (
+            IDENTIFIER              INTEGER PRIMARY KEY AUTOINCREMENT,
+            TRANSACTION_CATEGORY_ID INTEGER NOT NULL,
+            BUDGET_ID               INTEGER NOT NULL,
+            YEAR                    INTEGER NOT NULL,
+            MONTH                   INTEGER,
+            DAY                     INTEGER,
+            AMOUNT                  DOUBLE NOT NULL
+            
+            FOREIGN KEY BUDGET_ID REFERENCES CL_BUDGET(IDENTIFIER)
           );
         ''');
   }
 
   Future<void> insertTransactionCategory(Database db) async {
     await db.execute('''
-      INSERT INTO CL_TRANSACTION_CATEGORY (NAME, ICON, TYPE, SEQUENCE, IS_DELETED) VALUES
+      INSERT INTO CL_TRANSACTION_CATEGORY (NAME, ICON, TYPE, SEQUENCE, IS_CLOSED) VALUES
         ("Breakfast", "coffee", "Expense", 1, False),
         ("Lunch", "lunch_dining", "Expense", 2, False),
         ("Dinner", "burger", "Expense", 3, False),
@@ -104,20 +133,12 @@ class DatabaseService {
 
   Future<void> insertAccount(Database db) async {
     await db.execute('''
-      INSERT INTO CL_ACCOUNT (NAME, ICON, SEQUENCE, BALANCE, IS_DEFAULT, IS_DELETED) VALUES
+      INSERT INTO CL_ACCOUNT (NAME, ICON, SEQUENCE, BALANCE, IS_DEFAULT, IS_CLOSED) VALUES
         ("Bank", "account_balance", 1, 0.0, False, False),
         ("E-Wallet", "monetization_on", 2, 0.0, True, False),
         ("Cash", "money", 2, 0.0, False, False);
     ''');
   }
-  
-  // Future<void> insertRecords(Database db) async {
-  //   await db.execute('''
-  //     INSERT INTO CL_RECORD (TRANSACTION_CATEGORY_ID, SOURCE_ACCOUNT_ID, DATE, DESCRIPTION, TYPE, AMOUNT) VALUES
-  //       (1, 2, "2025-06-01 10:07:36.085738", null, "Expense", 5.0),
-  //       (2, 2, "2025-06-01 10:07:36.085738", null, "Expense", 15.0);
-  //   ''');
-  // }
 
   Future<Database> _initDB(bool isResetDatabase) async {
     final dbPath = await getDatabasesPath();
@@ -144,6 +165,8 @@ class DatabaseService {
         await createAccountTable(database);
         await createAccountLogTable(database);
         await createRecordTable(database);
+        await createBudgetTable(database);
+        // await createBudgetTransactionTable(database);
         await insertTransactionCategory(database);
         await insertAccount(database);
       },

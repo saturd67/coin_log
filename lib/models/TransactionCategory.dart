@@ -8,7 +8,7 @@ class TransactionCategory implements BaseModel<TransactionCategoryFormModel>{
   String icon;
   String type;
   int sequence;
-  bool isDeleted;
+  bool isClosed;
 
   TransactionCategory({
     this.identifier,
@@ -16,7 +16,7 @@ class TransactionCategory implements BaseModel<TransactionCategoryFormModel>{
     required this.icon,
     required this.type,
     required this.sequence,
-    required this.isDeleted
+    required this.isClosed
   });
 
   factory TransactionCategory.fromMap(Map<String, dynamic> map) {
@@ -26,7 +26,7 @@ class TransactionCategory implements BaseModel<TransactionCategoryFormModel>{
       icon: map['ICON'], 
       type: map['TYPE'],
       sequence: map['SEQUENCE'],
-      isDeleted: map['IS_DELETED'] == 1 ? true : false
+      isClosed: map['IS_CLOSED'] == 1 ? true : false
     );
   }
 
@@ -37,7 +37,7 @@ class TransactionCategory implements BaseModel<TransactionCategoryFormModel>{
       'ICON': icon,
       'TYPE': type,
       'SEQUENCE': sequence,
-      'IS_DELETED': isDeleted ? 1 : 0
+      'IS_CLOSED': isClosed ? 1 : 0
     };
 
     if (identifier != null) {
@@ -55,7 +55,7 @@ class TransactionCategory implements BaseModel<TransactionCategoryFormModel>{
       icon: icon,
       type: type,
       sequence: sequence,
-      isDeleted: isDeleted
+      isClosed: isClosed
     );
   }
 }

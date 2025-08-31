@@ -8,7 +8,7 @@ class AccountFormModel implements BaseFormModel<Account>{
   int? sequence;
   double? balance;
   bool? isDefault;
-  bool? isDeleted;
+  bool? isClosed;
 
   TextEditingController nameController = TextEditingController();
 
@@ -18,7 +18,7 @@ class AccountFormModel implements BaseFormModel<Account>{
     this.sequence,
     this.balance,
     this.isDefault,
-    this.isDeleted,
+    this.isClosed,
     String? name
   }) : nameController = TextEditingController(text: name ?? "");
 
@@ -49,8 +49,8 @@ class AccountFormModel implements BaseFormModel<Account>{
       throw "Invalid isDefault.";
     }
 
-    if (isDeleted == null) {
-      throw "Invalid isDeleted.";
+    if (isClosed == null) {
+      throw "Invalid isClosed.";
     }
 
     return Account(
@@ -60,7 +60,7 @@ class AccountFormModel implements BaseFormModel<Account>{
       sequence: sequence!,
       balance: balance!,
       isDefault: isDefault!,
-      isDeleted: isDeleted!
+      isClosed: isClosed!
     );
   }
 }

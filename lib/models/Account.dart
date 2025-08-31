@@ -9,7 +9,7 @@ class Account implements BaseModel<AccountFormModel>{
   int sequence;
   double balance;
   bool isDefault;
-  bool isDeleted;
+  bool isClosed;
 
   Account({
     this.identifier,
@@ -18,7 +18,7 @@ class Account implements BaseModel<AccountFormModel>{
     required this.sequence,
     required this.balance,
     required this.isDefault,
-    required this.isDeleted
+    required this.isClosed
   });
 
   factory Account.fromMap(Map<String, dynamic> map) {
@@ -29,7 +29,7 @@ class Account implements BaseModel<AccountFormModel>{
       sequence: map['SEQUENCE'],
       balance: map['BALANCE'],
       isDefault: map['IS_DEFAULT'] == 1 ? true : false,
-      isDeleted: map['IS_DELETED'] == 1 ? true : false
+      isClosed: map['IS_CLOSED'] == 1 ? true : false
     );
   }
 
@@ -49,7 +49,7 @@ class Account implements BaseModel<AccountFormModel>{
       'SEQUENCE': sequence,
       'BALANCE': balance,
       'IS_DEFAULT': isDefault ? 1 : 0,
-      'IS_DELETED': isDeleted ? 1 : 0
+      'IS_CLOSED': isClosed ? 1 : 0
     };
 
     if (identifier != null) {
@@ -68,7 +68,7 @@ class Account implements BaseModel<AccountFormModel>{
       sequence: sequence,
       balance: balance,
       isDefault: isDefault,
-      isDeleted: isDeleted
+      isClosed: isClosed
     );
   }
 }

@@ -32,13 +32,14 @@ class Record implements BaseModel<RecordFormModel>{
 
   Record({
     this.identifier,
-    this.transactionCategoryId,
-    this.sourceAccountId,
-    this.destinationAccountId,
     required this.date,
     this.description,
     required this.type,
-    required this.amount
+    required this.amount,
+
+    this.transactionCategoryId,
+    this.sourceAccountId,
+    this.destinationAccountId,
   });
 
   factory Record.fromMap(Map<String, dynamic> map) {

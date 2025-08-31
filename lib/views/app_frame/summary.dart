@@ -57,7 +57,7 @@ class _SummaryState extends State<Summary> {
               child: ListView(
                 children: [
                   SizedBox(
-                      height: 100,
+                      height: 90,
                       child: BalanceSummary(sharedSelectedSummaryType: sharedSelectedSummaryType, sharedSelectedDateTime: sharedSelectedDateTime)
                   ),
                   Divider(
@@ -253,7 +253,7 @@ class _BalanceSummaryState extends State<BalanceSummary> {
       expenseAmount = tempExpenseAmount;
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
 
@@ -359,7 +359,7 @@ class BalanceSummaryRemark extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(fontSize: Theme.of(context).textTheme.bodySmall!.fontSize),),
+              Text(label, style: Theme.of(context).textTheme.bodySmall,),
               Text(balance.toStringAsFixed(2))
             ],
           )

@@ -30,7 +30,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
   final TransactionCategoryService transactionCategoryService = TransactionCategoryService();
 
   int? _identifier;
-  TransactionCategoryFormModel _transactionCategoryFormModel = TransactionCategoryFormModel(type: RecordType.expense.name, sequence: 1, isDeleted: false);
+  TransactionCategoryFormModel _transactionCategoryFormModel = TransactionCategoryFormModel(type: RecordType.expense.name, sequence: 1, isClosed: false);
   IconData? onDisplayIconData;
 
   @override
@@ -121,7 +121,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                     Expanded(
                       child: ThemedTextField(
                         placeholder: "Name",
-                        maxLenght: 10,
+                        maxLength: 10,
                         controller: _transactionCategoryFormModel.nameController,
                       )
                     ),
