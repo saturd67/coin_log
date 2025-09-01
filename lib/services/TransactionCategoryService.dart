@@ -68,11 +68,11 @@ class TransactionCategoryService {
   Future<List<TransactionCategory>> listByTypeIsClosed(String? type, bool? isClosed) async {
     final db = await DatabaseService().database;
 
-    List<String> wheres = [];
+    List<String> wheres = ["1=1"];
     List<Object> whereArgs = [];
 
     if (type != null) {
-      wheres.add('TYPE = ?');
+      wheres.add('AND TYPE = ?');
       whereArgs.add(type);
     }
 

@@ -67,7 +67,7 @@ class _BudgetListState extends State<BudgetList> {
           ),
           body: ListView(
             children: List.generate(_budgets.length, (index) {
-              return BudgetItem(icon: getTransactionCategoryIconData(_budgets[index].transactionCategory!.icon), name: _budgets[index].transactionCategory!.name, page: BudgetDetails(identifer: _budgets[index].identifier), load: load);
+              return BudgetItem(budget: _budgets[index], page: BudgetDetails(identifer: _budgets[index].identifier), load: load);
             })
           )
         )
@@ -76,15 +76,13 @@ class _BudgetListState extends State<BudgetList> {
 }
 
 class BudgetItem extends StatelessWidget {
-  IconData icon;
-  String name;
+  Budget budget;
   Widget page;
   void Function()? load;
 
   BudgetItem({
     super.key,
-    required this.icon,
-    required this.name,
+    required this.budget,
     required this.page,
     this.load
   });
@@ -105,15 +103,21 @@ class BudgetItem extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
-                    child: Icon(
-                        icon,
-                        size: 30.0
-                    ),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+                        child: Icon(
+                            getTransactionCategoryIconData(budget.transactionCategory!.icon),
+                            size: 30.0
+                        ),
+                      ),
+                      Text(budget.transactionCategory!.name)
+                    ],
                   ),
-                  Text(name)
+                  Text("${budget.period}: ${budget.amount.toStringAsFixed(2)}")
                 ]
             ),
           )

@@ -176,8 +176,8 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                           GridView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 4,
+                            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                              maxCrossAxisExtent: 100,
                               crossAxisSpacing: 2.0,
                               mainAxisSpacing: 2.0,
                               childAspectRatio: 1,
