@@ -12,6 +12,7 @@ import 'package:logging/logging.dart';
 import '../../constants/IconMap.dart';
 import '../../services/TransactionCategoryService.dart';
 import '../../shared_widgets/grid_view_icon.dart';
+import '../../shared_widgets/showConfirmationDialog.dart';
 import '../../shared_widgets/themed_text_field.dart';
 import '../../shared_widgets/themed_toast.dart';
 
@@ -33,7 +34,7 @@ class _BudgetDetailsState extends State<BudgetDetails> {
   final TransactionCategoryService _transactionCategoryService = TransactionCategoryService();
 
   List<TransactionCategory> _transactionCategories = [];
-  BudgetFormModel _budgetFormModel = BudgetFormModel(period: Period.monthly.name);
+  BudgetFormModel _budgetFormModel = BudgetFormModel(period: Period.monthly.name, isClosed: false);
   IconData? onDisplayIconData;
   String? onDisplayName;
 
@@ -44,7 +45,7 @@ class _BudgetDetailsState extends State<BudgetDetails> {
   }
 
   void load() async {
-    final transactionCategories = await _transactionCategoryService.listByType(RecordType.expense.name);
+    final transactionCategories = await _transactionCategoryService.listByTypeIsClosed(RecordType.expense.name, false);
 
     setState(() {
       _transactionCategories = transactionCategories;
@@ -160,29 +161,49 @@ class _BudgetDetailsState extends State<BudgetDetails> {
                         ]
                       ),
                       TableRow(
-                          children: [
-                            TableCell(
-                              verticalAlignment: TableCellVerticalAlignment.middle,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text("Amount: ", style: Theme.of(context).textTheme.bodySmall),
+                        children: [
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text("Amount: ", style: Theme.of(context).textTheme.bodySmall),
+                            ),
+                          ),
+                          TableCell(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: ThemedTextField(
+                                      placeholder: "Amount",
+                                      textInputType: TextInputType.numberWithOptions(decimal: true),
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                                      ],
+                                      controller: _budgetFormModel.amountController,
+                                    ),
+                                  ),
+                                  if (widget.identifer != null)
+                                    IconButton(
+                                      onPressed: () async {
+                                        showConfirmationDialog(
+                                            context,
+                                            "Are you sure you want to delete?",
+                                                () async {
+                                              await _budgetService.delete(widget.identifer!);
+                                              Navigator.of(context).pop("reload");
+                                            },
+                                                () {});
+                                      },
+                                      icon: Icon(Icons.delete, color: Color(0xffff0000))
+                                    )
+                                ],
                               ),
                             ),
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: ThemedTextField(
-                                  placeholder: "Amount",
-                                  textInputType: TextInputType.numberWithOptions(decimal: true),
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
-                                  ],
-                                  controller: _budgetFormModel.amountController,
-                                ),
-                              ),
-                            )
-                          ]
-                      )
+                          )
+                        ]
+                      ),
                     ]
                   ),
                   Expanded(

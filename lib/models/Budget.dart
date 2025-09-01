@@ -17,6 +17,7 @@ class Budget implements BaseModel<BudgetFormModel> {
   int? identifier;
   String period;
   double amount;
+  bool isClosed;
 
   // Foreign keys
   int transactionCategoryId;
@@ -28,7 +29,8 @@ class Budget implements BaseModel<BudgetFormModel> {
     this.identifier,
     required this.transactionCategoryId,
     required this.period,
-    required this.amount
+    required this.amount,
+    required this.isClosed,
   });
 
   factory Budget.fromMap(Map<String, dynamic> map) {
@@ -36,7 +38,8 @@ class Budget implements BaseModel<BudgetFormModel> {
       identifier: map['IDENTIFIER'],
       transactionCategoryId: map['TRANSACTION_CATEGORY_ID'],
       period: map['PERIOD'],
-      amount: map['AMOUNT']
+      amount: map['AMOUNT'],
+      isClosed: map['IS_CLOSED'] == 1 ? true : false
     );
   }
 
@@ -45,7 +48,8 @@ class Budget implements BaseModel<BudgetFormModel> {
     final map = <String, dynamic> {
       'TRANSACTION_CATEGORY_ID': transactionCategoryId,
       'PERIOD': period,
-      'AMOUNT': amount
+      'AMOUNT': amount,
+      'IS_CLOSED': isClosed ? 1 : 0
     };
 
     if (identifier != null) {
@@ -61,7 +65,8 @@ class Budget implements BaseModel<BudgetFormModel> {
       identifier: identifier,
       transactionCategoryId: transactionCategoryId,
       period: period,
-      amount: amount
+      amount: amount,
+      isClosed: isClosed
     );
   }
 }

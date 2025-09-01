@@ -28,7 +28,7 @@ class _BudgetListState extends State<BudgetList> {
   }
 
   void load() async {
-    final tempBudgets = await _budgetService.list();
+    final tempBudgets = await _budgetService.listByIsClosed(false);
 
     if (tempBudgets.isNotEmpty) {
       for (Budget budget in tempBudgets) {

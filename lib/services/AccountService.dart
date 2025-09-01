@@ -76,8 +76,9 @@ class AccountService {
 
   Future<int?> delete(int identifier) async {
     final db = await DatabaseService().database;
-    return await db.delete(
+    return await db.update(
         TABLE_NAME,
+        {'IS_CLOSED': true},
         where: 'identifier = ?',
         whereArgs: [identifier]
     );
@@ -100,10 +101,21 @@ class AccountService {
     return account;
   }
 
-  Future<List<Account>> list() async {
+  Future<List<Account>> listByIsClosed(bool? isClosed) async {
     final db = await DatabaseService().database;
+
+    List<String> wheres = [];
+    List<Object> whereArgs = [];
+
+    if (isClosed != null) {
+      wheres.add('IS_CLOSED = ?');
+      whereArgs.add(isClosed);
+    }
+
     List<Map<String, dynamic>> maps = await db.query(
         TABLE_NAME,
+        where: wheres.isNotEmpty ? wheres.join(" ") : null,
+        whereArgs: whereArgs.isNotEmpty ? whereArgs : null,
         orderBy: 'sequence'
     );
     return maps.map((e) => Account.fromMap(e)).toList();

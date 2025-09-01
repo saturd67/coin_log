@@ -30,7 +30,7 @@ class _TransactionListState extends State<TransactionList> {
   }
 
   void load() async {
-    final transactionCategories = await _transactionCategoryService.listByType(_selectedType);
+    final transactionCategories = await _transactionCategoryService.listByTypeIsClosed(_selectedType, false);
     setState(() {
       _transactionCategories = transactionCategories;
     });

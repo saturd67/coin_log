@@ -30,12 +30,12 @@ class DatabaseService {
   Future<void> createTransactionCategoryTable(Database db) async {
     await db.execute('''
           CREATE TABLE CL_TRANSACTION_CATEGORY (
-            IDENTIFIER INTEGER PRIMARY KEY AUTOINCREMENT,
-            NAME VARCHAR(10) NOT NULL,
-            ICON VARCHAR(50) NOT NULL,
-            TYPE VARCHAR(8) NOT NULL,
-            SEQUENCE INTEGER NOT NULL,
-            IS_CLOSED INTEGER NOT NULL
+            IDENTIFIER  INTEGER PRIMARY KEY AUTOINCREMENT,
+            NAME        VARCHAR(10) NOT NULL,
+            ICON        VARCHAR(50) NOT NULL,
+            TYPE        VARCHAR(8) NOT NULL,
+            SEQUENCE    INTEGER NOT NULL,
+            IS_CLOSED   INTEGER NOT NULL
           );
         ''');
   }
@@ -45,13 +45,13 @@ class DatabaseService {
   Future<void> createAccountTable(Database db) async {
     await db.execute('''
           CREATE TABLE CL_ACCOUNT (
-            IDENTIFIER INTEGER PRIMARY KEY AUTOINCREMENT,
-            NAME VARCHAR(10) NOT NULL,
-            ICON VARCHAR(50) NOT NULL,
-            SEQUENCE INTEGER NOT NULL,
-            BALANCE DOUBLE NOT NULL,
-            IS_DEFAULT INTEGER NOT NULL,
-            IS_CLOSED INTEGER NOT NULL
+            IDENTIFIER  INTEGER PRIMARY KEY AUTOINCREMENT,
+            NAME        VARCHAR(10) NOT NULL,
+            ICON        VARCHAR(50) NOT NULL,
+            SEQUENCE    INTEGER NOT NULL,
+            BALANCE     DOUBLE NOT NULL,
+            IS_DEFAULT  INTEGER NOT NULL,
+            IS_CLOSED   INTEGER NOT NULL
           );
     ''');
   }
@@ -98,6 +98,7 @@ class DatabaseService {
             TRANSACTION_CATEGORY_ID INTEGER NOT NULL,
             PERIOD                  VARCHAR(10) CHECK(PERIOD IN ('Weekly', 'Monthly', 'Yearly')) NOT NULL,
             AMOUNT                  DOUBLE NOT NULL,
+            IS_CLOSED               INTEGER NOT NULL,
             
             FOREIGN KEY (TRANSACTION_CATEGORY_ID) REFERENCES CL_TRANSACTION_CATEGORY(IDENTIFIER)
           );
@@ -110,10 +111,9 @@ class DatabaseService {
             IDENTIFIER              INTEGER PRIMARY KEY AUTOINCREMENT,
             TRANSACTION_CATEGORY_ID INTEGER NOT NULL,
             BUDGET_ID               INTEGER NOT NULL,
-            YEAR                    INTEGER NOT NULL,
-            MONTH                   INTEGER,
-            DAY                     INTEGER,
-            AMOUNT                  DOUBLE NOT NULL
+            START_DATE              DATE NOT NULL,
+            END_DATE                DATE NOT NULL,
+            AMOUNT                  DOUBLE NOT NULL,
             
             FOREIGN KEY BUDGET_ID REFERENCES CL_BUDGET(IDENTIFIER)
           );

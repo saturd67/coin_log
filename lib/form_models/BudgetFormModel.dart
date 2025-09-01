@@ -7,6 +7,7 @@ class BudgetFormModel implements BaseFormModel<Budget> {
 
   int? identifier;
   String? period;
+  bool? isClosed;
 
   int? transactionCategoryId;
 
@@ -17,6 +18,7 @@ class BudgetFormModel implements BaseFormModel<Budget> {
   BudgetFormModel({
     this.identifier,
     this.period,
+    this.isClosed,
     this.transactionCategoryId,
     this.transactionCategory,
     double? amount
@@ -41,10 +43,15 @@ class BudgetFormModel implements BaseFormModel<Budget> {
       throw "Invalid transaction category id.";
     }
 
+    if (isClosed == null) {
+      throw "Invalid isClosed.";
+    }
+
     return Budget(
       identifier: identifier,
       transactionCategoryId: transactionCategoryId!,
       period: period!,
+      isClosed: isClosed!,
       amount: double.parse(amountController.text)
     );
   }

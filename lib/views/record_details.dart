@@ -113,7 +113,7 @@ class _RecordDetailsState extends State<RecordDetails> {
   }
 
   Future<void> loadTransactionCategories() async {
-    final transactionCategories = await _transactionCategoryService.listByType(_recordFormModel.type!);
+    final transactionCategories = await _transactionCategoryService.listByTypeIsClosed(_recordFormModel.type, false);
 
     setState(() {
       _transactionCategories = transactionCategories;
@@ -121,7 +121,7 @@ class _RecordDetailsState extends State<RecordDetails> {
   }
 
   Future<void> loadAccounts() async {
-    final accounts = await _accountService.list();
+    final accounts = await _accountService.listByIsClosed(false);
 
     if (widget.identifier == null) {
       Account defaultAccount = accounts.where((account) => account.isDefault == true).toList().first;

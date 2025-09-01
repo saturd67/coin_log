@@ -26,7 +26,7 @@ class _AccountListState extends State<AccountList> {
   }
 
   void load() async {
-    final accounts = await _accountService.list();
+    final accounts = await _accountService.listByIsClosed(false);
     for (Account account in accounts) {
       print(account.toMap());
     }

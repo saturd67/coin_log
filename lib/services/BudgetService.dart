@@ -20,8 +20,9 @@ class BudgetService {
 
   Future<int?> delete(int identifier) async {
     final db = await DatabaseService().database;
-    return await db.delete(
+    return await db.update(
         TABLE_NAME,
+        {'IS_CLOSED': true},
         where: 'identifier = ?',
         whereArgs: [identifier]
     );
@@ -44,9 +45,23 @@ class BudgetService {
     return budget;
   }
   
-  Future<List<Budget>> list() async {
+  Future<List<Budget>> listByIsClosed(bool? isClosed) async {
     final db = await DatabaseService().database;
-    List<Map<String, dynamic>> maps = await db.query(TABLE_NAME);
+
+    List<String> wheres = [];
+    List<Object> whereArgs = [];
+
+    if (isClosed != null) {
+      wheres.add('IS_CLOSED = ?');
+      whereArgs.add(isClosed);
+    }
+
+
+    List<Map<String, dynamic>> maps = await db.query(
+      TABLE_NAME,
+      where: wheres.isNotEmpty ? wheres.join(" ") : null,
+      whereArgs: whereArgs.isNotEmpty ? whereArgs : null
+    );
     return maps.map((e) => Budget.fromMap(e)).toList();
   }
 
