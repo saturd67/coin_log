@@ -112,7 +112,7 @@ class _BudgetDetailsState extends State<BudgetDetails> {
               child: Column(
                 children: [
                   SwitchButton(
-                    labels: [Period.weekly.name, Period.monthly.name, Period.yearly.name],
+                    labels: [Period.monthly.name, Period.yearly.name],
                     selectedValue: _budgetFormModel.period!,
                     onChanged: (value) {
                         _budgetFormModel.period = value;

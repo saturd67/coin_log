@@ -3,7 +3,6 @@ import 'package:coin_log/models/BaseModel.dart';
 import 'package:coin_log/models/TransactionCategory.dart';
 
 enum Period {
-  weekly(name: "Weekly"),
   monthly(name: "Monthly"),
   yearly(name: "Yearly");
 

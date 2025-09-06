@@ -96,7 +96,7 @@ class DatabaseService {
           CREATE TABLE CL_BUDGET (
             IDENTIFIER              INTEGER PRIMARY KEY AUTOINCREMENT,
             TRANSACTION_CATEGORY_ID INTEGER NOT NULL,
-            PERIOD                  VARCHAR(10) CHECK(PERIOD IN ('Weekly', 'Monthly', 'Yearly')) NOT NULL,
+            PERIOD                  VARCHAR(10) CHECK(PERIOD IN ('Monthly', 'Yearly')) NOT NULL,
             AMOUNT                  DOUBLE NOT NULL,
             IS_CLOSED               INTEGER NOT NULL,
             
