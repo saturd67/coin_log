@@ -38,11 +38,11 @@ class BudgetBalance extends StatelessWidget {
                   Expanded(
                     child: ListView(
                       children: [
-                        BudgetPeriodItem(),
-                        BudgetPeriodItem(),
-                        BudgetPeriodItem(),
-                        BudgetPeriodItem(),
-                        BudgetPeriodItem()
+                        BudgetTransactionItem(),
+                        BudgetTransactionItem(),
+                        BudgetTransactionItem(),
+                        BudgetTransactionItem(),
+                        BudgetTransactionItem()
                       ],
                     ),
                   )
@@ -149,16 +149,46 @@ class _SummaryTypeState extends State<SummaryType> {
   }
 }
 
-class BudgetPeriodItem extends StatefulWidget {
+class BudgetTransactionItem extends StatefulWidget {
 
   @override
-  State<BudgetPeriodItem> createState() => _BudgetPeriodItemState();
+  State<BudgetTransactionItem> createState() => _BudgetTransactionItemState();
 }
 
-class _BudgetPeriodItemState extends State<BudgetPeriodItem> {
+class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
 
   double incomeAmount = 5000;
   double expenseAmount = 1000;
+
+  Future<void> showEditDialog(BuildContext context) async {
+    final result = await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          titleTextStyle: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+            fontSize: Theme.of(context).textTheme.displayLarge!.fontSize,
+          ),
+          backgroundColor: Theme.of(context).colorScheme.secondary,
+          title: const Text("Edit"),
+          content: SizedBox(
+            width: 300,   // set width
+            height: 150,  // set height
+            child: const Text("This is a normal dialog."),
+          ),
+          actions: [
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +216,9 @@ class _BudgetPeriodItemState extends State<BudgetPeriodItem> {
                   ],
                 ),
                 IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      showEditDialog(context);
+                    },
                     icon: Icon(Icons.edit, color: Colors.blue,)
                 )
               ]
