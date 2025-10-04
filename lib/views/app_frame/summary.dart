@@ -5,7 +5,7 @@ import 'package:coin_log/services/RecordService.dart';
 import 'package:coin_log/shared_widgets/switch_button.dart';
 import 'package:coin_log/shared_widgets/themedShowMonthPicker.dart';
 import 'package:coin_log/shared_widgets/themedShowYearPicker.dart';
-import 'package:coin_log/views/budget_balance.dart';
+import 'package:coin_log/views/budget_transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
@@ -451,7 +451,7 @@ class _TransactionTypeSummaryState extends State<TransactionTypeSummary> {
 
     setState(() {
       if (tempTransactionCategoryAmountMaps.keys.isEmpty) {
-        transactionCategoryAmountMaps = {"No Date": 0};
+        transactionCategoryAmountMaps = {"No Data": 0};
       }
 
       else {
@@ -543,14 +543,13 @@ class _PeriodSummaryState extends State<PeriodSummary> {
 
     else {
       tempPeriodTransactionAmountMaps = await _recordService.listMonthlyTransactionCategoryAmountByYearMonthTransactionType(selectedTransactionType, selectedYear);
-      for (var map in tempPeriodTransactionAmountMaps) {
-        print(map);
-      }
     }
+
+    var tempMaxAmount = tempPeriodTransactionAmountMaps.reduce((a, b) => a['total'] > b['total'] ? a :b)['total'];
 
     setState(() {
       periodTransactionAmountMaps = tempPeriodTransactionAmountMaps;
-      maxAmount = tempPeriodTransactionAmountMaps.reduce((a, b) => a['total'] > b['total'] ? a :b)['total'];
+      maxAmount = tempMaxAmount.toDouble();
       bottomTitlesInterval = periodTransactionAmountMaps.length > 12 ? 15 : 1;
       leftTitlesInterval = maxAmount > 1000 ? 1000 : 300;
     });

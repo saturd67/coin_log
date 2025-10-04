@@ -56,13 +56,40 @@ class BudgetService {
       whereArgs.add(isClosed);
     }
 
-
     List<Map<String, dynamic>> maps = await db.query(
       TABLE_NAME,
       where: wheres.isNotEmpty ? wheres.join(" ") : null,
       whereArgs: whereArgs.isNotEmpty ? whereArgs : null
     );
+
     return maps.map((e) => Budget.fromMap(e)).toList();
+  }
+
+  Future<List<Budget>> listByPeriodIsClosed(Period? period, bool? isClosed) async {
+    final db = await DatabaseService().database;
+
+    List<String> wheres = [];
+    List<Object> whereArgs = [];
+    
+    wheres.add('1=1');
+    
+    if (period != null) {
+      wheres.add('AND PERIOD = ?');
+      whereArgs.add(period.name);
+    }
+
+    if (isClosed != null) {
+      wheres.add('AND IS_CLOSED = ?');
+      whereArgs.add(isClosed);
+    }
+
+    List<Map<String, dynamic>> maps = await db.query(
+      TABLE_NAME,
+      where: wheres.isNotEmpty ? wheres.join(" ") : null,
+      whereArgs: whereArgs
+    );
+
+    return maps.map((map) => Budget.fromMap(map)).toList();
   }
 
 }

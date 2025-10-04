@@ -1,24 +1,77 @@
 import 'package:coin_log/main.dart';
+import 'package:coin_log/models/Budget.dart';
+import 'package:coin_log/models/BudgetTransaction.dart';
+import 'package:coin_log/services/BudgetService.dart';
+import 'package:coin_log/services/BudgetTransactionService.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/MonthMap.dart';
-import '../models/Budget.dart';
-import '../shared_widgets/switch_button.dart';
 import '../shared_widgets/themedShowMonthPicker.dart';
 import '../shared_widgets/themedShowYearPicker.dart';
 
-class SharedSelectedSummaryType extends ValueNotifier<String> {
-  SharedSelectedSummaryType(super.value);
+class SharedSelectedPeriod extends ValueNotifier<Period> {
+  SharedSelectedPeriod(super.value);
 }
 
 class SharedSelectedDateTime extends ValueNotifier<DateTime> {
   SharedSelectedDateTime(super.value);
 }
 
-class BudgetBalance extends StatelessWidget {
+class BudgetBalance extends StatefulWidget {
 
-  final sharedSelectedSummaryType = SharedSelectedSummaryType('Monthly');
+  @override
+  State<BudgetBalance> createState() => _BudgetBalanceState();
+}
+
+class _BudgetBalanceState extends State<BudgetBalance> {
+  BudgetTransactionService _budgetTransactionService =  BudgetTransactionService();
+  BudgetService _budgetService = BudgetService();
+
+  final sharedSelectedPeriod = SharedSelectedPeriod(Period.monthly);
   final sharedSelectedDateTime = SharedSelectedDateTime(DateTime.now());
+
+  List<BudgetTransaction> budgetTransactions = [];
+  DateTime todayDateTime = DateTime.now();
+
+  // Allow Update BudgetTransactionCategory amount only.
+  // Allow Delete BudgetTransactionCategory.
+  // Allow Add BudgetTransactionCategory.
+
+  @override
+  void initState() {
+    super.initState();
+
+    load();
+  }
+
+  void load() async {
+    final tempBudgetTransactions = await _budgetTransactionService.listByYearMonth(todayDateTime.year, sharedSelectedPeriod.value == Period.monthly ? todayDateTime.month : null);
+
+    setState(() {
+      budgetTransactions = tempBudgetTransactions;
+    });
+  }
+
+  void generateBudgetTransactions() async {
+    List<Budget> budgets = await _budgetService.listByPeriodIsClosed(sharedSelectedPeriod.value, false);
+    for (Budget budget in budgets) {
+      BudgetTransaction budgetTransaction = BudgetTransaction(
+          transactionCategoryId: budget.transactionCategoryId,
+          budgetId: budget.identifier!,
+          date: sharedSelectedPeriod.value == Period.monthly
+              ? DateTime(todayDateTime.year, todayDateTime.month, 1)
+              : DateTime(todayDateTime.year, 1, 1),
+          amount: budget.amount
+      );
+
+      await _budgetTransactionService.save(budgetTransaction);
+    }
+  }
+
+  void refreshBudgetTransaction() {
+    _budgetTransactionService.updateByYearMonth(sharedSelectedDateTime.value.year, sharedSelectedDateTime.value.month, budgetTransactions);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -27,24 +80,40 @@ class BudgetBalance extends StatelessWidget {
             appBar: AppBar(
               shadowColor: Theme.of(context).colorScheme.surface,
               backgroundColor: Theme.of(context).colorScheme.primary,
-              title: const Text("Budget Balance")
+              title: const Text("Budget Transaction"),
+              actions: [
+                if (budgetTransactions.isNotEmpty)
+                  IconButton(
+                      onPressed: () {
+                        refreshBudgetTransaction();
+                      },
+                      icon: const Icon(Icons.update)
+                  )
+              ],
             ),
             body: Container(
               color: Theme.of(context).colorScheme.secondary,
               padding: EdgeInsetsDirectional.fromSTEB(15, 5, 15, 5),
               child: Column(
                 children: [
-                  SummaryType(sharedSelectedSummaryType: sharedSelectedSummaryType, sharedSelectedDateTime: sharedSelectedDateTime),
+                  SummaryType(sharedSelectedSummaryType: sharedSelectedPeriod, sharedSelectedDateTime: sharedSelectedDateTime),
                   Expanded(
-                    child: ListView(
+                    child: budgetTransactions.isNotEmpty
+                    ? ListView(
                       children: [
-                        BudgetTransactionItem(),
-                        BudgetTransactionItem(),
-                        BudgetTransactionItem(),
-                        BudgetTransactionItem(),
-                        BudgetTransactionItem()
+                        for (final budgetTransaction in budgetTransactions) ... {
+                          BudgetTransactionItem()
+                        }
                       ],
-                    ),
+                    )
+                    : Center(
+                      child: ElevatedButton(
+                          onPressed: () {
+                            generateBudgetTransactions();
+                          },
+                          child: const Text("Generate")
+                      )
+                    )
                   )
                 ],
               ),
@@ -55,7 +124,7 @@ class BudgetBalance extends StatelessWidget {
 }
 
 class SummaryType extends StatefulWidget {
-  SharedSelectedSummaryType sharedSelectedSummaryType;
+  SharedSelectedPeriod sharedSelectedSummaryType;
   SharedSelectedDateTime sharedSelectedDateTime;
 
   SummaryType({
@@ -81,7 +150,7 @@ class _SummaryTypeState extends State<SummaryType> {
             InkWell(
               onTap: () {
                 setState(() {
-                  widget.sharedSelectedSummaryType.value = "Monthly";
+                  widget.sharedSelectedSummaryType.value = Period.monthly;
                 });
               },
               child: Container(
@@ -90,7 +159,7 @@ class _SummaryTypeState extends State<SummaryType> {
                 alignment: Alignment.center,
                 child: Text("Monthly",
                   style: TextStyle(
-                      fontWeight: widget.sharedSelectedSummaryType.value == "Monthly" ? FontWeight.bold : FontWeight.normal
+                      fontWeight: widget.sharedSelectedSummaryType.value == Period.monthly ? FontWeight.bold : FontWeight.normal
                   ),
                 ),
               ),
@@ -98,7 +167,7 @@ class _SummaryTypeState extends State<SummaryType> {
             InkWell(
               onTap: () {
                 setState(() {
-                  widget.sharedSelectedSummaryType.value = "Yearly";
+                  widget.sharedSelectedSummaryType.value = Period.yearly;
                 });
               },
               child: Container(
@@ -107,7 +176,7 @@ class _SummaryTypeState extends State<SummaryType> {
                 alignment: Alignment.center,
                 child: Text("Yearly",
                   style: TextStyle(
-                      fontWeight: widget.sharedSelectedSummaryType.value == "Yearly" ? FontWeight.bold : FontWeight.normal
+                      fontWeight: widget.sharedSelectedSummaryType.value == Period.yearly ? FontWeight.bold : FontWeight.normal
                   ),
                 ),
               ),
@@ -118,7 +187,7 @@ class _SummaryTypeState extends State<SummaryType> {
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
           child: Row(
             children: [
-              widget.sharedSelectedSummaryType.value == "Monthly" ?
+              widget.sharedSelectedSummaryType.value == Period.monthly ?
               InkWell(
                 onTap: () async {
                   DateTime? tempDateTime = await themedShowMonthPicker(context, widget.sharedSelectedDateTime.value);

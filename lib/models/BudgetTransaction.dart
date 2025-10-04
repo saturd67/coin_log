@@ -8,8 +8,7 @@ import '../form_models/BudgetTransactionFormModel.dart';
 class BudgetTransaction implements BaseModel<BudgetTransactionFormModel> {
 
   int? identifier;
-  DateTime startDate;
-  DateTime endDate;
+  DateTime date;
   double amount;
 
   // Foreign keys
@@ -24,8 +23,7 @@ class BudgetTransaction implements BaseModel<BudgetTransactionFormModel> {
     this.identifier,
     required this.transactionCategoryId,
     required this.budgetId,
-    required this.startDate,
-    required this.endDate,
+    required this.date,
     required this.amount,
   });
 
@@ -34,8 +32,7 @@ class BudgetTransaction implements BaseModel<BudgetTransactionFormModel> {
       identifier: map['IDENTIFIER'],
       transactionCategoryId: map['TRANSACTION_CATEGORY_ID'],
       budgetId: map['BUDGET_ID'],
-      startDate: map['START_DATE'],
-      endDate: map['END_DATE'],
+      date: DateTime.parse(map['DATE']),
       amount: map['AMOUNT'],
     );
   }
@@ -45,8 +42,7 @@ class BudgetTransaction implements BaseModel<BudgetTransactionFormModel> {
     final map = <String, dynamic>{
       'TRANSACTION_CATEGORY_ID': transactionCategoryId,
       'BUDGET_ID': budgetId,
-      'START_DATE': startDate,
-      'END_DATE': endDate,
+      'DATE': date.toString(),
       'AMOUNT': amount
     };
 
@@ -63,8 +59,7 @@ class BudgetTransaction implements BaseModel<BudgetTransactionFormModel> {
       identifier: identifier,
       transactionCategoryId: transactionCategoryId,
       budgetId: budgetId,
-      startDate: startDate,
-      endDate: endDate,
+      date: date,
       amount: amount
     );
   }

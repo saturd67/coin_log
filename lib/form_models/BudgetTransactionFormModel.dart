@@ -8,8 +8,7 @@ import '../models/TransactionCategory.dart';
 class BudgetTransactionFormModel implements BaseFormModel<BudgetTransaction> {
 
   int? identifier;
-  DateTime? startDate;
-  DateTime? endDate;
+  DateTime? date;
 
   // Foreign keys
   int? transactionCategoryId;
@@ -23,8 +22,7 @@ class BudgetTransactionFormModel implements BaseFormModel<BudgetTransaction> {
 
   BudgetTransactionFormModel({
     this.identifier,
-    this.startDate,
-    this.endDate,
+    this.date,
     this.transactionCategoryId,
     this.budgetId,
     double? amount
@@ -41,8 +39,7 @@ class BudgetTransactionFormModel implements BaseFormModel<BudgetTransaction> {
       identifier: identifier,
       transactionCategoryId: transactionCategoryId!,
       budgetId: budgetId!,
-      startDate: startDate!,
-      endDate: endDate!,
+      date: date!,
       amount: double.parse(amountController.text)
     );
   }

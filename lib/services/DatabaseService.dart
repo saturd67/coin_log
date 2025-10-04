@@ -17,7 +17,7 @@ class DatabaseService {
     if (_db != null) {
       return _db!;
     }
-    _db = await _initDB(true);
+    _db = await _initDB(false);
     return _db!;
   }
 
@@ -79,7 +79,7 @@ class DatabaseService {
             TRANSACTION_CATEGORY_ID INTEGER,
             SOURCE_ACCOUNT_ID       INTEGER,
             DESTINATION_ACCOUNT_ID  INTEGER,
-            DATE                    DATE NOT NULL,
+            DATE                    DATETIME NOT NULL,
             DESCRIPTION             VARCHAR(50),
             TYPE                    VARCHAR(8) CHECK(TYPE IN ('Expense', 'Income', 'Transfer')) NOT NULL,
             AMOUNT                  DOUBLE NOT NULL,
@@ -111,11 +111,11 @@ class DatabaseService {
             IDENTIFIER              INTEGER PRIMARY KEY AUTOINCREMENT,
             TRANSACTION_CATEGORY_ID INTEGER NOT NULL,
             BUDGET_ID               INTEGER NOT NULL,
-            START_DATE              DATE NOT NULL,
-            END_DATE                DATE NOT NULL,
+            DATE                    DATE NOT NULL,
             AMOUNT                  DOUBLE NOT NULL,
             
-            FOREIGN KEY BUDGET_ID REFERENCES CL_BUDGET(IDENTIFIER)
+            FOREIGN KEY (TRANSACTION_CATEGORY_ID) REFERENCES CL_TRANSACTION_CATEGORY(IDENTIFIER),
+            FOREIGN KEY (BUDGET_ID) REFERENCES CL_BUDGET(IDENTIFIER)
           );
         ''');
   }
@@ -166,7 +166,7 @@ class DatabaseService {
         await createAccountLogTable(database);
         await createRecordTable(database);
         await createBudgetTable(database);
-        // await createBudgetTransactionTable(database);
+        await createBudgetTransactionTable(database);
         await insertTransactionCategory(database);
         await insertAccount(database);
       },
