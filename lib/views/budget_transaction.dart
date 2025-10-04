@@ -18,7 +18,6 @@ class SharedSelectedDateTime extends ValueNotifier<DateTime> {
 }
 
 class BudgetBalance extends StatefulWidget {
-
   @override
   State<BudgetBalance> createState() => _BudgetBalanceState();
 }
@@ -26,6 +25,8 @@ class BudgetBalance extends StatefulWidget {
 class _BudgetBalanceState extends State<BudgetBalance> {
   BudgetTransactionService _budgetTransactionService =  BudgetTransactionService();
   BudgetService _budgetService = BudgetService();
+
+  late VoidCallback listener;
 
   final sharedSelectedPeriod = SharedSelectedPeriod(Period.monthly);
   final sharedSelectedDateTime = SharedSelectedDateTime(DateTime.now());
@@ -42,10 +43,26 @@ class _BudgetBalanceState extends State<BudgetBalance> {
     super.initState();
 
     load();
+    listener = () {
+      load();
+      
+      setState(() {});
+    };
+    
+    sharedSelectedPeriod.addListener(listener);
+    sharedSelectedDateTime.addListener(listener);
+  }
+
+  @override
+  void dispose() {
+    sharedSelectedPeriod.removeListener(listener);
+    sharedSelectedDateTime.removeListener(listener);
+
+    super.dispose();
   }
 
   void load() async {
-    final tempBudgetTransactions = await _budgetTransactionService.listByYearMonth(todayDateTime.year, sharedSelectedPeriod.value == Period.monthly ? todayDateTime.month : null);
+    final tempBudgetTransactions = await _budgetTransactionService.listByYearMonth(sharedSelectedDateTime.value.year, sharedSelectedPeriod.value == Period.monthly ? sharedSelectedDateTime.value.month : null);
 
     setState(() {
       budgetTransactions = tempBudgetTransactions;
@@ -102,7 +119,7 @@ class _BudgetBalanceState extends State<BudgetBalance> {
                     ? ListView(
                       children: [
                         for (final budgetTransaction in budgetTransactions) ... {
-                          BudgetTransactionItem()
+                          BudgetTransactionItem(budgetTransaction: budgetTransaction)
                         }
                       ],
                     )
@@ -219,6 +236,12 @@ class _SummaryTypeState extends State<SummaryType> {
 }
 
 class BudgetTransactionItem extends StatefulWidget {
+  BudgetTransaction budgetTransaction;
+
+  BudgetTransactionItem({
+    super.key,
+    required this.budgetTransaction
+  });
 
   @override
   State<BudgetTransactionItem> createState() => _BudgetTransactionItemState();
@@ -226,8 +249,8 @@ class BudgetTransactionItem extends StatefulWidget {
 
 class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
 
-  double incomeAmount = 5000;
-  double expenseAmount = 1000;
+  //double incomeAmount = 5000;
+  //double expenseAmount = 1000;
 
   Future<void> showEditDialog(BuildContext context) async {
     final result = await showDialog<void>(
@@ -261,6 +284,9 @@ class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
 
   @override
   Widget build(BuildContext context) {
+
+    double incomeAmount = widget.budgetTransaction!.amount;
+    double expenseAmount = 1000;
 
     Color balanceColor = incomeAmount > expenseAmount ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.error;
     Color numeratorColor = incomeAmount > expenseAmount ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.success;
@@ -305,7 +331,7 @@ class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error], label: "Expenses: ", balance: expenseAmount,),
-                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Income: ", balance: incomeAmount,),
+                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Budget: ", balance: incomeAmount,),
                 BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.success], label: "Balance: ", balance: incomeAmount - expenseAmount),
               ],
             ),

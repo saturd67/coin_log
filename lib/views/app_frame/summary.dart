@@ -221,9 +221,9 @@ class _BalanceSummaryState extends State<BalanceSummary> {
   @override
   void initState() {
     super.initState();
+
     load();
     listener = () {
-
       load();
       // Optionally force UI update
       setState(() {});
