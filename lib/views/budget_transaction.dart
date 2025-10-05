@@ -1,3 +1,4 @@
+import 'package:coin_log/constants/IconMap.dart';
 import 'package:coin_log/main.dart';
 import 'package:coin_log/models/Budget.dart';
 import 'package:coin_log/models/BudgetTransaction.dart';
@@ -19,8 +20,13 @@ class SharedSelectedDateTime extends ValueNotifier<DateTime> {
 }
 
 class BudgetTransactionJoinRecordTotal {
-  late BudgetTransaction budgetTransaction;
-  late Map<String, dynamic> recordTotal;
+  BudgetTransaction budgetTransaction;
+  Map<String, dynamic> recordTotal;
+
+  BudgetTransactionJoinRecordTotal({
+    required this.budgetTransaction,
+    required this.recordTotal
+  });
 }
 
 class BudgetBalance extends StatefulWidget {
@@ -40,7 +46,7 @@ class _BudgetBalanceState extends State<BudgetBalance> {
 
   List<BudgetTransaction> budgetTransactions = [];
   DateTime todayDateTime = DateTime.now();
-  List<Map<String, dynamic>> recordTotals = [];
+  List<BudgetTransactionJoinRecordTotal> budgetTransactionJoinRecordTotals = [];
 
   // Allow Update BudgetTransactionCategory amount only.
   // Allow Delete BudgetTransactionCategory.
@@ -53,10 +59,10 @@ class _BudgetBalanceState extends State<BudgetBalance> {
     load();
     listener = () {
       load();
-      
+
       setState(() {});
     };
-    
+
     sharedSelectedPeriod.addListener(listener);
     sharedSelectedDateTime.addListener(listener);
   }
@@ -72,12 +78,12 @@ class _BudgetBalanceState extends State<BudgetBalance> {
   void load() async {
     List<BudgetTransaction> tempBudgetTransactions = await _budgetTransactionService.listByYearMonth(sharedSelectedDateTime.value.year, sharedSelectedPeriod.value == Period.monthly ? sharedSelectedDateTime.value.month : null);
 
-    // Join BudgetTransaction with RecordTotal
-
     for (BudgetTransaction tempBudgetTransaction in tempBudgetTransactions) {
-      Map<String, dynamic>? recordTotal = await _recordService.findRecordTotalByYearMonth(tempBudgetTransaction.transactionCategory!.name, sharedSelectedDateTime.value.year, sharedSelectedDateTime.value.month);
-
-      recordTotals.add(recordTotal!);
+      Map<String, dynamic> recordTotal = await _recordService.findRecordTotalByYearMonth(tempBudgetTransaction.transactionCategory!.name, sharedSelectedDateTime.value.year, sharedSelectedDateTime.value.month);
+      budgetTransactionJoinRecordTotals.add(BudgetTransactionJoinRecordTotal(
+        budgetTransaction: tempBudgetTransaction,
+        recordTotal: recordTotal
+      ));
     }
 
     setState(() {
@@ -134,8 +140,8 @@ class _BudgetBalanceState extends State<BudgetBalance> {
                     child: budgetTransactions.isNotEmpty
                     ? ListView(
                       children: [
-                        for (final budgetTransaction in budgetTransactions) ... {
-                          BudgetTransactionItem(budgetTransaction: budgetTransaction)
+                        for (final budgetTransactionJoinRecordTotal in budgetTransactionJoinRecordTotals) ... {
+                          BudgetTransactionItem(budgetTransactionJoinRecordTotal: budgetTransactionJoinRecordTotal)
                         }
                       ],
                     )
@@ -252,11 +258,11 @@ class _SummaryTypeState extends State<SummaryType> {
 }
 
 class BudgetTransactionItem extends StatefulWidget {
-  BudgetTransaction budgetTransaction;
+  BudgetTransactionJoinRecordTotal budgetTransactionJoinRecordTotal;
 
   BudgetTransactionItem({
     super.key,
-    required this.budgetTransaction
+    required this.budgetTransactionJoinRecordTotal
   });
 
   @override
@@ -264,9 +270,6 @@ class BudgetTransactionItem extends StatefulWidget {
 }
 
 class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
-
-  //double incomeAmount = 5000;
-  //double expenseAmount = 1000;
 
   Future<void> showEditDialog(BuildContext context) async {
     final result = await showDialog<void>(
@@ -301,8 +304,11 @@ class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
   @override
   Widget build(BuildContext context) {
 
-    double incomeAmount = widget.budgetTransaction!.amount;
-    double expenseAmount = 1000;
+    BudgetTransaction budgetTransaction = widget.budgetTransactionJoinRecordTotal.budgetTransaction;
+    Map<String, dynamic> recordTotal = widget.budgetTransactionJoinRecordTotal.recordTotal;
+
+    double incomeAmount = budgetTransaction.amount;
+    double expenseAmount = recordTotal['R_TOTAL'] ?? 0;
 
     Color balanceColor = incomeAmount > expenseAmount ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.error;
     Color numeratorColor = incomeAmount > expenseAmount ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.success;
@@ -319,11 +325,11 @@ class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
                       child: Icon(
-                          Icons.image,
+                          getTransactionCategoryIconData(budgetTransaction.transactionCategory!.icon),
                           size: 30.0
                       ),
                     ),
-                    Text('Icon Data')
+                    Text(budgetTransaction.transactionCategory!.name)
                   ],
                 ),
                 IconButton(

@@ -237,7 +237,7 @@ class RecordService {
     return results;
   }
 
-  Future<Map<String, dynamic>?> findRecordTotalByYearMonth(String transactionCategoryName, int year, int? month) async {
+  Future<Map<String, dynamic>> findRecordTotalByYearMonth(String transactionCategoryName, int year, int? month) async {
     final db = await DatabaseService().database;
 
     String query =  '''
@@ -259,10 +259,10 @@ class RecordService {
     List<Object> whereArgs = [];
 
     whereArgs.add(transactionCategoryName);
-    whereArgs.add(year);
+    whereArgs.add(year.toString());
 
     if (month != null) {
-      whereArgs.add(month);
+      whereArgs.add(month.toString());
     }
 
     List<Map<String, dynamic>> maps = await db.rawQuery(
@@ -270,10 +270,6 @@ class RecordService {
       whereArgs
     );
 
-    if (maps.isNotEmpty) {
-      return maps.first;
-    }
-
-    return null;
+    return maps.first;
   }
 }
