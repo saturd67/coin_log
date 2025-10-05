@@ -45,7 +45,6 @@ class _BudgetBalanceState extends State<BudgetBalance> {
   final sharedSelectedDateTime = SharedSelectedDateTime(DateTime.now());
 
   List<BudgetTransaction> budgetTransactions = [];
-  DateTime todayDateTime = DateTime.now();
   List<BudgetTransactionJoinRecordTotal> budgetTransactionJoinRecordTotals = [];
 
   // Allow Update BudgetTransactionCategory amount only.
@@ -78,6 +77,7 @@ class _BudgetBalanceState extends State<BudgetBalance> {
   void load() async {
     List<BudgetTransaction> tempBudgetTransactions = await _budgetTransactionService.listByYearMonth(sharedSelectedDateTime.value.year, sharedSelectedPeriod.value == Period.monthly ? sharedSelectedDateTime.value.month : null);
 
+    budgetTransactionJoinRecordTotals = [];
     for (BudgetTransaction tempBudgetTransaction in tempBudgetTransactions) {
       Map<String, dynamic> recordTotal = await _recordService.findRecordTotalByYearMonth(tempBudgetTransaction.transactionCategory!.name, sharedSelectedDateTime.value.year, sharedSelectedDateTime.value.month);
       budgetTransactionJoinRecordTotals.add(BudgetTransactionJoinRecordTotal(
@@ -93,18 +93,23 @@ class _BudgetBalanceState extends State<BudgetBalance> {
 
   void generateBudgetTransactions() async {
     List<Budget> budgets = await _budgetService.listByPeriodIsClosed(sharedSelectedPeriod.value, false);
+
+    List<Future> futures = [];
     for (Budget budget in budgets) {
       BudgetTransaction budgetTransaction = BudgetTransaction(
           transactionCategoryId: budget.transactionCategoryId,
           budgetId: budget.identifier!,
           date: sharedSelectedPeriod.value == Period.monthly
-              ? DateTime(todayDateTime.year, todayDateTime.month, 1)
-              : DateTime(todayDateTime.year, 1, 1),
+              ? DateTime(sharedSelectedDateTime.value.year, sharedSelectedDateTime.value.month, 1)
+              : DateTime(sharedSelectedDateTime.value.year, 1, 1),
           amount: budget.amount
       );
 
-      await _budgetTransactionService.save(budgetTransaction);
+      futures.add(_budgetTransactionService.save(budgetTransaction));
     }
+    await Future.wait(futures);
+
+    load();
   }
 
   void refreshBudgetTransaction() {
@@ -354,7 +359,7 @@ class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
               children: [
                 BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error], label: "Expenses: ", balance: expenseAmount,),
                 BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Budget: ", balance: incomeAmount,),
-                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.success], label: "Balance: ", balance: incomeAmount - expenseAmount),
+                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.success], label: "Unspent: ", balance: incomeAmount - expenseAmount),
               ],
             ),
           )

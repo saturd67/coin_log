@@ -118,20 +118,20 @@ class BudgetTransactionService {
         ON BT.BUDGET_ID = B.IDENTIFIER 
       WHERE 1=1 
         AND B.PERIOD = ?
-        AND strftime('%Y', BT.DATE) = ? 
+        AND CAST(strftime('%Y', BT.DATE) AS INTEGER) = ? 
     ''';
 
     List<Object> whereArgs = [];
 
     whereArgs.add(month != null ? Period.monthly.name : Period.yearly.name);
-    whereArgs.add(year.toString());
+    whereArgs.add(year);
 
     if (month != null) {
       query += '''
-        AND strftime('%m', BT.DATE) = ?
+        AND CAST(strftime('%m', BT.DATE) AS INTEGER) = ?
       ''';
 
-      whereArgs.add(month.toString());
+      whereArgs.add(month);
     }
     
     List<Map<String, dynamic>> maps = await db.rawQuery(

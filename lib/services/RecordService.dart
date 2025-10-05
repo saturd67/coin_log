@@ -252,17 +252,17 @@ class RecordService {
       WHERE 1=1
         AND R.TYPE = 'Expense' 
         AND TC.NAME = ? 
-        AND STRFTIME('%Y', R.DATE) = ?
+        AND CAST(STRFTIME('%Y', R.DATE) AS INTEGER) = ?
     ''';
-    query += month != null ? 'AND STRFTIME("%m", R.DATE) = ? ' : '';
+    query += month != null ? 'AND CAST(STRFTIME("%m", R.DATE) AS INTEGER) = ? ' : '';
 
     List<Object> whereArgs = [];
 
     whereArgs.add(transactionCategoryName);
-    whereArgs.add(year.toString());
+    whereArgs.add(year);
 
     if (month != null) {
-      whereArgs.add(month.toString());
+      whereArgs.add(month);
     }
 
     List<Map<String, dynamic>> maps = await db.rawQuery(

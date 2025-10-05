@@ -213,7 +213,8 @@ class DatabaseService {
     final directory = Directory(directoryPath);
     final backupDb = join(directory.path, filename);
 
-    if (await dbFile.exists()) {
+    bool isFileExist = await dbFile.exists();
+    if (isFileExist) {
       await dbFile.copy(backupDb);
       return "Exported database to: $backupDb";
     }

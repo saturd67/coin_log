@@ -52,7 +52,7 @@ class ExportData extends StatefulWidget{
 class _ExportDataState extends State<ExportData> {
   DatabaseService _databaseService = DatabaseService();
 
-  String exportDirectory = "/storage/emulated/0/Document";
+  String exportDirectory = "/storage/emulated/0/Documents";
   String exportedFilename = "coin_log_backup.db";
   String filePath = "";
 
