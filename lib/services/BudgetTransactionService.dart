@@ -1,6 +1,7 @@
 import 'package:coin_log/models/BudgetTransaction.dart';
 
 import '../models/Budget.dart';
+import '../models/TransactionCategory.dart';
 import 'DatabaseService.dart';
 
 class BudgetTransactionService {
@@ -91,8 +92,6 @@ class BudgetTransactionService {
   Future<List<BudgetTransaction>> listByYearMonth(int year, int? month) async {
     final db = await DatabaseService().database;
 
-    List<Object> whereArgs = [];
-
     String query = '''
       SELECT 
         BT.IDENTIFIER              AS BT_IDENTIFIER,
@@ -101,17 +100,28 @@ class BudgetTransactionService {
         BT.DATE                    AS BT_DATE,
         BT.AMOUNT                  AS BT_AMOUNT,
       
+        TC.IDENTIFIER              AS TC_IDENTIFIER,
+        TC.NAME                    AS TC_NAME,
+        TC.ICON                    AS TC_ICON,
+        TC.TYPE                    AS TC_TYPE,
+        TC.SEQUENCE                AS TC_SEQUENCE,
+        TC.IS_CLOSED               AS TC_IS_CLOSED,
+      
         B.IDENTIFIER               AS B_IDENTIFIER,
         B.TRANSACTION_CATEGORY_ID  AS B_TRANSACTION_CATEGORY_ID,
         B.PERIOD                   AS B_PERIOD,
         B.AMOUNT                   AS B_AMOUNT
       FROM CL_BUDGET_TRANSACTION BT 
+      JOIN CL_TRANSACTION_CATEGORY TC 
+        ON BT.TRANSACTION_CATEGORY_ID = TC.IDENTIFIER
       JOIN CL_BUDGET B 
         ON BT.BUDGET_ID = B.IDENTIFIER 
       WHERE 1=1 
         AND B.PERIOD = ?
         AND strftime('%Y', BT.DATE) = ? 
     ''';
+
+    List<Object> whereArgs = [];
 
     whereArgs.add(month != null ? Period.monthly.name : Period.yearly.name);
     whereArgs.add(year.toString());
@@ -140,6 +150,15 @@ class BudgetTransactionService {
           'AMOUNT': map['BT_AMOUNT']
         });
 
+        final transactionCategory = TransactionCategory.fromMap({
+          'IDENTIFIER': map['TC_IDENTIFIER'],
+          'NAME': map['TC_NAME'],
+          'ICON': map['TC_ICON'],
+          'TYPE': map['TC_TYPE'],
+          'SEQUENCE': map['TC_SEQUENCE'],
+          'IS_CLOSED': map['TC_IS_CLOSED'],
+        });
+
         final budget = Budget.fromMap({
           'IDENTIFIER': map['B_IDENTIFIER'],
           'TRANSACTION_CATEGORY_ID': map['B_TRANSACTION_CATEGORY_ID'],
@@ -149,6 +168,7 @@ class BudgetTransactionService {
         });
 
         budgetTransaction.budget = budget;
+        budgetTransaction.transactionCategory = transactionCategory;
         budgetTransactions.add(budgetTransaction);
       }
     }

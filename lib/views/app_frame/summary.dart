@@ -422,7 +422,7 @@ class _TransactionTypeSummaryState extends State<TransactionTypeSummary> {
     String selectedSummaryType = widget.sharedSelectedSummaryType.value;
     String selectedYear = widget.sharedSelectedDateTime.value.year.toString();
     String? selectedMonth = selectedSummaryType == "Monthly" ? widget.sharedSelectedDateTime.value.month.toString() : null;
-    List<Map<String, dynamic>> maps = await _recordService.listTransactionCategoryAmountByTypeYearMonth(selectedTransactionType, selectedYear, selectedMonth);
+    List<Map<String, dynamic>> maps = await _recordService.listTransactionCategoryTotalByTypeYearMonth(selectedTransactionType, selectedYear, selectedMonth);
     double tempTotal = 0;
     // Count Top 5 Transaction Types, the rest in Others
     Map<String, double> tempTransactionCategoryAmountMaps = {};
@@ -538,11 +538,11 @@ class _PeriodSummaryState extends State<PeriodSummary> {
 
     List<Map<String, dynamic>> tempPeriodTransactionAmountMaps = [];
     if  (selectedSummaryType == 'Monthly') {
-      tempPeriodTransactionAmountMaps = await _recordService.listDailyTransactionCategoryAmountByYearMonthTransactionType(selectedTransactionType, selectedYear, selectedMonth);
+      tempPeriodTransactionAmountMaps = await _recordService.listDailyTransactionCategoryTotalByYearMonthTransactionType(selectedTransactionType, selectedYear, selectedMonth);
     }
 
     else {
-      tempPeriodTransactionAmountMaps = await _recordService.listMonthlyTransactionCategoryAmountByYearMonthTransactionType(selectedTransactionType, selectedYear);
+      tempPeriodTransactionAmountMaps = await _recordService.listMonthlyTransactionCategoryTotalByYearMonthTransactionType(selectedTransactionType, selectedYear);
     }
 
     var tempMaxAmount = tempPeriodTransactionAmountMaps.reduce((a, b) => a['total'] > b['total'] ? a :b)['total'];

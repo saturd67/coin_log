@@ -3,6 +3,8 @@ import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/services/DatabaseService.dart';
 import 'package:coin_log/utils/BalanceManager.dart';
 
+import '../models/TransactionCategory.dart';
+
 class RecordService {
 
   final String TABLE_NAME = "CL_RECORD";
@@ -145,7 +147,7 @@ class RecordService {
     return maps[0]["TOTAL"] ?? 0;
   }
 
-  Future<List<Map<String, dynamic>>> listTransactionCategoryAmountByTypeYearMonth(String? type, String? year, String? month) async {
+  Future<List<Map<String, dynamic>>> listTransactionCategoryTotalByTypeYearMonth(String? type, String? year, String? month) async {
     String query = 'SELECT tc.name, SUM(x.amount) as TOTAL FROM $TABLE_NAME x '
         'JOIN CL_TRANSACTION_CATEGORY tc ON x.transaction_category_id = tc.identifier '
         'WHERE 1=1 ';
@@ -173,7 +175,7 @@ class RecordService {
     return await db.rawQuery(query, arguments);
   }
 
-  Future<List<Map<String, dynamic>>> listDailyTransactionCategoryAmountByYearMonthTransactionType(String transactionType, String year, String month) async {
+  Future<List<Map<String, dynamic>>> listDailyTransactionCategoryTotalByYearMonthTransactionType(String transactionType, String year, String month) async {
 
     String query = 'SELECT CAST(STRFTIME("%d", date) as INTEGER) as x_date, SUM(amount) as total FROM $TABLE_NAME '
         'WHERE 1=1 '
@@ -205,7 +207,7 @@ class RecordService {
     return results;
   }
 
-  Future<List<Map<String, dynamic>>> listMonthlyTransactionCategoryAmountByYearMonthTransactionType(String transactionType, String year) async {
+  Future<List<Map<String, dynamic>>> listMonthlyTransactionCategoryTotalByYearMonthTransactionType(String transactionType, String year) async {
 
     String query = 'SELECT CAST(STRFTIME("%m", date) AS INTEGER) as x_date, SUM(amount) as total FROM $TABLE_NAME '
         'WHERE 1=1 '
@@ -233,5 +235,45 @@ class RecordService {
     }
 
     return results;
+  }
+
+  Future<Map<String, dynamic>?> findRecordTotalByYearMonth(String transactionCategoryName, int year, int? month) async {
+    final db = await DatabaseService().database;
+
+    String query =  '''
+      SELECT 
+        R.IDENTIFIER AS R_IDENTIFIER,
+        R.TRANSACTION_CATEGORY_ID AS R_TRANSACTION_CATEGORY_ID,
+        SUM(R.AMOUNT) AS R_TOTAL,
+        
+        TC.IDENTIFIER AS TC_IDENTIFIER
+      FROM CL_RECORD R
+      JOIN CL_TRANSACTION_CATEGORY TC ON R.TRANSACTION_CATEGORY_ID = TC.IDENTIFIER 
+      WHERE 1=1
+        AND R.TYPE = 'Expense' 
+        AND TC.NAME = ? 
+        AND STRFTIME('%Y', R.DATE) = ?
+    ''';
+    query += month != null ? 'AND STRFTIME("%m", R.DATE) = ? ' : '';
+
+    List<Object> whereArgs = [];
+
+    whereArgs.add(transactionCategoryName);
+    whereArgs.add(year);
+
+    if (month != null) {
+      whereArgs.add(month);
+    }
+
+    List<Map<String, dynamic>> maps = await db.rawQuery(
+      query,
+      whereArgs
+    );
+
+    if (maps.isNotEmpty) {
+      return maps.first;
+    }
+
+    return null;
   }
 }

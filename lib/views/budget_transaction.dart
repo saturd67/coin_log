@@ -3,6 +3,7 @@ import 'package:coin_log/models/Budget.dart';
 import 'package:coin_log/models/BudgetTransaction.dart';
 import 'package:coin_log/services/BudgetService.dart';
 import 'package:coin_log/services/BudgetTransactionService.dart';
+import 'package:coin_log/services/RecordService.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/MonthMap.dart';
@@ -17,6 +18,11 @@ class SharedSelectedDateTime extends ValueNotifier<DateTime> {
   SharedSelectedDateTime(super.value);
 }
 
+class BudgetTransactionJoinRecordTotal {
+  late BudgetTransaction budgetTransaction;
+  late Map<String, dynamic> recordTotal;
+}
+
 class BudgetBalance extends StatefulWidget {
   @override
   State<BudgetBalance> createState() => _BudgetBalanceState();
@@ -25,6 +31,7 @@ class BudgetBalance extends StatefulWidget {
 class _BudgetBalanceState extends State<BudgetBalance> {
   BudgetTransactionService _budgetTransactionService =  BudgetTransactionService();
   BudgetService _budgetService = BudgetService();
+  RecordService _recordService = RecordService();
 
   late VoidCallback listener;
 
@@ -33,6 +40,7 @@ class _BudgetBalanceState extends State<BudgetBalance> {
 
   List<BudgetTransaction> budgetTransactions = [];
   DateTime todayDateTime = DateTime.now();
+  List<Map<String, dynamic>> recordTotals = [];
 
   // Allow Update BudgetTransactionCategory amount only.
   // Allow Delete BudgetTransactionCategory.
@@ -62,7 +70,15 @@ class _BudgetBalanceState extends State<BudgetBalance> {
   }
 
   void load() async {
-    final tempBudgetTransactions = await _budgetTransactionService.listByYearMonth(sharedSelectedDateTime.value.year, sharedSelectedPeriod.value == Period.monthly ? sharedSelectedDateTime.value.month : null);
+    List<BudgetTransaction> tempBudgetTransactions = await _budgetTransactionService.listByYearMonth(sharedSelectedDateTime.value.year, sharedSelectedPeriod.value == Period.monthly ? sharedSelectedDateTime.value.month : null);
+
+    // Join BudgetTransaction with RecordTotal
+
+    for (BudgetTransaction tempBudgetTransaction in tempBudgetTransactions) {
+      Map<String, dynamic>? recordTotal = await _recordService.findRecordTotalByYearMonth(tempBudgetTransaction.transactionCategory!.name, sharedSelectedDateTime.value.year, sharedSelectedDateTime.value.month);
+
+      recordTotals.add(recordTotal!);
+    }
 
     setState(() {
       budgetTransactions = tempBudgetTransactions;

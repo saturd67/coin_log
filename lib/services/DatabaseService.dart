@@ -44,15 +44,15 @@ class DatabaseService {
 
   Future<void> createAccountTable(Database db) async {
     await db.execute('''
-          CREATE TABLE CL_ACCOUNT (
-            IDENTIFIER  INTEGER PRIMARY KEY AUTOINCREMENT,
-            NAME        VARCHAR(10) NOT NULL,
-            ICON        VARCHAR(50) NOT NULL,
-            SEQUENCE    INTEGER NOT NULL,
-            BALANCE     DOUBLE NOT NULL,
-            IS_DEFAULT  INTEGER NOT NULL,
-            IS_CLOSED   INTEGER NOT NULL
-          );
+      CREATE TABLE CL_ACCOUNT (
+        IDENTIFIER  INTEGER PRIMARY KEY AUTOINCREMENT,
+        NAME        VARCHAR(10) NOT NULL,
+        ICON        VARCHAR(50) NOT NULL,
+        SEQUENCE    INTEGER NOT NULL,
+        BALANCE     DOUBLE NOT NULL,
+        IS_DEFAULT  INTEGER NOT NULL,
+        IS_CLOSED   INTEGER NOT NULL
+      );
     ''');
   }
 
@@ -74,21 +74,21 @@ class DatabaseService {
 
   Future<void> createRecordTable(Database db) async {
     await db.execute('''
-          CREATE TABLE CL_RECORD (
-            IDENTIFIER              INTEGER PRIMARY KEY AUTOINCREMENT,
-            TRANSACTION_CATEGORY_ID INTEGER,
-            SOURCE_ACCOUNT_ID       INTEGER,
-            DESTINATION_ACCOUNT_ID  INTEGER,
-            DATE                    DATETIME NOT NULL,
-            DESCRIPTION             VARCHAR(50),
-            TYPE                    VARCHAR(8) CHECK(TYPE IN ('Expense', 'Income', 'Transfer')) NOT NULL,
-            AMOUNT                  DOUBLE NOT NULL,
-            
-            FOREIGN KEY (TRANSACTION_CATEGORY_ID) REFERENCES CL_TRANSACTION_CATEGORY(IDENTIFIER),
-            FOREIGN KEY (SOURCE_ACCOUNT_ID) REFERENCES CL_ACCOUNT(IDENTIFIER),
-            FOREIGN KEY (DESTINATION_ACCOUNT_ID) REFERENCES CL_ACCOUNT(IDENTIFIER)
-          );
-        ''');
+      CREATE TABLE CL_RECORD (
+        IDENTIFIER              INTEGER PRIMARY KEY AUTOINCREMENT,
+        TRANSACTION_CATEGORY_ID INTEGER,
+        SOURCE_ACCOUNT_ID       INTEGER,
+        DESTINATION_ACCOUNT_ID  INTEGER,
+        DATE                    DATETIME NOT NULL,
+        DESCRIPTION             VARCHAR(50),
+        TYPE                    VARCHAR(8) CHECK(TYPE IN ('Expense', 'Income', 'Transfer')) NOT NULL,
+        AMOUNT                  DOUBLE NOT NULL,
+        
+        FOREIGN KEY (TRANSACTION_CATEGORY_ID) REFERENCES CL_TRANSACTION_CATEGORY(IDENTIFIER),
+        FOREIGN KEY (SOURCE_ACCOUNT_ID) REFERENCES CL_ACCOUNT(IDENTIFIER),
+        FOREIGN KEY (DESTINATION_ACCOUNT_ID) REFERENCES CL_ACCOUNT(IDENTIFIER)
+      );
+    ''');
   }
 
   Future<void> createBudgetTable(Database db) async {
