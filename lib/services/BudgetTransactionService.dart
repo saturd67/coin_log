@@ -22,33 +22,23 @@ class BudgetTransactionService {
         whereArgs: [budgetTransaction.identifier]);
   }
 
-  Future<void> updateByYearMonth(int year, int? month, List<BudgetTransaction> budgetTransactions) async {
+  Future<void> refresh(List<BudgetTransaction> oldBudgetTransactions, List<BudgetTransaction> newBudgetTransactions) async {
     final db = await DatabaseService().database;
 
-    Period period = month != null ? Period.monthly : Period.yearly;
+    final oldIdentifiers = oldBudgetTransactions
+      .map((bt) => bt.identifier)
+      .toList();
 
-    List<String> wheres = [];
-    List<Object> whereArgs = [];
-
-    wheres.add('PERIOD = ?');
-    whereArgs.add(period.name);
-
-    wheres.add("AND strftime('%Y', BT.DATE) AS YEAR = ?");
-    whereArgs.add(year);
-
-    if (month != null) {
-      wheres.add("AND strftime('%m', BT.DATE) AS MONTH = ?");
-      whereArgs.add(month);
-    }
+    final placeholders = List.filled(oldIdentifiers.length, '?').join(',');
 
     await db.transaction((transaction) async {
-      await transaction.delete(
+      int? output = await transaction.delete(
         TABLE_NAME,
-        where: wheres.join(" "),
-        whereArgs: whereArgs
+        where: 'IDENTIFIER in ($placeholders)',
+        whereArgs: oldIdentifiers
       );
 
-      for (final budgetTransaction in budgetTransactions) {
+      for (final budgetTransaction in newBudgetTransactions) {
         transaction.insert(TABLE_NAME, budgetTransaction.toMap());
       }
     });
@@ -56,9 +46,8 @@ class BudgetTransactionService {
 
   Future<int?> delete(int identifier) async {
     final db = await DatabaseService().database;
-    return await db.update(
+    return await db.delete(
         TABLE_NAME,
-        {'IS_CLOSED': true},
         where: 'identifier = ?',
         whereArgs: [identifier]
     );

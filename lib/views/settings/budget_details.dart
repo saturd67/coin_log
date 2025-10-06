@@ -102,7 +102,7 @@ class _BudgetDetailsState extends State<BudgetDetails> {
 
                       Navigator.of(context).pop("reload");
                     },
-                    icon: const Icon(Icons.check)
+                    icon: const Icon(Icons.check_box)
                 )
               ],
             ),

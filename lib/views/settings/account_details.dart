@@ -92,7 +92,7 @@ class _TransactionDetailsState extends State<AccountDetails> {
 
                       Navigator.of(context).pop("reload");
                     },
-                    icon: const Icon(Icons.check)
+                    icon: const Icon(Icons.check_box)
                 )
               ],
             ),
@@ -145,13 +145,14 @@ class _TransactionDetailsState extends State<AccountDetails> {
                               IconButton(
                                   onPressed: () async {
                                     showConfirmationDialog(
-                                        context,
-                                        "Are you sure you want to delete?",
-                                            () async {
-                                          await accountService.delete(widget.identifier!);
-                                          Navigator.of(context).pop("reload");
-                                        },
-                                            () {});
+                                      context,
+                                      "Are you sure you want to delete?",
+                                      () async {
+                                        await accountService.delete(widget.identifier!);
+                                        Navigator.of(context).pop("reload");
+                                      },
+                                      () {}
+                                    );
                                   },
                                   icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.danger)
                               )

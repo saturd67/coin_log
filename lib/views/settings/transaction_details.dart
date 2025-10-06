@@ -97,7 +97,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
 
                 Navigator.of(context).pop("reload");
               }, 
-              icon: const Icon(Icons.check)
+              icon: const Icon(Icons.check_box)
             )
           ],
         ),

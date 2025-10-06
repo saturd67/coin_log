@@ -5,9 +5,13 @@ import 'package:coin_log/models/BudgetTransaction.dart';
 import 'package:coin_log/services/BudgetService.dart';
 import 'package:coin_log/services/BudgetTransactionService.dart';
 import 'package:coin_log/services/RecordService.dart';
+import 'package:coin_log/shared_widgets/themed_text_field.dart';
+import 'package:coin_log/shared_widgets/themed_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../constants/MonthMap.dart';
+import '../shared_widgets/showConfirmationDialog.dart';
 import '../shared_widgets/themedShowMonthPicker.dart';
 import '../shared_widgets/themedShowYearPicker.dart';
 
@@ -46,10 +50,6 @@ class _BudgetBalanceState extends State<BudgetBalance> {
 
   List<BudgetTransaction> budgetTransactions = [];
   List<BudgetTransactionJoinRecordTotal> budgetTransactionJoinRecordTotals = [];
-
-  // Allow Update BudgetTransactionCategory amount only.
-  // Allow Delete BudgetTransactionCategory.
-  // Allow Add BudgetTransactionCategory.
 
   @override
   void initState() {
@@ -94,6 +94,11 @@ class _BudgetBalanceState extends State<BudgetBalance> {
   void generateBudgetTransactions() async {
     List<Budget> budgets = await _budgetService.listByPeriodIsClosed(sharedSelectedPeriod.value, false);
 
+    if (budgets.isEmpty) {
+      ThemedToast.showToast("No budgets set.");
+      return;
+    }
+
     List<Future> futures = [];
     for (Budget budget in budgets) {
       BudgetTransaction budgetTransaction = BudgetTransaction(
@@ -112,8 +117,26 @@ class _BudgetBalanceState extends State<BudgetBalance> {
     load();
   }
 
-  void refreshBudgetTransaction() {
-    _budgetTransactionService.updateByYearMonth(sharedSelectedDateTime.value.year, sharedSelectedDateTime.value.month, budgetTransactions);
+  Future<void> refreshBudgetTransaction() async {
+    List<Budget> budgets = await _budgetService.listByPeriodIsClosed(sharedSelectedPeriod.value, false);
+
+    List<BudgetTransaction> newBudgetTransactions = [];
+    for (Budget budget in budgets) {
+      BudgetTransaction budgetTransaction = BudgetTransaction(
+          transactionCategoryId: budget.transactionCategoryId,
+          budgetId: budget.identifier!,
+          date: sharedSelectedPeriod.value == Period.monthly
+              ? DateTime(sharedSelectedDateTime.value.year,
+              sharedSelectedDateTime.value.month, 1)
+              : DateTime(sharedSelectedDateTime.value.year, 1, 1),
+          amount: budget.amount
+      );
+
+      newBudgetTransactions.add(budgetTransaction);
+    }
+
+    await _budgetTransactionService.refresh(budgetTransactions, newBudgetTransactions);
+    load();
   }
 
 
@@ -129,7 +152,14 @@ class _BudgetBalanceState extends State<BudgetBalance> {
                 if (budgetTransactions.isNotEmpty)
                   IconButton(
                       onPressed: () {
-                        refreshBudgetTransaction();
+                        showConfirmationDialog(
+                            context,
+                            "Refresh will override you existing data.",
+                            () async {
+                              await refreshBudgetTransaction();
+                            },
+                            () {}
+                        );
                       },
                       icon: const Icon(Icons.update)
                   )
@@ -146,7 +176,7 @@ class _BudgetBalanceState extends State<BudgetBalance> {
                     ? ListView(
                       children: [
                         for (final budgetTransactionJoinRecordTotal in budgetTransactionJoinRecordTotals) ... {
-                          BudgetTransactionItem(budgetTransactionJoinRecordTotal: budgetTransactionJoinRecordTotal)
+                          BudgetTransactionItem(budgetTransactionJoinRecordTotal: budgetTransactionJoinRecordTotal, load: load)
                         }
                       ],
                     )
@@ -264,10 +294,12 @@ class _SummaryTypeState extends State<SummaryType> {
 
 class BudgetTransactionItem extends StatefulWidget {
   BudgetTransactionJoinRecordTotal budgetTransactionJoinRecordTotal;
+  Function() load;
 
   BudgetTransactionItem({
     super.key,
-    required this.budgetTransactionJoinRecordTotal
+    required this.budgetTransactionJoinRecordTotal,
+    required this.load
   });
 
   @override
@@ -275,8 +307,18 @@ class BudgetTransactionItem extends StatefulWidget {
 }
 
 class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
+  BudgetTransactionService _budgetTransactionService = BudgetTransactionService();
+  TextEditingController amountController = TextEditingController();
 
-  Future<void> showEditDialog(BuildContext context) async {
+  @override
+  void dispose() {
+    amountController.dispose();
+    super.dispose();
+  }
+
+  Future<void> showEditDialog(BuildContext context, BudgetTransaction budgetTransaction) async {
+    amountController = TextEditingController(text: budgetTransaction.amount.toStringAsFixed(2));
+
     final result = await showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -289,20 +331,83 @@ class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
           title: const Text("Edit"),
           content: SizedBox(
             width: 300,   // set width
-            height: 150,  // set height
-            child: const Text("This is a normal dialog."),
+            height: 100,  // set height
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 8.0),
+                      child: Icon(
+                          getTransactionCategoryIconData(budgetTransaction.transactionCategory!.icon),
+                          size: 30.0
+                      ),
+                    ),
+                    Text(budgetTransaction.transactionCategory!.name),
+                  ],
+                ),
+                ThemedTextField(
+                  placeholder: "Amount",
+                  textInputType: TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                  ],
+                  controller: amountController
+                )
+              ]
+            )
           ),
           actions: [
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.danger,),
+                  onPressed: () async {
+                    Navigator.of(context).pop(true);
+
+                    showConfirmationDialog(
+                      context,
+                      "Are you sure you want to delete?",
+                      () async {
+                        await _budgetTransactionService.delete(budgetTransaction.identifier!);
+                        widget.load();
+                      },
+                      () {
+                      }
+                    );
+                  },
+                ),
+                Row(
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(true);
+                        },
+                        child: Text("Back")
+                    ),
+                    ElevatedButton(
+                      child: const Text("Save"),
+                      onPressed: () async {
+                        budgetTransaction.amount = double.parse(amountController.text);
+                        await _budgetTransactionService.update(budgetTransaction);
+                        widget.load();
+                        Navigator.of(context).pop(true);
+                      },
+                    ),
+                  ],
+                ),
+              ],
             )
           ],
         );
       },
     );
+
   }
 
 
@@ -339,7 +444,7 @@ class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
                 ),
                 IconButton(
                     onPressed: () {
-                      showEditDialog(context);
+                      showEditDialog(context, budgetTransaction);
                     },
                     icon: Icon(Icons.edit, color: Colors.blue,)
                 )
