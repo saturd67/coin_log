@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:coin_log/permission_handler/permission_handler.dart';
 import 'package:logging/logging.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -214,13 +215,19 @@ class DatabaseService {
     final backupDb = join(directory.path, filename);
 
     bool isFileExist = await dbFile.exists();
-    if (isFileExist) {
-      await dbFile.copy(backupDb);
-      return "Exported database to: $backupDb";
-    }
-    else {
+    bool isPermissionGranted = await ensureStoragePermission();
+
+    if (!isFileExist) {
       return "No database found at $originalDb";
     }
+
+    else if (!isPermissionGranted) {
+      return 'Permission denied.';
+    }
+
+    await dbFile.copy(backupDb);
+    return "Exported database to: $backupDb";
+
   }
 
   Future<String> importDatabase(String file) async {
