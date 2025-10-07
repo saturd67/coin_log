@@ -29,7 +29,7 @@ class GridViewIcon extends StatelessWidget {
         Icon(iconData,
             color: isDisabled != null && isDisabled == true ? Colors.white : (isSelected != null && isSelected! ?
               Theme.of(context).colorScheme.onPrimary
-                : Theme.of(context).iconTheme.color),
+                : Theme.of(context).colorScheme.onSecondary),
             size: iconSize ?? Theme.of(context).iconTheme.size)
         : Icon(Icons.picture_in_picture, size: iconSize ?? Theme.of(context).iconTheme.size),
     );

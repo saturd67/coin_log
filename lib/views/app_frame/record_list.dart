@@ -150,7 +150,7 @@ class _RecordsAppBarState extends State<RecordsAppBar> {
               Text(
                 "Coin Log",
                 style: TextStyle(
-                    fontSize: 25,
+                    fontSize: 20,
                     color: Theme.of(context).colorScheme.onPrimary),
               ),
               InkWell(
@@ -466,10 +466,28 @@ class _TransactionRecordDayBodyItemState extends State<TransactionRecordDayBodyI
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(
                             0, 0, 10, 0),
-                        child: Icon(
-                          getTransactionCategoryIconData(widget.record.transactionCategory!.icon),
-                          color: Color(0xFFFFD700),
-                          size: 30,
+                        child: Stack(
+                          children: [
+                            Icon(
+                              getTransactionCategoryIconData(widget.record.transactionCategory!.icon),
+                              size: 30,
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(3)
+                                ),
+                                child: Icon(
+                                  getAccountIconData(widget.record.sourceAccount!.icon),
+                                  color: Color(0xffFFD700),
+                                  size: 15
+                                ),
+                              )
+                            )
+                          ]
                         ),
                       ),
                       Text(widget.record.transactionCategory!.name),
@@ -543,7 +561,6 @@ class _TransferRecordDayBodyItemState extends State<TransferRecordDayBodyItem> {
                             0, 0, 10, 0),
                         child: Icon(
                           getAccountIconData(widget.record.sourceAccount!.icon),
-                          color: Color(0xFFFFD700),
                           size: 30,
                         ),
                       ),
@@ -554,7 +571,6 @@ class _TransferRecordDayBodyItemState extends State<TransferRecordDayBodyItem> {
                             0, 0, 10, 0),
                         child: Icon(
                           getAccountIconData(widget.record.destinationAccount!.icon),
-                          color: Color(0xFFFFD700),
                           size: 30,
                         ),
                       ),

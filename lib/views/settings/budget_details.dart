@@ -129,7 +129,7 @@ class _BudgetDetailsState extends State<BudgetDetails> {
                               shape: BoxShape.circle,
                               color: onDisplayIconData != null ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.tertiary
                           ),
-                          child: Icon(onDisplayIconData ?? Icons.picture_in_picture, color: onDisplayIconData != null ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).iconTheme.color),
+                          child: Icon(onDisplayIconData ?? Icons.picture_in_picture, color: onDisplayIconData != null ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSecondary),
                         ),
                         Expanded(
                             child: Text(onDisplayName ?? "Please Select", style: onDisplayName == null ? TextStyle(color: Theme.of(context).colorScheme.onTertiary) : Theme.of(context).textTheme.bodyMedium,)

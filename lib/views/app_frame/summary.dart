@@ -257,8 +257,8 @@ class _BalanceSummaryState extends State<BalanceSummary> {
   @override
   Widget build(BuildContext context) {
 
-    Color balanceColor = incomeAmount > expenseAmount ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.error;
-    Color numeratorColor = incomeAmount > expenseAmount ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.success;
+    Color balanceColor = Theme.of(context).colorScheme.success;
+    Color numeratorColor = Theme.of(context).colorScheme.error;
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(RouterUtils.createRoute(

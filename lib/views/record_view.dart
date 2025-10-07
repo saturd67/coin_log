@@ -110,7 +110,11 @@ class _RecordViewState extends State<RecordView> {
                                               shape: BoxShape.circle,
                                               color: Theme.of(context).colorScheme.tertiary
                                           ),
-                                          child: Icon(getTransactionCategoryIconData(_record.transactionCategory!.icon), size: Theme.of(context).iconTheme.size),
+                                          child: Icon(
+                                              getTransactionCategoryIconData(_record.transactionCategory!.icon),
+                                              size: Theme.of(context).iconTheme.size,
+                                              color: Theme.of(context).colorScheme.onSecondary
+                                          ),
                                         ),
                                       ),
                                       Text(_record.transactionCategory!.name)
@@ -131,7 +135,10 @@ class _RecordViewState extends State<RecordView> {
                                               shape: BoxShape.circle,
                                               color: Theme.of(context).colorScheme.tertiary
                                           ),
-                                          child: Icon(getAccountIconData(_record.sourceAccount!.icon), size: Theme.of(context).iconTheme.size),
+                                          child: Icon(getAccountIconData(_record.sourceAccount!.icon),
+                                              size: Theme.of(context).iconTheme.size,
+                                              color: Theme.of(context).colorScheme.onSecondary
+                                          ),
                                         ),
                                       ),
                                       Text(_record.sourceAccount!.name),
@@ -145,7 +152,10 @@ class _RecordViewState extends State<RecordView> {
                                               shape: BoxShape.circle,
                                               color: Theme.of(context).colorScheme.tertiary
                                           ),
-                                          child: Icon(getAccountIconData(_record.destinationAccount!.icon), size: Theme.of(context).iconTheme.size),
+                                          child: Icon(getAccountIconData(_record.destinationAccount!.icon),
+                                            size: Theme.of(context).iconTheme.size,
+                                            color: Theme.of(context).colorScheme.onSecondary
+                                          ),
                                         ),
                                       ),
                                       Text(_record.destinationAccount!.name),
@@ -266,7 +276,10 @@ class _RecordViewState extends State<RecordView> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.edit),
+                          Icon(
+                            Icons.edit,
+                            color: Theme.of(context).colorScheme.onSecondary
+                          ),
                           SizedBox(width:4),
                           Text("Edit")
                         ],

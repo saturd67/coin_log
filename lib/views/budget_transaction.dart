@@ -417,11 +417,14 @@ class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
     BudgetTransaction budgetTransaction = widget.budgetTransactionJoinRecordTotal.budgetTransaction;
     Map<String, dynamic> recordTotal = widget.budgetTransactionJoinRecordTotal.recordTotal;
 
-    double incomeAmount = budgetTransaction.amount;
+    double budgetAmount = budgetTransaction.amount;
     double expenseAmount = recordTotal['R_TOTAL'] ?? 0;
 
-    Color balanceColor = incomeAmount > expenseAmount ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.error;
-    Color numeratorColor = incomeAmount > expenseAmount ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.success;
+    print("Budget Amount: " + budgetAmount.toString());
+    print("Expense Amount: " + budgetAmount.toString());
+
+    Color unspentColor = Theme.of(context).colorScheme.success;
+    Color numeratorColor = Theme.of(context).colorScheme.error;
 
     return Padding(
       padding: EdgeInsetsDirectional.fromSTEB(0, 15, 0, 15),
@@ -446,15 +449,15 @@ class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
                     onPressed: () {
                       showEditDialog(context, budgetTransaction);
                     },
-                    icon: Icon(Icons.edit, color: Colors.blue,)
+                    icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.onSecondary,)
                 )
               ]
           ),
           Stack(
             alignment: AlignmentDirectional.topStart,
             children: [
-              Container(height: 25, width: double.infinity, color: balanceColor),
-              Container(height: 25, width: incomeAmount == 0 ? 0 :(MediaQuery.of(context).size.width * expenseAmount / incomeAmount), color: numeratorColor)
+              Container(height: 25, width: double.infinity, color: unspentColor),
+              Container(height: 25, width: budgetAmount == 0 ? 0 :(MediaQuery.of(context).size.width * expenseAmount / budgetAmount), color: numeratorColor)
             ],
           ),
           Padding(
@@ -463,8 +466,8 @@ class _BudgetTransactionItemState extends State<BudgetTransactionItem> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error], label: "Expenses: ", balance: expenseAmount,),
-                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Budget: ", balance: incomeAmount,),
-                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.success], label: "Unspent: ", balance: incomeAmount - expenseAmount),
+                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Budget: ", balance: budgetAmount,),
+                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.success], label: "Unspent: ", balance: budgetAmount - expenseAmount),
               ],
             ),
           )

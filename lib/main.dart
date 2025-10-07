@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
                 primary: Color(0xff00e68e),
                 onPrimary: Color(0xffffffff),
                 secondary: Color(0xffffffff),
-                onSecondary: Color(0xffa0a0a0),
+                onSecondary: Color(0xffb4b4b4),
                 tertiary: Color(0xffe6e6e6),
                 onTertiary: Color(0xffa0a0a0),
                 error: Color(0xffff2c2c),
@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
             ),
             iconTheme: const IconThemeData(
               size: 24,
-              color: Color(0xffa0a0a0),
+              color: Color(0xff00e68e),
             ),
             inputDecorationTheme: const InputDecorationTheme(
               isDense: true,
