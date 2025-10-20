@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
             colorScheme: ColorScheme(
                 brightness: Brightness.dark,
-                primary: Color(0xff00e68e),
+                primary: Color(0xff27ae60),
                 onPrimary: Color(0xffffffff),
                 secondary: Color(0xffffffff),
                 onSecondary: Color(0xffb4b4b4),
@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
             ),
             iconTheme: const IconThemeData(
               size: 24,
-              color: Color(0xff00e68e),
+              color: Color(0xff27ae60),
             ),
             inputDecorationTheme: const InputDecorationTheme(
               isDense: true,
@@ -95,7 +95,7 @@ class MyApp extends StatelessWidget {
             ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xff00e68e),
+              backgroundColor: Color(0xff50a55e),
               foregroundColor: Color(0xffffffff),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6)
