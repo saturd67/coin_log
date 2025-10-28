@@ -45,29 +45,32 @@ class SettingItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(RouterUtils.createRoute(page));
-      },
-      child: Container(
-        color: Theme.of(context).colorScheme.secondary,
-        height: 65,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
-                child: Icon(
-                  icon,
-                  size: 30.0
+    return Material(
+      color: Colors.transparent, // required for ripple visibility
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).push(RouterUtils.createRoute(page));
+        },
+        splashColor: Colors.grey[300],    // ripple color
+        highlightColor: Colors.grey[300], // gray color on press
+        child: Ink(
+          color: Theme.of(context).colorScheme.secondary, // your original color
+          height: 65,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Icon(icon, size: 30.0),
                 ),
-              ),
-              Text(name)
-            ]
+                Text(name),
+              ],
+            ),
           ),
-        )
+        ),
       ),
     );
   }
+
 }

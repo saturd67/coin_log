@@ -135,6 +135,9 @@ class RecordsAppBar extends StatefulWidget {
 }
 
 class _RecordsAppBarState extends State<RecordsAppBar> {
+
+  bool _isDatePressed = false;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -171,30 +174,46 @@ class _RecordsAppBarState extends State<RecordsAppBar> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GestureDetector(
-                onTap: widget.onDateTimeChange,
-                child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.selectedDateTime.year.toString(),
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).colorScheme.onPrimary
-                        ),
-                      ),
-                      Text(
-                        monthMap[widget.selectedDateTime.month.toString()]!,
-                        style: TextStyle(
-                            fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).colorScheme.onPrimary
-                        ),
-                      )
-                    ]
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: widget.onDateTimeChange,
+                  borderRadius: BorderRadius.circular(4),
+                  splashColor: Color(0xff218f50),
+                  highlightColor: Color(0xff218f50),
+                  child: Ink(
+                    child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.selectedDateTime.year.toString(),
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).colorScheme.onPrimary
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                monthMap[widget.selectedDateTime.month.toString()]!,
+                                style: TextStyle(
+                                    fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
+                                    fontWeight: FontWeight.w500,
+                                    color: Theme.of(context).colorScheme.onPrimary
+                                ),
+                              ),
+                              Icon(
+                                Icons.keyboard_arrow_down,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              )
+                            ],
+                          )
+                        ]
+                    ),
+                  ),
                 ),
               ),
               SizedBox(

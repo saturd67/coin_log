@@ -57,7 +57,7 @@ class _SummaryState extends State<Summary> {
               child: ListView(
                 children: [
                   SizedBox(
-                      height: 90,
+                      height: 120,
                       child: BalanceSummary(sharedSelectedSummaryType: sharedSelectedSummaryType, sharedSelectedDateTime: sharedSelectedDateTime)
                   ),
                   Divider(
@@ -162,28 +162,60 @@ class _SummaryTypeState extends State<SummaryType> {
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
           child: Row(
             children: [
-              widget.sharedSelectedSummaryType.value == "Monthly" ?
-              InkWell(
-                onTap: () async {
-                  DateTime? tempDateTime = await themedShowMonthPicker(context, widget.sharedSelectedDateTime.value);
-                  if (tempDateTime != null) {
-                    setState(() {
-                      widget.sharedSelectedDateTime.value = tempDateTime;
-                    });
-                  }
-                },
-                child: Text("${monthMap[widget.sharedSelectedDateTime.value.month.toString()]!} ${widget.sharedSelectedDateTime.value.year}"),
-              )
-              : InkWell(
-                onTap: () async {
-                  int? tempYear = await themedShowYearPicker(context, widget.sharedSelectedDateTime.value);
-                  if (tempYear != null) {
-                    setState(() {
-                      widget.sharedSelectedDateTime.value = DateTime(tempYear);
-                    });
-                  }
-                },
-                child: Text("${widget.sharedSelectedDateTime.value.year}"),
+              Material(
+                color: Colors.transparent,
+                child:  widget.sharedSelectedSummaryType.value == "Monthly" ?
+                InkWell(
+                  onTap: () async {
+                    DateTime? tempDateTime = await themedShowMonthPicker(context, widget.sharedSelectedDateTime.value);
+                    if (tempDateTime != null) {
+                      setState(() {
+                        widget.sharedSelectedDateTime.value = tempDateTime;
+                      });
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(4),
+                  splashColor: Colors.grey[300],
+                  highlightColor: Colors.grey[300],
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
+                    child: Row(
+                      children: [
+                        Text("${monthMap[widget.sharedSelectedDateTime.value.month.toString()]!} ${widget.sharedSelectedDateTime.value.year}"),
+                        Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Theme.of(context).textTheme.bodyMedium!.color,
+                        )
+                      ],
+                    ),
+                  )
+                )
+                :
+                InkWell(
+                  onTap: () async {
+                    int? tempYear = await themedShowYearPicker(context, widget.sharedSelectedDateTime.value);
+                    if (tempYear != null) {
+                      setState(() {
+                        widget.sharedSelectedDateTime.value = DateTime(tempYear);
+                      });
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(4),
+                  splashColor: Colors.grey[300],
+                  highlightColor: Colors.grey[300],
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
+                    child: Row(
+                      children: [
+                        Text("${widget.sharedSelectedDateTime.value.year}"),
+                        Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Theme.of(context).textTheme.bodyMedium!.color,
+                        )
+                      ],
+                    ),
+                  ),
+                )
               )
             ],
           ),
@@ -259,38 +291,54 @@ class _BalanceSummaryState extends State<BalanceSummary> {
 
     Color balanceColor = Theme.of(context).colorScheme.success;
     Color numeratorColor = Theme.of(context).colorScheme.error;
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(RouterUtils.createRoute(
-          BudgetBalance()
-        ));
-      },
-      child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-              child: Stack(
-                alignment: AlignmentDirectional.topStart,
-                children: [
-                  Container(height: 25, width: double.infinity, color: balanceColor),
-                  Container(height: 25, width: incomeAmount == 0 ? 0 :(MediaQuery.of(context).size.width * expenseAmount / incomeAmount), color: numeratorColor)
-                ],
-              ),
+    return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+            child: Stack(
+              alignment: AlignmentDirectional.topStart,
+              children: [
+                Container(height: 25, width: double.infinity, color: balanceColor),
+                Container(height: 25, width: incomeAmount == 0 ? 0 :(MediaQuery.of(context).size.width * expenseAmount / incomeAmount), color: numeratorColor)
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error], label: "Expenses: ", balance: expenseAmount,),
-                  BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Income: ", balance: incomeAmount,),
-                  BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.success], label: "Balance: ", balance: incomeAmount - expenseAmount),
-                ],
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error], label: "Expenses: ", balance: expenseAmount,),
+                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Income: ", balance: incomeAmount,),
+                BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.success], label: "Balance: ", balance: incomeAmount - expenseAmount),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+            child: Row(
+              children: [
+                SizedBox(
+                  height: 35,
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).push(RouterUtils.createRoute(
+                            BudgetBalance()
+                        ));
+                      },
+                      child: Row(
+                        children: [
+                          Text('View Budget'),
+                          Icon(Icons.keyboard_arrow_right)
+                        ],
+                      )
+                  ),
+                ),
+              ],
             )
-          ],
-        ),
-    );
+          )
+        ],
+      );
   }
 }
 

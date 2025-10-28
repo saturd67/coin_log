@@ -261,28 +261,60 @@ class _SummaryTypeState extends State<SummaryType> {
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
           child: Row(
             children: [
-              widget.sharedSelectedSummaryType.value == Period.monthly ?
-              InkWell(
-                onTap: () async {
-                  DateTime? tempDateTime = await themedShowMonthPicker(context, widget.sharedSelectedDateTime.value);
-                  if (tempDateTime != null) {
-                    setState(() {
-                      widget.sharedSelectedDateTime.value = tempDateTime;
-                    });
-                  }
-                },
-                child: Text("${monthMap[widget.sharedSelectedDateTime.value.month.toString()]!} ${widget.sharedSelectedDateTime.value.year}"),
-              )
-                  : InkWell(
-                onTap: () async {
-                  int? tempYear = await themedShowYearPicker(context, widget.sharedSelectedDateTime.value);
-                  if (tempYear != null) {
-                    setState(() {
-                      widget.sharedSelectedDateTime.value = DateTime(tempYear);
-                    });
-                  }
-                },
-                child: Text("${widget.sharedSelectedDateTime.value.year}"),
+              Material(
+                color: Colors.transparent,
+                child: widget.sharedSelectedSummaryType.value == Period.monthly ?
+                InkWell(
+                    onTap: () async {
+                      DateTime? tempDateTime = await themedShowMonthPicker(context, widget.sharedSelectedDateTime.value);
+                      if (tempDateTime != null) {
+                        setState(() {
+                          widget.sharedSelectedDateTime.value = tempDateTime;
+                        });
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(4),
+                    splashColor: Colors.grey[300],    // ripple color
+                    highlightColor: Colors.grey[300], // gray color on press
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
+                      child: Row(
+                        children: [
+                          Text("${monthMap[widget.sharedSelectedDateTime.value.month.toString()]!} ${widget.sharedSelectedDateTime.value.year}"),
+                          Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Theme.of(context).textTheme.bodyMedium!.color,
+                          )
+                        ],
+                      ),
+                    )
+                )
+                    :
+                InkWell(
+                  onTap: () async {
+                    int? tempYear = await themedShowYearPicker(context, widget.sharedSelectedDateTime.value);
+                    if (tempYear != null) {
+                      setState(() {
+                        widget.sharedSelectedDateTime.value = DateTime(tempYear);
+                      });
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(4),
+                  splashColor: Colors.grey[300],    // ripple color
+                  highlightColor: Colors.grey[300], // gray color on press
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
+                    child: Row(
+                      children: [
+                        Text("${widget.sharedSelectedDateTime.value.year}"),
+                        Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Theme.of(context).textTheme.bodyMedium!.color,
+                        )
+                      ],
+                    ),
+                  ),
+                )
               )
             ],
           ),
