@@ -32,7 +32,7 @@ class DatabaseService {
     await db.execute('''
           CREATE TABLE CL_TRANSACTION_CATEGORY (
             IDENTIFIER  INTEGER PRIMARY KEY AUTOINCREMENT,
-            NAME        VARCHAR(10) NOT NULL,
+            NAME        VARCHAR(20) NOT NULL,
             ICON        VARCHAR(50) NOT NULL,
             TYPE        VARCHAR(8) NOT NULL,
             SEQUENCE    INTEGER NOT NULL,
@@ -159,7 +159,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (Database database, int version) async {
         await configDatabase(database);
         await createTransactionCategoryTable(database);
@@ -173,7 +173,7 @@ class DatabaseService {
       },
       onUpgrade: (Database database, int oldVersion, int newVersion) async {
         // if (oldVersion < 2) {
-        //   await database.execute("ALTER TABLE ...");
+        //   await database.execute("ALTER TABLE ... ");
         // }
       }
     );

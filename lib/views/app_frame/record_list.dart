@@ -604,7 +604,10 @@ class _TransferRecordDayBodyItemState extends State<TransferRecordDayBodyItem> {
                   decoration: BoxDecoration(),
                   alignment: AlignmentDirectional(1, 0),
                   child: Text(
-                    widget.record.amount.toStringAsFixed(2),
+                    widget.record.amount.toString(),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.success
+                    )
                   ),
                 ),
               ],
