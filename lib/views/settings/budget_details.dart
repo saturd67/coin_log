@@ -232,7 +232,7 @@ class _BudgetDetailsState extends State<BudgetDetails> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 GridViewIcon(iconData: getTransactionCategoryIconData(_transactionCategories[index].icon), isSelected: _budgetFormModel.transactionCategoryId == _transactionCategories[index].identifier),
-                                Text(_transactionCategories[index].name, style: TextStyle(fontSize: 13))
+                                Text(_transactionCategories[index].name, textAlign: TextAlign.center , style: TextStyle(fontSize: 13))
                               ],
                             ),
                           );

@@ -116,7 +116,7 @@ class _TransactionDetailsState extends State<AccountDetails> {
                           Expanded(
                               child: ThemedTextField(
                                 placeholder: "Name",
-                                maxLength: 10,
+                                maxLength: 20,
                                 controller: _accountFormModel.nameController,
                               )
                           ),
@@ -196,7 +196,7 @@ class _TransactionDetailsState extends State<AccountDetails> {
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               GridViewIcon(iconData: entry.value[index].values.first.iconData, isSelected: entry.value[index].keys.first == _accountFormModel.icon),
-                                              Text(entry.value[index].values.first.name, style: TextStyle(fontSize: 13))
+                                              Text(entry.value[index].values.first.name, textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
                                             ],
                                           ),
                                         );

@@ -124,7 +124,7 @@ class _TransactionListState extends State<TransactionList> {
                                           mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
                                             GridViewIcon(iconData: getTransactionCategoryIconData(_transactionCategories[index].icon)),
-                                            Text(_transactionCategories[index].name, style: TextStyle(fontSize: 13))
+                                            Text(_transactionCategories[index].name, textAlign: TextAlign.center, style: TextStyle(fontSize: 13)),
                                           ],
                                         ),
                                       ),

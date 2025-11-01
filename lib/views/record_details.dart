@@ -201,7 +201,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                   return GridView.builder(
                                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 4,
-                                      childAspectRatio: 1.25,
+                                      childAspectRatio: 1.1,
                                       mainAxisSpacing: itemPerPage.toDouble(),
                                     ),
                                     itemCount: itemPerPage,
@@ -218,9 +218,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                           children: [
                                             if (itemIndex < _transactionCategories.length) ... {
                                               GridViewIcon(iconData: getTransactionCategoryIconData(_transactionCategories[itemIndex].icon), isSelected: _transactionCategories[itemIndex].identifier == _selectedTransactionCategoryId,),
-                                              Text(_transactionCategories[itemIndex].name, style: TextStyle(
-                                                  fontSize: 13
-                                              ),)
+                                              Text(_transactionCategories[itemIndex].name, textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
                                             }
                                           ],
                                         ),
@@ -243,7 +241,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                     return GridView.builder(
                                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                         crossAxisCount: 4,
-                                        childAspectRatio: 1.25,
+                                        childAspectRatio: 1.1,
                                         mainAxisSpacing: 8,
                                       ),
                                       itemCount: 4,
@@ -260,7 +258,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                             children: [
                                               if (itemIndex < _accounts.length) ... {
                                                 GridViewIcon(iconData: getAccountIconData(_accounts[itemIndex].icon), isSelected: _selectedAccountId == null ? _accounts[itemIndex].isDefault : _accounts[itemIndex].identifier == _selectedAccountId,),
-                                                Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13),)
+                                                Text(_accounts[itemIndex].name, textAlign: TextAlign.center, style: TextStyle(fontSize: 13),)
                                               }
                                             ],
                                           ),
@@ -285,7 +283,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                     return GridView.builder(
                                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                         crossAxisCount: 4,
-                                        childAspectRatio: 1.25,
+                                        childAspectRatio: 1.1,
                                         mainAxisSpacing: 8,
                                       ),
                                       itemCount: 4,
@@ -301,7 +299,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
                                               GridViewIcon(iconData: getAccountIconData(_accounts[itemIndex].icon), isSelected: _accounts[itemIndex].identifier == _selectedSourceAccountId, isDisabled: _accounts[itemIndex].identifier == _selectedDestinationAccountId,),
-                                              Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13),)
+                                              Text(_accounts[itemIndex].name, textAlign: TextAlign.center, style: TextStyle(fontSize: 13),)
                                             ],
                                           ),
                                         ) : null;
@@ -323,7 +321,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                     return GridView.builder(
                                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                         crossAxisCount: 4,
-                                        childAspectRatio: 1.25,
+                                        childAspectRatio: 1.1,
                                         mainAxisSpacing: 8,
                                       ),
                                       itemCount: 4,
@@ -339,7 +337,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
                                               GridViewIcon(iconData: getAccountIconData(_accounts[itemIndex].icon), isSelected: _accounts[itemIndex].identifier == _selectedDestinationAccountId, isDisabled: _accounts[itemIndex].identifier == _selectedSourceAccountId),
-                                              Text(_accounts[itemIndex].name, style: TextStyle(fontSize: 13))
+                                              Text(_accounts[itemIndex].name, textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
                                             ],
                                           ),
                                         ) : null;

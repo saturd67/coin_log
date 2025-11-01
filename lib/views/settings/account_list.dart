@@ -112,7 +112,7 @@ class _AccountListState extends State<AccountList> {
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
                                           GridViewIcon(iconData: getAccountIconData(_accounts[index].icon)),
-                                          Text(_accounts[index].name, style: TextStyle(fontSize: 13))
+                                          Text(_accounts[index].name, textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
                                         ],
                                       ),
                                     ),

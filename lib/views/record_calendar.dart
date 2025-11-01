@@ -294,7 +294,7 @@ class RecordCalendarBodyCell extends StatelessWidget {
                       Text(
                         sumExpend!.toStringAsFixed(2),
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 9,
                           color: Theme.of(context).colorScheme.danger,
                         ),
                         maxLines: 1,
@@ -305,7 +305,7 @@ class RecordCalendarBodyCell extends StatelessWidget {
                       Text(
                         sumIncome!.toStringAsFixed(2),
                         style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 9,
                           color: Theme.of(context).colorScheme.success
                         ),
                         maxLines: 1,
