@@ -50,6 +50,7 @@ class _RecordDetailsState extends State<RecordDetails> {
   int? _selectedDestinationAccountId;
   String _amount = "0";
 
+  bool _isFirstAmountUpdate = true;
   bool _isKeyboardVisible = false;
   late final KeyboardVisibilityController keyboardVisibilityController;
   late final StreamSubscription<bool> _keyboardSubscription;
@@ -362,8 +363,18 @@ class _RecordDetailsState extends State<RecordDetails> {
                     amount: _amount,
                     date: _recordFormModel.date,
                     onValueButtonPressed: (String input) {
-                      Calculator calculator = Calculator(_amount);
-                      final tempAmount = calculator.onInput(input);
+                      String tempAmount = "";
+                      if (_isFirstAmountUpdate) {
+                        tempAmount +=  input != "Del" ? input : "0";
+                      }
+
+                      else {
+                        Calculator calculator = Calculator(_amount);
+                        tempAmount = calculator.onInput(input);
+                      }
+
+                      _isFirstAmountUpdate = false;
+
                       setState(() {
                         _amount = tempAmount;
                       });
