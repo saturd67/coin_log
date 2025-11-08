@@ -99,67 +99,75 @@ class _RecordCalendarState extends State<RecordCalendar> {
   @override
   Widget build(BuildContext context) {
     final double columnWidth = (MediaQuery.sizeOf(context).width - 50) / 7;
-    return SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            shadowColor: Theme.of(context).colorScheme.surface,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            title: const Text("Calendar"),
-            leading: IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop("reload");
-                },
-                icon: Icon(Icons.arrow_back)
-            ),
-          ),
-          body: Container(
-            color: Theme.of(context).colorScheme.secondary,
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                GestureDetector(
-                  onTap: () async {
-                    DateTime? selectedDate = await themedShowMonthPicker(context, widget.selectedDateTime);
-
-                    if (selectedDate != null) {
-                      List<List<DateTime?>> tempDateInMonth = getDateListByYearMonth(selectedDate.year, selectedDate.month);
-
-                      setState(() {
-                        widget.selectedDateTime = selectedDate;
-                        datesInMonth = tempDateInMonth;
-                      });
-                    }
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (canPop,result) {
+        if (!canPop) {
+          Navigator.of(context).pop("reload");
+        }
+      },
+      child: SafeArea(
+          child: Scaffold(
+            appBar: AppBar(
+              shadowColor: Theme.of(context).colorScheme.surface,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              title: const Text("Calendar"),
+              leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop("reload");
                   },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        widget.selectedDateTime.year.toString(),
-                        style: TextStyle(
-                            fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-                            fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        monthMap[widget.selectedDateTime.month.toString()]!,
-                        style: TextStyle(
-                          fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-                            fontWeight: FontWeight.w500,
-                        ),
-                      )
-                    ]
-                  ),
-                ),
-                RecordCalendarHeader(columnWidth: columnWidth,),
-                RecordCalendarBody(columnWidth: columnWidth, datesInMonth: datesInMonth, groupedRecordItemsWithDay: groupedRecordItemsWithDay, load: load)
-              ],
+                  icon: Icon(Icons.arrow_back)
+              ),
             ),
-          ),
-        )
+            body: Container(
+              color: Theme.of(context).colorScheme.secondary,
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      DateTime? selectedDate = await themedShowMonthPicker(context, widget.selectedDateTime);
+
+                      if (selectedDate != null) {
+                        List<List<DateTime?>> tempDateInMonth = getDateListByYearMonth(selectedDate.year, selectedDate.month);
+
+                        setState(() {
+                          widget.selectedDateTime = selectedDate;
+                          datesInMonth = tempDateInMonth;
+                        });
+                      }
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          widget.selectedDateTime.year.toString(),
+                          style: TextStyle(
+                              fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
+                              fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          monthMap[widget.selectedDateTime.month.toString()]!,
+                          style: TextStyle(
+                            fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
+                              fontWeight: FontWeight.w500,
+                          ),
+                        )
+                      ]
+                    ),
+                  ),
+                  RecordCalendarHeader(columnWidth: columnWidth,),
+                  RecordCalendarBody(columnWidth: columnWidth, datesInMonth: datesInMonth, groupedRecordItemsWithDay: groupedRecordItemsWithDay, load: load)
+                ],
+              ),
+            ),
+          )
+      ),
     );
   }
 }
@@ -264,7 +272,7 @@ class RecordCalendarBodyCell extends StatelessWidget {
       onTap: () async {
         if (date != null) {
           final results = await Navigator.of(context).push(RouterUtils.createRoute(RecordDetails(defaultDateTime: date!,)));
-          if (results.length > 0 && results[0] == "reload") {
+          if (results != null && results.length > 0 && results[0] == "reload") {
             load();
           }
         }
