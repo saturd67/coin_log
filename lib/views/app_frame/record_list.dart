@@ -37,12 +37,12 @@ class RecordListState extends State<RecordList> {
   }
 
   void load(DateTime selectedDateTime) async {
-    final List<Record> records = await _recordService.listByYearMonth(selectedDateTime.year.toString(), selectedDateTime.month.toString());
+    final List<Record_> records = await _recordService.listByYearMonth(selectedDateTime.year.toString(), selectedDateTime.month.toString());
     Map<String, GroupedRecordItem> groupedRecords = <String, GroupedRecordItem>{};
 
     double totalIncome = 0;
     double totalExpense = 0;
-    for (Record record in records) {
+    for (Record_ record in records) {
       String formattedDate = "${DateTimeFormatter.toDayMonth(record.date)}  ${weekMap[record.date.weekday.toString()]}";
 
       double income = 0;
@@ -444,7 +444,7 @@ class _RecordDayHeaderState extends State<RecordDayHeader> {
 }
 
 class TransactionRecordDayBodyItem extends StatefulWidget {
-  Record record;
+  Record_ record;
   void Function(DateTime) load;
 
   TransactionRecordDayBodyItem({
@@ -536,7 +536,7 @@ class _TransactionRecordDayBodyItemState extends State<TransactionRecordDayBodyI
 }
 
 class TransferRecordDayBodyItem extends StatefulWidget {
-  Record record;
+  Record_ record;
   void Function(DateTime) load;
 
   TransferRecordDayBodyItem({
@@ -622,7 +622,7 @@ class _TransferRecordDayBodyItemState extends State<TransferRecordDayBodyItem> {
 class GroupedRecordItem {
   late double sumIncome;
   late double sumExpense;
-  late List<Record> records;
+  late List<Record_> records;
 
   GroupedRecordItem(this.sumIncome, this.sumExpense, this.records);
 }

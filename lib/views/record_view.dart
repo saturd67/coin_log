@@ -31,7 +31,7 @@ class _RecordViewState extends State<RecordView> {
   final TransactionCategoryService _transactionCategoryService = TransactionCategoryService();
   final AccountService _accountService = AccountService();
 
-  Record _record = Record(transactionCategoryId: 0, sourceAccountId: 0, date: DateTime.now(), type: "", amount: 0.0);
+  Record_ _record = Record_(transactionCategoryId: 0, sourceAccountId: 0, date: DateTime.now(), type: "", amount: 0.0);
 
   @override
   void initState() {
@@ -45,7 +45,7 @@ class _RecordViewState extends State<RecordView> {
   }
 
   void load() async {
-    Record? record = await _recordService.findById(widget.identifier);
+    Record_? record = await _recordService.findById(widget.identifier);
     if (record != null) {
       if ([RecordType.expense.name, RecordType.income.name].contains(record.type)) {
         TransactionCategory transactionCategory = (await _transactionCategoryService.findById(record.transactionCategoryId!))!;
@@ -76,7 +76,7 @@ class _RecordViewState extends State<RecordView> {
           appBar: AppBar(
             shadowColor: Theme.of(context).colorScheme.surface,
             backgroundColor: Theme.of(context).colorScheme.primary,
-            title: const Text("Account View"),
+            title: const Text("Record View"),
           ),
           body: Container(
             color: Theme.of(context).colorScheme.secondary,

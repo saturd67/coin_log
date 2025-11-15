@@ -64,11 +64,11 @@ class _RecordCalendarState extends State<RecordCalendar> {
   }
 
   void load() async {
-    final List<Record> records = await _recordService.listByYearMonth(widget.selectedDateTime.year.toString(), widget.selectedDateTime.month.toString());
+    final List<Record_> records = await _recordService.listByYearMonth(widget.selectedDateTime.year.toString(), widget.selectedDateTime.month.toString());
     Map<int, GroupedRecordItem> groupedRecordItemsWithDay = {};
     double sumIncome = 0;
     double sumExpense = 0;
-    for(Record record in records) {
+    for(Record_ record in records) {
       if ([RecordType.income.name, RecordType.expense.name].contains(record.type)) {
         if (!groupedRecordItemsWithDay.keys.contains(record.date.day)) {
           sumIncome = record.type == RecordType.income.name ? record.amount : 0;
@@ -333,7 +333,7 @@ class RecordCalendarBodyCell extends StatelessWidget {
 class GroupedRecordItem {
   late double sumIncome;
   late double sumExpense;
-  late List<Record> records;
+  late List<Record_> records;
 
   GroupedRecordItem(this.sumIncome, this.sumExpense, this.records);
 }

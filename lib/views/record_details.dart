@@ -415,7 +415,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                     },
                     onSaveButtonPressed: () async {
                       if (_recordFormModel.type == RecordType.expense.name || _recordFormModel.type == RecordType.income.name) {
-                        Record record;
+                        Record_ record;
 
                         try {
                           _recordFormModel.transactionCategoryId = _selectedTransactionCategoryId;
@@ -460,7 +460,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                       }
 
                       else if (_recordFormModel.type == RecordType.transfer.name) {
-                        Record record;
+                        Record_ record;
                         try {
                           _recordFormModel.sourceAccountId = _selectedSourceAccountId;
                           _recordFormModel.destinationAccountId = _selectedDestinationAccountId;

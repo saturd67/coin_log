@@ -13,7 +13,7 @@ enum RecordType {
   const RecordType({required this.name});
 }
 
-class Record implements BaseModel<RecordFormModel>{
+class Record_ implements BaseModel<RecordFormModel>{
   int? identifier;
   DateTime date;
   String? description;
@@ -30,7 +30,7 @@ class Record implements BaseModel<RecordFormModel>{
   Account? sourceAccount;
   Account? destinationAccount;
 
-  Record({
+  Record_({
     this.identifier,
     required this.date,
     this.description,
@@ -42,8 +42,8 @@ class Record implements BaseModel<RecordFormModel>{
     this.destinationAccountId,
   });
 
-  factory Record.fromMap(Map<String, dynamic> map) {
-    return Record(
+  factory Record_.fromMap(Map<String, dynamic> map) {
+    return Record_(
       identifier: map['IDENTIFIER'],
       transactionCategoryId: map['TRANSACTION_CATEGORY_ID'],
       sourceAccountId: map['SOURCE_ACCOUNT_ID'],
@@ -61,7 +61,7 @@ class Record implements BaseModel<RecordFormModel>{
       'TRANSACTION_CATEGORY_ID': transactionCategoryId,
       'SOURCE_ACCOUNT_ID': sourceAccountId,
       'DESTINATION_ACCOUNT_ID': destinationAccountId,
-      'DATE': date.toString(),
+      'DATE': date.toIso8601String(),
       'DESCRIPTION': description,
       'TYPE': type,
       'AMOUNT': amount

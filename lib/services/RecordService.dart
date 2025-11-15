@@ -11,7 +11,7 @@ class RecordService {
 
   final AccountService accountService = AccountService();
 
-  Future<int?> saveTransaction(Record record) async {
+  Future<int?> saveTransaction(Record_ record) async {
     final db = await DatabaseService().database;
 
     record.identifier = await db.insert(TABLE_NAME, record.toMap());
@@ -21,7 +21,7 @@ class RecordService {
     return record.identifier;
   }
 
-  Future<int?> updateTransaction(Record record) async {
+  Future<int?> updateTransaction(Record_ record) async {
     final db = await DatabaseService().database;
 
     await BalanceManager.updateBalanceOnUpdateTransactionRecord(record);
@@ -33,7 +33,7 @@ class RecordService {
         whereArgs: [record.identifier]);
   }
 
-  Future<int?> deleteTransaction(Record record) async {
+  Future<int?> deleteTransaction(Record_ record) async {
     final db = await DatabaseService().database;
 
     int effectedRowCount = await db.delete(
@@ -47,7 +47,7 @@ class RecordService {
     return effectedRowCount;
   }
 
-  Future<int?> saveTransfer(Record record) async {
+  Future<int?> saveTransfer(Record_ record) async {
     final db = await DatabaseService().database;
 
     record.identifier = await db.insert(TABLE_NAME, record.toMap());
@@ -57,7 +57,7 @@ class RecordService {
     return record.identifier;
   }
 
-  Future<int?> updateTransfer(Record record) async {
+  Future<int?> updateTransfer(Record_ record) async {
     final db = await DatabaseService().database;
 
     await BalanceManager.updateBalanceOnUpdateTransferRecord(record);
@@ -69,7 +69,7 @@ class RecordService {
         whereArgs: [record.identifier]);
   }
 
-  Future<int?> deleteTransfer(Record record) async {
+  Future<int?> deleteTransfer(Record_ record) async {
     final db = await DatabaseService().database;
 
     int effectedRowCount = await db.delete(
@@ -83,7 +83,7 @@ class RecordService {
     return effectedRowCount;
   }
 
-  Future<Record?> findById(int identifier) async {
+  Future<Record_?> findById(int identifier) async {
     final db = await DatabaseService().database;
     List<Map<String, dynamic>> maps = await db.query(
       TABLE_NAME,
@@ -92,24 +92,24 @@ class RecordService {
       whereArgs: [identifier]
     );
 
-    Record? record;
+    Record_? record;
     if (maps.isNotEmpty) {
-      record = Record.fromMap(maps.first);
+      record = Record_.fromMap(maps.first);
     }
 
     return record;
   }
 
-  Future<List<Record>> list() async {
+  Future<List<Record_>> list() async {
     final db = await DatabaseService().database;
     List<Map<String, dynamic>> maps = await db.query(
       TABLE_NAME,
       orderBy: 'date desc'
     );
-    return maps.map((e) => Record.fromMap(e)).toList();
+    return maps.map((e) => Record_.fromMap(e)).toList();
   }
 
-  Future<List<Record>> listByYearMonth(String year, String month) async {
+  Future<List<Record_>> listByYearMonth(String year, String month) async {
     final db = await DatabaseService().database;
     List<Map<String, dynamic>> maps = await db.query(
       TABLE_NAME,
@@ -117,7 +117,7 @@ class RecordService {
       orderBy: 'date desc',
       whereArgs: [year, month]
     );
-    return maps.map((e) => Record.fromMap(e)).toList();
+    return maps.map((e) => Record_.fromMap(e)).toList();
   }
 
   Future<double> sumByTypeYearMonth(String? type, String? year, String? month) async {

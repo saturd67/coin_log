@@ -4,7 +4,7 @@ import 'package:coin_log/form_models/AccountFormModel.dart';
 import 'package:coin_log/models/Record.dart';
 import 'package:flutter/cupertino.dart';
 
-class RecordFormModel implements BaseFormModel<Record>{
+class RecordFormModel implements BaseFormModel<Record_>{
   int? identifier;
   int? transactionCategoryId;
   int? sourceAccountId;
@@ -41,7 +41,7 @@ class RecordFormModel implements BaseFormModel<Record>{
   }
 
   @override
-  Record toModel() {
+  Record_ toModel() {
     if (sourceAccountId == null) {
       throw "Invalid Source Account.";
     }
@@ -58,7 +58,7 @@ class RecordFormModel implements BaseFormModel<Record>{
       throw "Invalid Amount.";
     }
 
-    return Record(
+    return Record_(
       identifier: identifier,
       transactionCategoryId: transactionCategoryId,
       sourceAccountId: sourceAccountId,

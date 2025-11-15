@@ -2,6 +2,7 @@ import 'package:coin_log/constants/IconMap.dart';
 import 'package:coin_log/models/Account.dart';
 import 'package:coin_log/router/RouterUtils.dart';
 import 'package:coin_log/services/AccountService.dart';
+import 'package:coin_log/views/app_frame/account_log_details.dart';
 import 'package:flutter/material.dart';
 
 class AccountsBalance extends StatefulWidget {
@@ -38,7 +39,12 @@ class _AccountsBalanceState extends State<AccountsBalance> {
       ),
       body: ListView(
         children: List.generate(_accounts.length, (index) {
-          return AccountsBalanceItem(icon: getAccountIconData(_accounts[index].icon), name: _accounts[index].name, balance: _accounts[index].balance);
+          return AccountsBalanceItem(
+            icon: getAccountIconData(_accounts[index].icon),
+            name: _accounts[index].name,
+            balance: _accounts[index].balance,
+            page: AccountLogDetails(identifier: _accounts[index].identifier!)
+          );
         })
       ),
     );
