@@ -88,7 +88,6 @@ class _RecordViewState extends State<RecordView> {
                   Card(
                     elevation: 2,
                     color: Theme.of(context).colorScheme.secondary,
-
                     child: Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(10, 15, 15, 10),
                       child: Column(

@@ -52,7 +52,6 @@ class RecordListState extends State<RecordList> {
         record.transactionCategory = await _transactionCategoryService.findById(record.transactionCategoryId!);
         record.sourceAccount = await _accountService.findById(record.sourceAccountId!);
 
-
         income = record.type == RecordType.income.name ? record.amount : 0;
         totalIncome += income;
 

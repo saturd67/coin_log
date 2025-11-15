@@ -111,8 +111,6 @@ class SummaryType extends StatefulWidget {
 
 class _SummaryTypeState extends State<SummaryType> {
 
-
-
   @override
   Widget build(BuildContext context) {
 

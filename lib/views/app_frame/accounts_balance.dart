@@ -2,7 +2,7 @@ import 'package:coin_log/constants/IconMap.dart';
 import 'package:coin_log/models/Account.dart';
 import 'package:coin_log/router/RouterUtils.dart';
 import 'package:coin_log/services/AccountService.dart';
-import 'package:coin_log/views/app_frame/account_log_details.dart';
+import 'package:coin_log/views/account_log_details.dart';
 import 'package:flutter/material.dart';
 
 class AccountsBalance extends StatefulWidget {

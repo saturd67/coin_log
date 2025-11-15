@@ -63,6 +63,7 @@ class DatabaseService {
         IDENTIFIER        INTEGER PRIMARY KEY AUTOINCREMENT,
         ACCOUNT_ID        INTEGER NOT NULL,
         RECORD_ID         INTEGER NOT NULL,
+        RECORD_DATE       DATETIME NOT NULL,
         RECORD_ACTION     VARCHAR(8) CHECK(RECORD_ACTION IN ('insert', 'update', 'delete')) NOT NULL,
         OLD_BALANCE       DOUBLE NOT NULL,
         NEW_BALANCE       DOUBLE NOT NULL,
@@ -159,7 +160,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (Database database, int version) async {
         await configDatabase(database);
         await createTransactionCategoryTable(database);
@@ -172,9 +173,12 @@ class DatabaseService {
         await insertAccount(database);
       },
       onUpgrade: (Database database, int oldVersion, int newVersion) async {
-        // if (oldVersion < 2) {
-        //   await database.execute("ALTER TABLE ... ");
-        // }
+        if (oldVersion < 3) {
+          await database.execute('''
+            ALTER TABLE CL_ACCOUNT_LOG
+            ADD COLUMN DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+          ''');
+        }
       }
     );
   }
