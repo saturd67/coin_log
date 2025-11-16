@@ -68,7 +68,7 @@ class AccountService {
         INSERT INTO CL_ACCOUNT_LOG (ACCOUNT_ID, RECORD_ID, RECORD_DATE, RECORD_ACTION, OLD_BALANCE, NEW_BALANCE, CREATED_ON) VALUES 
         (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
         """,
-          [accountId, recordId, recordDate, recordAction.name, oldBalance, newBalance]
+          [accountId, recordId, recordDate.toIso8601String(), recordAction.name, oldBalance, newBalance]
       );
     });
     return null;

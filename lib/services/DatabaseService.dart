@@ -173,11 +173,40 @@ class DatabaseService {
         await insertAccount(database);
       },
       onUpgrade: (Database database, int oldVersion, int newVersion) async {
-        if (oldVersion < 3) {
-          await database.execute('''
-            ALTER TABLE CL_ACCOUNT_LOG
-            ADD COLUMN DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
-          ''');
+        print("OldVersion: $oldVersion");
+        print("NewVersion: $newVersion");
+
+        if (oldVersion < 4) {
+            await database.execute('''
+              ALTER TABLE CL_ACCOUNT_LOG
+              RENAME TO OLD_CL_ACCOUNT_LOG;
+            ''');
+
+            await database.execute('''
+              CREATE TABLE CL_ACCOUNT_LOG (
+                IDENTIFIER        INTEGER PRIMARY KEY AUTOINCREMENT,
+                ACCOUNT_ID        INTEGER NOT NULL,
+                RECORD_ID         INTEGER NOT NULL,
+                RECORD_DATE       DATETIME NOT NULL,
+                RECORD_ACTION     VARCHAR(8) CHECK(RECORD_ACTION IN ('insert', 'update', 'delete')) NOT NULL,
+                OLD_BALANCE       DOUBLE NOT NULL,
+                NEW_BALANCE       DOUBLE NOT NULL,
+                CREATED_ON        DATETIME NOT NULL,
+                
+                FOREIGN KEY (ACCOUNT_ID) REFERENCES CL_ACCOUNT(IDENTIFIER)
+              );
+            ''');
+
+            await database.execute('''
+              INSERT INTO CL_ACCOUNT_LOG(ACCOUNT_ID, RECORD_ID, RECORD_DATE, RECORD_ACTION, OLD_BALANCE, NEW_BALANCE, CREATED_ON)
+              SELECT AL.ACCOUNT_ID, AL.RECORD_ID, R.DATE, AL.RECORD_ACTION, AL.OLD_BALANCE, AL.NEW_BALANCE, AL.CREATED_ON 
+              FROM OLD_CL_ACCOUNT_LOG AL 
+              JOIN CL_RECORD R ON AL.RECORD_ID = R.IDENTIFIER;
+            ''');
+
+            await database.execute('''
+              DROP TABLE OLD_CL_ACCOUNT_LOG;
+            ''');
         }
       }
     );

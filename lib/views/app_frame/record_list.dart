@@ -488,7 +488,6 @@ class _TransactionRecordDayBodyItemState extends State<TransactionRecordDayBodyI
                           children: [
                             Icon(
                               getTransactionCategoryIconData(widget.record.transactionCategory!.icon),
-                              size: 30,
                             ),
                             Positioned(
                               bottom: 0,
@@ -565,10 +564,9 @@ class _TransferRecordDayBodyItemState extends State<TransferRecordDayBodyItem> {
           children: [
             Row(
               mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  width:
-                  MediaQuery.sizeOf(context).width * 0.63,
                   height: 50,
                   decoration: BoxDecoration(),
                   child: Row(
@@ -579,7 +577,6 @@ class _TransferRecordDayBodyItemState extends State<TransferRecordDayBodyItem> {
                             0, 0, 10, 0),
                         child: Icon(
                           getAccountIconData(widget.record.sourceAccount!.icon),
-                          size: 30,
                         ),
                       ),
                       Text(widget.record.sourceAccount!.name),
@@ -589,7 +586,6 @@ class _TransferRecordDayBodyItemState extends State<TransferRecordDayBodyItem> {
                             0, 0, 10, 0),
                         child: Icon(
                           getAccountIconData(widget.record.destinationAccount!.icon),
-                          size: 30,
                         ),
                       ),
                       Text(widget.record.destinationAccount!.name),
@@ -597,8 +593,6 @@ class _TransferRecordDayBodyItemState extends State<TransferRecordDayBodyItem> {
                   ),
                 ),
                 Container(
-                  width:
-                  MediaQuery.sizeOf(context).width * 0.32,
                   height: 50,
                   decoration: BoxDecoration(),
                   alignment: AlignmentDirectional(1, 0),
