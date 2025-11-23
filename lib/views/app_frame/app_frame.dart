@@ -6,14 +6,22 @@ import 'package:coin_log/views/app_frame/summary.dart';
 import 'package:coin_log/views/app_frame/settings.dart';
 import 'package:coin_log/views/record_details.dart';
 
-class AppFramePage extends StatefulWidget {
-  const AppFramePage({super.key});
+import '../base_view.dart';
+
+class AppFrame extends StatefulWidget implements BaseView {
+  static const classNameValue = 'AppFramePage';
+  const AppFrame({super.key});
 
   @override
-  State<AppFramePage> createState() => _AppFramePageState();
+  String get className => classNameValue;
+
+  @override
+  State<AppFrame> createState() => _AppFrameState();
+
+
 }
 
-class _AppFramePageState extends State<AppFramePage> {
+class _AppFrameState extends State<AppFrame> {
     int selectedIndex = 0;
 
     final GlobalKey<RecordListState> recordListKey =  GlobalKey<RecordListState>();
@@ -56,7 +64,7 @@ class _AppFramePageState extends State<AppFramePage> {
                       color: Theme.of(context).colorScheme.onPrimary
                   ),
                   onPressed: () async {
-                    final results = await Navigator.of(context).push(RouterUtils.createRoute(RecordDetails()));
+                    final results = await Navigator.of(context).push(RouterUtils.createRoute(RecordDetails(returnTo: AppFrame.classNameValue)));
                     if (results.length > 1 && results[0] == "reload") {
                       setState(() {
                         selectedIndex = 0;

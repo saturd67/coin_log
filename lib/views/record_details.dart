@@ -9,6 +9,8 @@ import 'package:coin_log/utils/Calculator.dart';
 import 'package:coin_log/views/app_frame/app_frame.dart';
 import 'package:coin_log/shared_widgets/themed_text_field.dart';
 import 'package:coin_log/shared_widgets/themed_toast.dart';
+import 'package:coin_log/views/record_day_view.dart';
+import 'package:coin_log/views/base_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:coin_log/shared_widgets/switch_button.dart';
@@ -20,12 +22,19 @@ import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/models/Record.dart';
 import 'package:logging/logging.dart';
 
-class RecordDetails extends StatefulWidget {
+class RecordDetails extends StatefulWidget implements BaseView {
+  static const classNameValue = 'RecordDetails';
+
+  @override
+  String get className => classNameValue;
+
+  String returnTo;
   int? identifier;
   DateTime? defaultDateTime;
 
   RecordDetails({
     super.key,
+    required this.returnTo,
     this.identifier,
     this.defaultDateTime
   });
@@ -384,6 +393,17 @@ class _RecordDetailsState extends State<RecordDetails> {
                           builder: (context, child) {
                             return Theme(
                               data: Theme.of(context).copyWith(
+                                textTheme: TextTheme(
+                                  bodyLarge: TextStyle(
+                                    fontSize: 15
+                                  ),
+                                  bodyMedium: TextStyle(
+                                      fontSize: 16
+                                  ),
+                                  bodySmall: TextStyle(
+                                      fontSize: 11
+                                  ),
+                                ),
                                 colorScheme: ColorScheme.light(
                                   primary: Theme.of(context).colorScheme.primary,
                                   onPrimary: Theme.of(context).colorScheme.onPrimary,
@@ -402,7 +422,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                           context: context,
                           helpText: "Date",
                           initialEntryMode: DatePickerEntryMode.calendarOnly,
-                          initialDate: DateTime.now(),
+                          initialDate: _recordFormModel.date,
                           firstDate: DateTime(2001),
                           lastDate: DateTime(2100)
                       );
@@ -450,11 +470,18 @@ class _RecordDetailsState extends State<RecordDetails> {
                         }
 
                         else {
-                          print(record.amount);
                           int? identifier = await _recordService.updateTransaction(record);
                           _log.info("Updated ${record.toMap()}");
 
-                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => AppFramePage()), (Route<dynamic> route) => false);
+                          if (!context.mounted) return;
+
+                          if (widget.returnTo == AppFrame.classNameValue) {
+                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => AppFrame()), (Route<dynamic> route) => false);
+                          }
+
+                          else if (widget.returnTo == RecordDayView.classNameValue) {
+                            Navigator.of(context).pop("reload");
+                          }
                         }
 
                       }
@@ -496,7 +523,13 @@ class _RecordDetailsState extends State<RecordDetails> {
                           int? identifier = await _recordService.updateTransfer(record);
                           _log.info("Updated ${record.toMap()}");
 
-                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => AppFramePage()), (Route<dynamic> route) => false);
+                          if (widget.returnTo == "AppFrame") {
+                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => AppFrame()), (Route<dynamic> route) => false);
+                          }
+
+                          else if (widget.returnTo == "RecordDayView") {
+                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => RecordDayView(date: record.date)), (Route<dynamic> route) => false);
+                          }
                         }
                       }
                     }

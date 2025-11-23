@@ -160,7 +160,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: (Database database, int version) async {
         await configDatabase(database);
         await createTransactionCategoryTable(database);

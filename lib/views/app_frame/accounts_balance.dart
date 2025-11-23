@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:coin_log/models/Account.dart';
 import 'package:coin_log/router/RouterUtils.dart';
@@ -5,9 +7,18 @@ import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/views/account_log_details.dart';
 import 'package:flutter/material.dart';
 
-class AccountsBalance extends StatefulWidget {
+import '../base_view.dart';
+
+class AccountsBalance extends StatefulWidget implements BaseView {
+  static const classNameValue = 'AccountBalance';
+
+  @override
+  String get className => classNameValue;
+
   @override
   State<AccountsBalance> createState() => _AccountsBalanceState();
+
+
 }
 
 class _AccountsBalanceState extends State<AccountsBalance> {
@@ -67,37 +78,42 @@ class AccountsBalanceItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        if (page != null) {
-          Navigator.of(context).push(RouterUtils.createRoute(page!));
-        }
-      },
-      child: Container(
-        color: Theme.of(context).colorScheme.secondary,
-        height: 65,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
-                    child: Icon(
-                        icon,
-                        size: 30.0
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          if (page != null) {
+            Navigator.of(context).push(RouterUtils.createRoute(page!));
+          }
+        },
+        splashColor: Colors.grey[300],
+        highlightColor: Colors.grey[300],
+        child: Ink(
+          color: Theme.of(context).colorScheme.secondary,
+          height: 65,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+                      child: Icon(
+                          icon,
+                          size: 30.0
+                      ),
                     ),
-                  ),
-                  Text(name)
-                ],
-              ),
-              Text(balance.toStringAsFixed(2))
-            ]
-          )
-        ),
-      )
+                    Text(name)
+                  ],
+                ),
+                Text(balance.toStringAsFixed(2))
+              ]
+            )
+          ),
+        )
+      ),
     );
   }
 }

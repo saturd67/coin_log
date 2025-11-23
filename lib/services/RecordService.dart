@@ -109,13 +109,24 @@ class RecordService {
     return maps.map((e) => Record_.fromMap(e)).toList();
   }
 
-  Future<List<Record_>> listByYearMonth(String year, String month) async {
+  Future<List<Record_>> listByYearMonthDay(String year, String month, String? day) async {
     final db = await DatabaseService().database;
+
+    List<String> wheres = [
+      'STRFTIME("%Y", date) = ? AND CAST(STRFTIME("%m", date) AS INTEGER) = ?'
+    ];
+    List<Object?> whereArgs = [year, month];
+
+    if (day != null) {
+      wheres.add('AND CAST(STRFTIME("%d", date) AS INTEGER) = ?');
+      whereArgs.add(day);
+    }
+
     List<Map<String, dynamic>> maps = await db.query(
       TABLE_NAME,
-      where: 'STRFTIME("%Y", date) = ? and CAST(STRFTIME("%m", date) AS INTEGER) = ?',
+      where: wheres.join(" "),
       orderBy: 'date desc',
-      whereArgs: [year, month]
+      whereArgs: whereArgs
     );
     return maps.map((e) => Record_.fromMap(e)).toList();
   }

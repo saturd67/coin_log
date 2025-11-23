@@ -4,7 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class DataDetail extends StatefulWidget {
+import '../base_view.dart';
+
+class DataDetail extends StatefulWidget implements BaseView {
+  static const classNameValue = 'DataDetail';
+
+  @override
+  String get className => classNameValue;
 
   @override
   State<DataDetail> createState() => _DataDetailState();

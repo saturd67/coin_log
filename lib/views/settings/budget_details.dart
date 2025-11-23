@@ -15,8 +15,13 @@ import '../../shared_widgets/grid_view_icon.dart';
 import '../../shared_widgets/showConfirmationDialog.dart';
 import '../../shared_widgets/themed_text_field.dart';
 import '../../shared_widgets/themed_toast.dart';
+import '../base_view.dart';
 
-class BudgetDetails extends StatefulWidget {
+class BudgetDetails extends StatefulWidget implements BaseView {
+  static const classNameValue = 'BudgetDetails';
+
+  @override
+  String get className => classNameValue;
 
   int? identifer;
 
@@ -77,7 +82,6 @@ class _BudgetDetailsState extends State<BudgetDetails> {
               actions: [
                 IconButton(
                     onPressed: () async {
-                      print(_budgetFormModel.toModel());
                       Budget budget;
 
                       try {

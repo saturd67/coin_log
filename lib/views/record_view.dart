@@ -6,6 +6,7 @@ import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/services/RecordService.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:coin_log/utils/DateTimeFormatter.dart';
+import 'package:coin_log/views/base_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:coin_log/models/Record.dart';
@@ -14,11 +15,18 @@ import '../router/RouterUtils.dart';
 import '../shared_widgets/showConfirmationDialog.dart';
 import 'record_details.dart';
 
-class RecordView extends StatefulWidget {
+class RecordView extends StatefulWidget implements BaseView {
+  static const classNameValue = 'RecordView';
+
+  @override
+  String get className => classNameValue;
+
+  final String returnTo;
   final int identifier;
 
   RecordView({
     super.key,
+    required this.returnTo,
     required this.identifier
   });
 
@@ -266,8 +274,11 @@ class _RecordViewState extends State<RecordView> {
                 ),
                 Expanded(
                   child: InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(RouterUtils.createRoute(RecordDetails(identifier: _record.identifier)));
+                    onTap: () async {
+                      final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordDetails(returnTo: widget.returnTo, identifier: _record.identifier)));
+                      if (result != null) {
+                        Navigator.of(context).pop(result);
+                      }
                     },
                     child: Container(
                       height: double.infinity,

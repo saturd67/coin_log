@@ -13,8 +13,25 @@ import 'package:coin_log/services/RecordService.dart';
 import 'package:coin_log/constants/WeekMap.dart';
 import 'package:coin_log/utils/DateTimeFormatter.dart';
 
-class RecordList extends StatefulWidget {
+import '../base_view.dart';
+import 'app_frame.dart';
+
+class GroupedRecordItem {
+  late double sumIncome;
+  late double sumExpense;
+  late List<Record_> records;
+
+  GroupedRecordItem(this.sumIncome, this.sumExpense, this.records);
+}
+
+
+class RecordList extends StatefulWidget implements BaseView{
+  static const classNameValue = 'RecordList';
+
   const RecordList({super.key});
+
+  @override
+  String get className => classNameValue;
 
   @override
   State<RecordList> createState() => RecordListState();
@@ -37,7 +54,7 @@ class RecordListState extends State<RecordList> {
   }
 
   void load(DateTime selectedDateTime) async {
-    final List<Record_> records = await _recordService.listByYearMonth(selectedDateTime.year.toString(), selectedDateTime.month.toString());
+    final List<Record_> records = await _recordService.listByYearMonthDay(selectedDateTime.year.toString(), selectedDateTime.month.toString(), null);
     Map<String, GroupedRecordItem> groupedRecords = <String, GroupedRecordItem>{};
 
     double totalIncome = 0;
@@ -321,50 +338,36 @@ class _RecordDayState extends State<RecordDay> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      color: Theme.of(context).colorScheme.secondary,
       elevation: 1,
+      color: Theme.of(context).colorScheme.secondary,
+      clipBehavior: Clip.antiAliasWithSaveLayer,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Padding(
-        padding: EdgeInsetsDirectional.fromSTEB(5, 0, 5, 0),
-        child: Container(
-          width: 100,
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(0),
-              bottomRight: Radius.circular(0),
-              topLeft: Radius.circular(0),
-              topRight: Radius.circular(0),
+      child: Container(
+        padding: EdgeInsetsDirectional.fromSTEB(7, 0, 7, 0),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RecordDayHeader(date: widget.date, sumIncome: widget.groupedRecordItem.sumIncome.toStringAsFixed(2), sumExpense: widget.groupedRecordItem.sumExpense.toStringAsFixed(2)),
+            Divider(
+              height: 5,
             ),
-            shape: BoxShape.rectangle,
-          ),
-          alignment: AlignmentDirectional(0, -1),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RecordDayHeader(date: widget.date, sumIncome: widget.groupedRecordItem.sumIncome.toStringAsFixed(2), sumExpense: widget.groupedRecordItem.sumExpense.toStringAsFixed(2)),
-              Divider(
-                height: 5,
-              ),
-              Column(
-                children: [
-                  for (var record in widget.groupedRecordItem.records) ... {
-                    if ([RecordType.expense.name, RecordType.income.name].contains(record.type)) ... {
-                      TransactionRecordDayBodyItem(record: record, load: widget.load)
-                    }
-
-                    else if (record.type == RecordType.transfer.name) ... {
-                      TransferRecordDayBodyItem(record: record, load: widget.load)
-                    }
+            Column(
+              children: [
+                for (var record in widget.groupedRecordItem.records) ... {
+                  if ([RecordType.expense.name, RecordType.income.name].contains(record.type)) ... {
+                    TransactionRecordDayBodyItem(record: record, load: widget.load)
                   }
-                ]
-              )
-            ],
-          ),
+
+                  else if (record.type == RecordType.transfer.name) ... {
+                    TransferRecordDayBodyItem(record: record, load: widget.load)
+                  }
+                }
+              ]
+            )
+          ],
         ),
       ),
     );
@@ -392,15 +395,13 @@ class _RecordDayHeaderState extends State<RecordDayHeader> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
-      child: Container(
+      child: SizedBox(
         height: 20,
-        decoration: BoxDecoration(),
         child: Row(
-          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              width: MediaQuery.sizeOf(context).width * 0.3,
-              decoration: BoxDecoration(),
+            SizedBox(
+              width: 250,
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
@@ -411,30 +412,30 @@ class _RecordDayHeaderState extends State<RecordDayHeader> {
                 ],
               ),
             ),
-            Container(
-              width: MediaQuery.sizeOf(context).width * 0.32,
-              height: 100,
-              decoration: BoxDecoration(),
-              alignment: AlignmentDirectional(1, 0),
-              child: Text(
-                '+${widget.sumIncome}',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.success
+            Row(
+              children: [
+                Container(
+                  width: 120,
+                  alignment: AlignmentDirectional(1, 0),
+                  child: Text(
+                    '+${widget.sumIncome}',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.success
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Container(
-              width: MediaQuery.sizeOf(context).width * 0.32,
-              height: 100,
-              decoration: BoxDecoration(),
-              alignment: AlignmentDirectional(1, 0),
-              child: Text(
-                '-${widget.sumExpense}',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.danger
+                Container(
+                  width: 120,
+                  alignment: AlignmentDirectional(1, 0),
+                  child: Text(
+                    '-${widget.sumExpense}',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.danger
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              ],
+            )
           ],
         ),
       ),
@@ -461,70 +462,55 @@ class _TransactionRecordDayBodyItemState extends State<TransactionRecordDayBodyI
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordView(identifier: widget.record.identifier!,)));
+        final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordView(returnTo: AppFrame.classNameValue, identifier: widget.record.identifier!,)));
         if (result == "reload") {
           widget.load(widget.record.date);
         }
       },
-      child: Align(
-        alignment: AlignmentDirectional(0, 0),
-        child: Column(
+      child: SizedBox(
+        height: 40,
+        child: Row(
           mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
-              mainAxisSize: MainAxisSize.max,
               children: [
-                Container(
-                  width: MediaQuery.sizeOf(context).width * 0.63,
-                  height: 50,
-                  decoration: BoxDecoration(),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
+                  child: Stack(
                     children: [
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(
-                            0, 0, 10, 0),
-                        child: Stack(
-                          children: [
-                            Icon(
-                              getTransactionCategoryIconData(widget.record.transactionCategory!.icon),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(3)
-                                ),
-                                child: Icon(
-                                  getAccountIconData(widget.record.sourceAccount!.icon),
-                                  color: Color(0xffFFD700),
-                                  size: 15
-                                ),
-                              )
-                            )
-                          ]
-                        ),
+                      Icon(
+                        getTransactionCategoryIconData(widget.record.transactionCategory!.icon),
                       ),
-                      Text(widget.record.transactionCategory!.name),
-                    ],
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(3)
+                          ),
+                          child: Icon(
+                            getAccountIconData(widget.record.sourceAccount!.icon),
+                            color: Color(0xffFFD700),
+                            size: 15
+                          ),
+                        )
+                      )
+                    ]
                   ),
                 ),
-                Container(
-                  width:
-                      MediaQuery.sizeOf(context).width * 0.32,
-                  height: 50,
-                  decoration: BoxDecoration(),
-                  alignment: AlignmentDirectional(1, 0),
-                  child: Text(
-                    widget.record.type == RecordType.income.name ? "+${widget.record.amount}" : widget.record.type == RecordType.expense.name ? "-${widget.record.amount}" : "",
-                    style: TextStyle(
-                      color: widget.record.type == RecordType.income.name ? Theme.of(context).colorScheme.success : widget.record.type == RecordType.expense.name ? Theme.of(context).colorScheme.danger : Theme.of(context).colorScheme.danger,
-                    ),
-                  ),
-                ),
+                Text(widget.record.transactionCategory!.name),
               ],
+            ),
+            Container(
+              alignment: AlignmentDirectional(1, 0),
+              child: Text(
+                widget.record.type == RecordType.income.name ? "+${widget.record.amount}" : widget.record.type == RecordType.expense.name ? "-${widget.record.amount}" : "",
+                style: TextStyle(
+                  color: widget.record.type == RecordType.income.name ? Theme.of(context).colorScheme.success : widget.record.type == RecordType.expense.name ? Theme.of(context).colorScheme.danger : Theme.of(context).colorScheme.danger,
+                ),
+              ),
             ),
           ],
         ),
@@ -552,70 +538,46 @@ class _TransferRecordDayBodyItemState extends State<TransferRecordDayBodyItem> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordView(identifier: widget.record.identifier!,)));
+        final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordView(returnTo: AppFrame.classNameValue, identifier: widget.record.identifier!,)));
         if (result == "reload") {
           widget.load(widget.record.date);
         }
       },
-      child: Align(
-        alignment: AlignmentDirectional(0, 0),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
+      child: SizedBox(
+        height: 40,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  height: 50,
-                  decoration: BoxDecoration(),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(
-                            0, 0, 10, 0),
-                        child: Icon(
-                          getAccountIconData(widget.record.sourceAccount!.icon),
-                        ),
-                      ),
-                      Text(widget.record.sourceAccount!.name),
-                      Icon(Icons.arrow_forward),
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(
-                            0, 0, 10, 0),
-                        child: Icon(
-                          getAccountIconData(widget.record.destinationAccount!.icon),
-                        ),
-                      ),
-                      Text(widget.record.destinationAccount!.name),
-                    ],
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
+                  child: Icon(
+                    getAccountIconData(widget.record.sourceAccount!.icon),
                   ),
                 ),
-                Container(
-                  height: 50,
-                  decoration: BoxDecoration(),
-                  alignment: AlignmentDirectional(1, 0),
-                  child: Text(
-                    widget.record.amount.toString(),
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.success
-                    )
+                Text(widget.record.sourceAccount!.name),
+                Icon(Icons.arrow_forward),
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(
+                      0, 0, 10, 0),
+                  child: Icon(
+                    getAccountIconData(widget.record.destinationAccount!.icon),
                   ),
                 ),
+                Text(widget.record.destinationAccount!.name),
               ],
+            ),
+            Text(
+              widget.record.amount.toString(),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.success
+              )
             ),
           ],
         ),
       ),
     );
   }
-}
-
-class GroupedRecordItem {
-  late double sumIncome;
-  late double sumExpense;
-  late List<Record_> records;
-
-  GroupedRecordItem(this.sumIncome, this.sumExpense, this.records);
 }

@@ -4,6 +4,7 @@ import 'package:coin_log/models/AccountLog.dart';
 import 'package:coin_log/services/AccountLogService.dart';
 import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/services/RecordService.dart';
+import 'package:coin_log/views/base_view.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/MonthMap.dart';
@@ -14,7 +15,11 @@ import '../services/TransactionCategoryService.dart';
 import '../shared_widgets/themedShowMonthPicker.dart';
 import '../utils/DateTimeFormatter.dart';
 
-class AccountLogDetails extends StatefulWidget {
+class AccountLogDetails extends StatefulWidget implements BaseView {
+  static const classNameValue = 'AccountLogDetails';
+
+  @override
+  String get className => classNameValue;
   
   int identifier;
   
@@ -55,8 +60,6 @@ class _AccountLogDetailsState extends State<AccountLogDetails> {
   }
 
   void loadAccountLog() async {
-
-
     List<AccountLog> accountLogs = await _accountLogService.listByAccountIdYearMonth(widget.identifier, _selectedDateTime.year.toString(), _selectedDateTime.month.toString());
 
     Map<String, List<AccountLog>> groupedAccountLogs = {};

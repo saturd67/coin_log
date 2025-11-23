@@ -1,5 +1,7 @@
 import 'package:coin_log/main.dart';
+import 'package:coin_log/views/record_day_view.dart';
 import 'package:coin_log/views/record_details.dart';
+import 'package:coin_log/views/base_view.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/shared_widgets/themedShowMonthPicker.dart';
 import 'package:coin_log/constants/MonthMap.dart';
@@ -7,8 +9,14 @@ import 'package:coin_log/models/Record.dart';
 import 'package:coin_log/services/RecordService.dart';
 
 import '../router/RouterUtils.dart';
+import 'app_frame/app_frame.dart';
 
-class RecordCalendar extends StatefulWidget {
+class RecordCalendar extends StatefulWidget implements BaseView {
+  static const classNameValue = 'RecordCalendar';
+
+  @override
+  String get className => classNameValue;
+
   DateTime selectedDateTime;
 
   RecordCalendar({
@@ -64,7 +72,7 @@ class _RecordCalendarState extends State<RecordCalendar> {
   }
 
   void load() async {
-    final List<Record_> records = await _recordService.listByYearMonth(widget.selectedDateTime.year.toString(), widget.selectedDateTime.month.toString());
+    final List<Record_> records = await _recordService.listByYearMonthDay(widget.selectedDateTime.year.toString(), widget.selectedDateTime.month.toString(), null);
     Map<int, GroupedRecordItem> groupedRecordItemsWithDay = {};
     double sumIncome = 0;
     double sumExpense = 0;
@@ -101,7 +109,7 @@ class _RecordCalendarState extends State<RecordCalendar> {
     final double columnWidth = (MediaQuery.sizeOf(context).width - 50) / 7;
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (canPop,result) {
+      onPopInvokedWithResult: (canPop, result) {
         if (!canPop) {
           Navigator.of(context).pop("reload");
         }
@@ -271,8 +279,8 @@ class RecordCalendarBodyCell extends StatelessWidget {
     return InkWell(
       onTap: () async {
         if (date != null) {
-          final results = await Navigator.of(context).push(RouterUtils.createRoute(RecordDetails(defaultDateTime: date!,)));
-          if (results != null && results.length > 0 && results[0] == "reload") {
+          final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordDayView(date: date!)));
+          if (result == "reload") {
             load();
           }
         }

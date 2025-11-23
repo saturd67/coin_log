@@ -7,6 +7,7 @@ import 'package:coin_log/services/BudgetTransactionService.dart';
 import 'package:coin_log/services/RecordService.dart';
 import 'package:coin_log/shared_widgets/themed_text_field.dart';
 import 'package:coin_log/shared_widgets/themed_toast.dart';
+import 'package:coin_log/views/base_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -33,7 +34,12 @@ class BudgetTransactionJoinRecordTotal {
   });
 }
 
-class BudgetBalance extends StatefulWidget {
+class BudgetBalance extends StatefulWidget implements BaseView {
+  static const classNameValue = 'BudgetBalance';
+
+  @override
+  String get className => classNameValue;
+
   @override
   State<BudgetBalance> createState() => _BudgetBalanceState();
 }

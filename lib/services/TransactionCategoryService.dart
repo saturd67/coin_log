@@ -78,7 +78,7 @@ class TransactionCategoryService {
 
     if (isClosed != null) {
       wheres.add('AND IS_CLOSED = ?');
-      whereArgs.add(isClosed);
+      whereArgs.add(isClosed ? 1 : 0);
     }
 
     List<Map<String, dynamic>> maps = await db.query(

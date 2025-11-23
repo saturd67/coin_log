@@ -103,9 +103,9 @@ class MyApp extends StatelessWidget {
             )
           )
         ),
-        home: const AppFramePage(),
+        home: const AppFrame(),
         routes: {
-          '/home': (context) => const AppFramePage()
+          '/home': (context) => const AppFrame()
         },);
         // navigatorObservers: [routeObserver],
   }

@@ -5,13 +5,14 @@ import 'package:coin_log/services/RecordService.dart';
 import 'package:coin_log/shared_widgets/switch_button.dart';
 import 'package:coin_log/shared_widgets/themedShowMonthPicker.dart';
 import 'package:coin_log/shared_widgets/themedShowYearPicker.dart';
-import 'package:coin_log/views/budget_transaction.dart';
+import 'package:coin_log/views/budget_balance.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:fl_chart/fl_chart.dart' hide PieChart;
 
 import '../../models/Record.dart';
+import '../base_view.dart';
 
 class SharedSelectedTransactionType extends ValueNotifier<String> {
   SharedSelectedTransactionType(super.value);
@@ -25,7 +26,12 @@ class SharedSelectedDateTime extends ValueNotifier<DateTime> {
   SharedSelectedDateTime(super.value);
 }
 
-class Summary extends StatefulWidget {
+class Summary extends StatefulWidget implements BaseView {
+  static const classNameValue = 'Summary';
+
+  @override
+  String get className => classNameValue;
+
   @override
   State<Summary> createState() => _SummaryState();
 }
