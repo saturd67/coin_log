@@ -5,7 +5,14 @@ import 'package:coin_log/router/RouterUtils.dart';
 import 'package:coin_log/views/settings/transaction_list.dart';
 import 'package:coin_log/views/settings/account_list.dart';
 
-class Settings extends StatefulWidget {
+import '../base_view.dart';
+
+class Settings extends StatefulWidget implements BaseView{
+  static const classNameValue = 'Settings';
+
+  @override
+  String get className => classNameValue;
+
   @override
   State<Settings> createState() => _SettingsState();
 }

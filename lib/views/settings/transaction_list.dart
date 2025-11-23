@@ -9,8 +9,14 @@ import 'package:coin_log/constants/IconMap.dart';
 import 'package:reorderables/reorderables.dart';
 
 import '../../models/Record.dart';
+import '../base_view.dart';
 
-class TransactionList extends StatefulWidget {
+class TransactionList extends StatefulWidget implements BaseView {
+  static const classNameValue = 'TransactionList';
+
+  @override
+  String get className => classNameValue;
+
   @override
   State<TransactionList> createState() => _TransactionListState();
 }

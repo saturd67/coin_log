@@ -7,7 +7,14 @@ import 'package:reorderables/reorderables.dart';
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:coin_log/services/AccountService.dart';
 
-class AccountList extends StatefulWidget {
+import '../base_view.dart';
+
+class AccountList extends StatefulWidget implements BaseView{
+  static const classNameValue = 'AccountList';
+
+  @override
+  String get className => classNameValue;
+
   @override
   State<AccountList> createState() => _AccountListState();
 }
@@ -27,9 +34,6 @@ class _AccountListState extends State<AccountList> {
 
   void load() async {
     final accounts = await _accountService.listByIsClosed(false);
-    for (Account account in accounts) {
-      print(account.toMap());
-    }
     setState(() {
       _accounts = accounts;
     });

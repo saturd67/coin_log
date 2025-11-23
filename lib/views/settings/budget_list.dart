@@ -8,8 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../router/RouterUtils.dart';
+import '../base_view.dart';
 
-class BudgetList extends StatefulWidget {
+class BudgetList extends StatefulWidget implements BaseView{
+  static const classNameValue = 'BudgetList';
+
+  @override
+  String get className => classNameValue;
 
   @override
   State<BudgetList> createState() => _BudgetListState();

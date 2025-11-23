@@ -6,6 +6,7 @@ import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/services/RecordService.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:coin_log/utils/DateTimeFormatter.dart';
+import 'package:coin_log/views/base_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:coin_log/models/Record.dart';
@@ -14,11 +15,18 @@ import '../router/RouterUtils.dart';
 import '../shared_widgets/showConfirmationDialog.dart';
 import 'record_details.dart';
 
-class RecordView extends StatefulWidget {
+class RecordView extends StatefulWidget implements BaseView {
+  static const classNameValue = 'RecordView';
+
+  @override
+  String get className => classNameValue;
+
+  final String returnTo;
   final int identifier;
 
   RecordView({
     super.key,
+    required this.returnTo,
     required this.identifier
   });
 
@@ -88,7 +96,6 @@ class _RecordViewState extends State<RecordView> {
                   Card(
                     elevation: 2,
                     color: Theme.of(context).colorScheme.secondary,
-
                     child: Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(10, 15, 15, 10),
                       child: Column(
@@ -103,18 +110,9 @@ class _RecordViewState extends State<RecordView> {
                                     children: [
                                       Padding(
                                         padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
-                                        child: Container(
-                                          width: 45,
-                                          height: 45,
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Theme.of(context).colorScheme.tertiary
-                                          ),
-                                          child: Icon(
-                                              getTransactionCategoryIconData(_record.transactionCategory!.icon),
-                                              size: Theme.of(context).iconTheme.size,
-                                              color: Theme.of(context).colorScheme.onSecondary
-                                          ),
+                                        child: Icon(
+                                            getTransactionCategoryIconData(_record.transactionCategory!.icon),
+                                            color: Theme.of(context).colorScheme.primary
                                         ),
                                       ),
                                       Text(_record.transactionCategory!.name)
@@ -128,34 +126,16 @@ class _RecordViewState extends State<RecordView> {
                                     children: [
                                       Padding(
                                         padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
-                                        child: Container(
-                                          width: 45,
-                                          height: 45,
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Theme.of(context).colorScheme.tertiary
-                                          ),
-                                          child: Icon(getAccountIconData(_record.sourceAccount!.icon),
-                                              size: Theme.of(context).iconTheme.size,
-                                              color: Theme.of(context).colorScheme.onSecondary
-                                          ),
+                                        child: Icon(getAccountIconData(_record.sourceAccount!.icon),
+                                            color: Theme.of(context).colorScheme.primary
                                         ),
                                       ),
                                       Text(_record.sourceAccount!.name),
                                       Icon(Icons.arrow_forward),
                                       Padding(
                                         padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
-                                        child: Container(
-                                          width: 45,
-                                          height: 45,
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Theme.of(context).colorScheme.tertiary
-                                          ),
-                                          child: Icon(getAccountIconData(_record.destinationAccount!.icon),
-                                            size: Theme.of(context).iconTheme.size,
-                                            color: Theme.of(context).colorScheme.onSecondary
-                                          ),
+                                        child: Icon(getAccountIconData(_record.destinationAccount!.icon),
+                                          color: Theme.of(context).colorScheme.primary
                                         ),
                                       ),
                                       Text(_record.destinationAccount!.name),
@@ -267,8 +247,11 @@ class _RecordViewState extends State<RecordView> {
                 ),
                 Expanded(
                   child: InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(RouterUtils.createRoute(RecordDetails(identifier: _record.identifier)));
+                    onTap: () async {
+                      final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordDetails(returnTo: widget.returnTo, identifier: _record.identifier)));
+                      if (result != null) {
+                        Navigator.of(context).pop(result);
+                      }
                     },
                     child: Container(
                       height: double.infinity,

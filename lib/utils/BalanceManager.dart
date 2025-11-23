@@ -21,7 +21,7 @@ class BalanceManager {
       account.balance -= record.amount;
     }
 
-    await _accountService.logUpdateBalance(account.identifier!, record.identifier!, RecordAction.insert, oldBalance, account.balance);
+    await _accountService.logUpdateBalance(account.identifier!, record.identifier!, record.date, RecordAction.insert, oldBalance, account.balance);
   }
 
   static Future<void> updateBalanceOnUpdateTransactionRecord(Record_ newRecord) async {
@@ -36,7 +36,7 @@ class BalanceManager {
       oriAccount.balance += oriRecord.amount;
     }
 
-    await _accountService.logUpdateBalance(oriAccount.identifier!, oriRecord.identifier!, RecordAction.update, oldBalance, oriAccount.balance);
+    await _accountService.logUpdateBalance(oriAccount.identifier!, oriRecord.identifier!, oriRecord.date, RecordAction.update, oldBalance, oriAccount.balance);
 
     Account newAccount = (await _accountService.findById(newRecord.sourceAccountId!))!;
     oldBalance = newAccount.balance;
@@ -48,7 +48,7 @@ class BalanceManager {
       newAccount.balance -= newRecord.amount;
     }
 
-    await _accountService.logUpdateBalance(newAccount.identifier!, newRecord.identifier!, RecordAction.update, oldBalance, newAccount.balance);
+    await _accountService.logUpdateBalance(newAccount.identifier!, newRecord.identifier!, newRecord.date, RecordAction.update, oldBalance, newAccount.balance);
   }
 
   static Future<void> updateBalanceOnDeleteTransactionRecord(Record_ record) async {
@@ -62,7 +62,7 @@ class BalanceManager {
       account.balance += record.amount;
     }
 
-    await _accountService.logUpdateBalance(account.identifier!, record.identifier!, RecordAction.delete, oldBalance, account.balance);
+    await _accountService.logUpdateBalance(account.identifier!, record.identifier!, record.date, RecordAction.delete, oldBalance, account.balance);
   }
 
   static Future<void> updateBalanceOnSaveTransferRecord(Record_ record) async {
@@ -74,8 +74,8 @@ class BalanceManager {
     sourceAccount.balance -= record.amount;
     destinationAccount.balance += record.amount;
 
-    await _accountService.logUpdateBalance(sourceAccount.identifier!, record.identifier!, RecordAction.insert, oldSourceBalance, sourceAccount.balance);
-    await _accountService.logUpdateBalance(destinationAccount.identifier!, record.identifier!, RecordAction.insert, oldDestinationBalance, destinationAccount.balance);
+    await _accountService.logUpdateBalance(sourceAccount.identifier!, record.identifier!, record.date, RecordAction.insert, oldSourceBalance, sourceAccount.balance);
+    await _accountService.logUpdateBalance(destinationAccount.identifier!, record.identifier!, record.date, RecordAction.insert, oldDestinationBalance, destinationAccount.balance);
   }
 
   static Future<void> updateBalanceOnUpdateTransferRecord(Record_ newRecord) async {
@@ -90,8 +90,8 @@ class BalanceManager {
     oriRecordSourceAccount.balance += oriRecord.amount;
     oriRecordDestinationAccount.balance -= oriRecord.amount;
 
-    await _accountService.logUpdateBalance(oriRecordSourceAccount.identifier!, newRecord.identifier!, RecordAction.update, oldOriRecordSourceBalance, oriRecordSourceAccount.balance);
-    await _accountService.logUpdateBalance(oriRecordDestinationAccount.identifier!, newRecord.identifier!, RecordAction.update, oldOriRecordDestinationBalance, oriRecordDestinationAccount.balance);
+    await _accountService.logUpdateBalance(oriRecordSourceAccount.identifier!, newRecord.identifier!, newRecord.date, RecordAction.update, oldOriRecordSourceBalance, oriRecordSourceAccount.balance);
+    await _accountService.logUpdateBalance(oriRecordDestinationAccount.identifier!, newRecord.identifier!, newRecord.date,RecordAction.update, oldOriRecordDestinationBalance, oriRecordDestinationAccount.balance);
 
     Account newRecordSourceAccount = (await _accountService.findById(newRecord.sourceAccountId!))!;
     double oldNewRecordSourceBalance = newRecordSourceAccount.balance;
@@ -102,8 +102,8 @@ class BalanceManager {
     newRecordSourceAccount.balance -= newRecord.amount;
     newRecordDestinationAccount.balance += newRecord.amount;
 
-    await _accountService.logUpdateBalance(newRecordSourceAccount.identifier!, newRecord.identifier!, RecordAction.update, oldNewRecordSourceBalance, newRecordSourceAccount.balance);
-    await _accountService.logUpdateBalance(newRecordDestinationAccount.identifier!, newRecord.identifier!, RecordAction.update, oldNewRecordDestinationBalance, newRecordDestinationAccount.balance);
+    await _accountService.logUpdateBalance(newRecordSourceAccount.identifier!, newRecord.identifier!, newRecord.date, RecordAction.update, oldNewRecordSourceBalance, newRecordSourceAccount.balance);
+    await _accountService.logUpdateBalance(newRecordDestinationAccount.identifier!, newRecord.identifier!, newRecord.date, RecordAction.update, oldNewRecordDestinationBalance, newRecordDestinationAccount.balance);
   }
 
   static Future<void> updateBalanceOnDeleteTransferRecord(Record_ record) async {
@@ -115,7 +115,7 @@ class BalanceManager {
     sourceAccount.balance += record.amount;
     destinationAccount.balance -= record.amount;
 
-    await _accountService.logUpdateBalance(sourceAccount.identifier!, record.identifier!, RecordAction.delete, oldSourceBalance, sourceAccount.balance);
-    await _accountService.logUpdateBalance(destinationAccount.identifier!, record.identifier!, RecordAction.delete, oldDestinationBalance, destinationAccount.balance);
+    await _accountService.logUpdateBalance(sourceAccount.identifier!, record.identifier!, record.date, RecordAction.delete, oldSourceBalance, sourceAccount.balance);
+    await _accountService.logUpdateBalance(destinationAccount.identifier!, record.identifier!, record.date, RecordAction.delete, oldDestinationBalance, destinationAccount.balance);
   }
 }

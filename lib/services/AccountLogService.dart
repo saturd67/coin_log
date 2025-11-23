@@ -11,9 +11,9 @@ class AccountLogService {
 
     List<Map<String, dynamic>> maps = await db.query(
       TABLE_NAME,
-      where: 'ACCOUNT_ID = ? AND STRFTIME("%Y", CREATED_ON) = ? and CAST(STRFTIME("%m", CREATED_ON) AS INTEGER) = ?',
+      where: 'ACCOUNT_ID = ? AND STRFTIME("%Y", RECORD_DATE) = ? and CAST(STRFTIME("%m", RECORD_DATE) AS INTEGER) = ?',
       whereArgs: [accountId, year, month],
-      orderBy: 'CREATED_ON DESC'
+      orderBy: 'RECORD_DATE DESC, CREATED_ON DESC, IDENTIFIER DESC'
     );
 
     return maps.map((e) => AccountLog.fromMap(e)).toList();

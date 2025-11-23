@@ -11,7 +11,13 @@ import 'package:coin_log/shared_widgets/grid_view_icon.dart';
 import 'package:coin_log/constants/IconMap.dart';
 import 'package:logging/logging.dart';
 
-class AccountDetails extends StatefulWidget {
+import '../base_view.dart';
+
+class AccountDetails extends StatefulWidget implements BaseView{
+  static const classNameValue = 'AccountDetails';
+
+  @override
+  String get className => classNameValue;
 
   final int? identifier;
 

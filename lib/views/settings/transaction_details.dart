@@ -11,8 +11,13 @@ import 'package:coin_log/constants/IconMap.dart';
 import 'package:logging/logging.dart';
 
 import '../../models/Record.dart';
+import '../base_view.dart';
 
-class TransactionDetails extends StatefulWidget {
+class TransactionDetails extends StatefulWidget implements BaseView{
+  static const classNameValue = 'TransactionDetails';
+
+  @override
+  String get className => classNameValue;
 
   final int? identifier;
 

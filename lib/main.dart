@@ -69,7 +69,7 @@ class MyApp extends StatelessWidget {
                 ),
             ),
             iconTheme: const IconThemeData(
-              size: 24,
+              size: 30,
               color: Color(0xff27ae60),
             ),
             inputDecorationTheme: const InputDecorationTheme(
@@ -103,9 +103,9 @@ class MyApp extends StatelessWidget {
             )
           )
         ),
-        home: const AppFramePage(),
+        home: const AppFrame(),
         routes: {
-          '/home': (context) => const AppFramePage()
+          '/home': (context) => const AppFrame()
         },);
         // navigatorObservers: [routeObserver],
   }

@@ -4,7 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class DataDetail extends StatefulWidget {
+import '../base_view.dart';
+
+class DataDetail extends StatefulWidget implements BaseView {
+  static const classNameValue = 'DataDetail';
+
+  @override
+  String get className => classNameValue;
 
   @override
   State<DataDetail> createState() => _DataDetailState();
@@ -175,21 +181,21 @@ class _ImportDataState extends State<ImportData> {
                 width: 100,
                 child: ElevatedButton(
                     onPressed: () {
-                      showConfirmationDialog(
-                          context,
-                          "After importing you original data will be replaced.",
-                          () async {
-                            if (importFile != "") {
+                      if (importFile != "") {
+
+                          showConfirmationDialog(
+                            context,
+                            "After importing you original data will be replaced.",
+                            () async {
                               String output = await _databaseService.importDatabase(importFile);
                               Fluttertoast.showToast(msg: output);
-                            }
-
-                            else {
-                              Fluttertoast.showToast(msg: "Export path is empty.");
-                            }
-                          },
-                          () {}
-                      );
+                            },
+                            () {}
+                        );
+                      }
+                      else {
+                        Fluttertoast.showToast(msg: "Export path is empty.");
+                      }
                     },
                     child: Text("Import")
                 ),

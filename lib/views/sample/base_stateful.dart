@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
-class BaseStateful extends StatefulWidget {
+import '../base_view.dart';
+
+class BaseStateful extends StatefulWidget implements BaseView{
+  static const classNameValue = 'BaseStateful';
+
+  @override
+  String get className => classNameValue;
+
   @override
   State<BaseStateful> createState() => _BaseStatefulState();
 }

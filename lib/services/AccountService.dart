@@ -54,7 +54,7 @@ class AccountService {
     });
   }
 
-  Future<int?> logUpdateBalance(int accountId, int recordId, RecordAction recordAction, double oldBalance, double newBalance) async {
+  Future<int?> logUpdateBalance(int accountId, int recordId, DateTime recordDate, RecordAction recordAction, double oldBalance, double newBalance) async {
     final db = await DatabaseService().database;
 
     await db.transaction((transaction) async {
@@ -65,10 +65,10 @@ class AccountService {
 
       await transaction.rawInsert(
           """
-        INSERT INTO CL_ACCOUNT_LOG (ACCOUNT_ID, RECORD_ID, RECORD_ACTION, OLD_BALANCE, NEW_BALANCE, CREATED_ON) VALUES 
-        (?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
+        INSERT INTO CL_ACCOUNT_LOG (ACCOUNT_ID, RECORD_ID, RECORD_DATE, RECORD_ACTION, OLD_BALANCE, NEW_BALANCE, CREATED_ON) VALUES 
+        (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
         """,
-          [accountId, recordId, recordAction.name, oldBalance, newBalance]
+          [accountId, recordId, recordDate.toIso8601String(), recordAction.name, oldBalance, newBalance]
       );
     });
     return null;
@@ -109,7 +109,7 @@ class AccountService {
 
     if (isClosed != null) {
       wheres.add('IS_CLOSED = ?');
-      whereArgs.add(isClosed);
+      whereArgs.add(isClosed ? 1 : 0);
     }
 
     List<Map<String, dynamic>> maps = await db.query(
