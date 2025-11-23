@@ -110,18 +110,9 @@ class _RecordViewState extends State<RecordView> {
                                     children: [
                                       Padding(
                                         padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
-                                        child: Container(
-                                          width: 45,
-                                          height: 45,
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Theme.of(context).colorScheme.tertiary
-                                          ),
-                                          child: Icon(
-                                              getTransactionCategoryIconData(_record.transactionCategory!.icon),
-                                              size: Theme.of(context).iconTheme.size,
-                                              color: Theme.of(context).colorScheme.onSecondary
-                                          ),
+                                        child: Icon(
+                                            getTransactionCategoryIconData(_record.transactionCategory!.icon),
+                                            color: Theme.of(context).colorScheme.primary
                                         ),
                                       ),
                                       Text(_record.transactionCategory!.name)
@@ -135,34 +126,16 @@ class _RecordViewState extends State<RecordView> {
                                     children: [
                                       Padding(
                                         padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
-                                        child: Container(
-                                          width: 45,
-                                          height: 45,
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Theme.of(context).colorScheme.tertiary
-                                          ),
-                                          child: Icon(getAccountIconData(_record.sourceAccount!.icon),
-                                              size: Theme.of(context).iconTheme.size,
-                                              color: Theme.of(context).colorScheme.onSecondary
-                                          ),
+                                        child: Icon(getAccountIconData(_record.sourceAccount!.icon),
+                                            color: Theme.of(context).colorScheme.primary
                                         ),
                                       ),
                                       Text(_record.sourceAccount!.name),
                                       Icon(Icons.arrow_forward),
                                       Padding(
                                         padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
-                                        child: Container(
-                                          width: 45,
-                                          height: 45,
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Theme.of(context).colorScheme.tertiary
-                                          ),
-                                          child: Icon(getAccountIconData(_record.destinationAccount!.icon),
-                                            size: Theme.of(context).iconTheme.size,
-                                            color: Theme.of(context).colorScheme.onSecondary
-                                          ),
+                                        child: Icon(getAccountIconData(_record.destinationAccount!.icon),
+                                          color: Theme.of(context).colorScheme.primary
                                         ),
                                       ),
                                       Text(_record.destinationAccount!.name),

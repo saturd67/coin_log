@@ -401,7 +401,7 @@ class _RecordDayHeaderState extends State<RecordDayHeader> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(
-              width: 250,
+              width: 100,
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
@@ -415,7 +415,7 @@ class _RecordDayHeaderState extends State<RecordDayHeader> {
             Row(
               children: [
                 Container(
-                  width: 120,
+                  width: 90,
                   alignment: AlignmentDirectional(1, 0),
                   child: Text(
                     '+${widget.sumIncome}',
@@ -425,7 +425,7 @@ class _RecordDayHeaderState extends State<RecordDayHeader> {
                   ),
                 ),
                 Container(
-                  width: 120,
+                  width: 90,
                   alignment: AlignmentDirectional(1, 0),
                   child: Text(
                     '-${widget.sumExpense}',

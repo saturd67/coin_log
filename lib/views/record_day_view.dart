@@ -170,7 +170,7 @@ class RecordDayHeader extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(
-              width: 250,
+              width: 100,
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
@@ -184,7 +184,7 @@ class RecordDayHeader extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  width: 120,
+                  width: 90,
                   alignment: AlignmentDirectional(1, 0),
                   child: Text(
                     '+$sumIncome',
@@ -194,7 +194,7 @@ class RecordDayHeader extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  width: 120,
+                  width: 90,
                   alignment: AlignmentDirectional(1, 0),
                   child: Text(
                     '-$sumExpense',
