@@ -128,46 +128,65 @@ class _RecordCalendarState extends State<RecordCalendar> {
               ),
             ),
             body: Container(
+              padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
               color: Theme.of(context).colorScheme.secondary,
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  GestureDetector(
-                    onTap: () async {
-                      DateTime? selectedDate = await themedShowMonthPicker(context, widget.selectedDateTime);
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(4),
+                          splashColor: Colors.grey[300],
+                          highlightColor: Colors.grey[300],
+                          onTap: () async {
+                            DateTime? selectedDate = await themedShowMonthPicker(context, widget.selectedDateTime);
 
-                      if (selectedDate != null) {
-                        List<List<DateTime?>> tempDateInMonth = getDateListByYearMonth(selectedDate.year, selectedDate.month);
+                            if (selectedDate != null) {
+                              List<List<DateTime?>> tempDateInMonth = getDateListByYearMonth(selectedDate.year, selectedDate.month);
 
-                        setState(() {
-                          widget.selectedDateTime = selectedDate;
-                          datesInMonth = tempDateInMonth;
-                        });
-                      }
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          widget.selectedDateTime.year.toString(),
-                          style: TextStyle(
-                              fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-                              fontWeight: FontWeight.w500,
+                              setState(() {
+                                widget.selectedDateTime = selectedDate;
+                                datesInMonth = tempDateInMonth;
+                              });
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  widget.selectedDateTime.year.toString(),
+                                  style: TextStyle(
+                                      fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
+                                      fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  monthMap[widget.selectedDateTime.month.toString()]!,
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
+                                      fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: Theme.of(context).textTheme.bodyMedium!.color,
+                                )
+                              ]
+                            ),
                           ),
                         ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          monthMap[widget.selectedDateTime.month.toString()]!,
-                          style: TextStyle(
-                            fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-                              fontWeight: FontWeight.w500,
-                          ),
-                        )
-                      ]
-                    ),
+                      ),
+                    ],
                   ),
                   RecordCalendarHeader(columnWidth: columnWidth,),
                   RecordCalendarBody(columnWidth: columnWidth, datesInMonth: datesInMonth, groupedRecordItemsWithDay: groupedRecordItemsWithDay, load: load)
@@ -193,7 +212,7 @@ class RecordCalendarHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+      padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
