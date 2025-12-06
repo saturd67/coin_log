@@ -560,6 +560,7 @@ class _PeriodSummaryState extends State<PeriodSummary> {
   List<Map<String, dynamic>> periodBalanceAmountMaps = [];
   double maxAmount = 0;
   double bottomTitlesInterval = 1;
+  double leftTitlesInterval = 300;
 
   @override
   void initState() {
@@ -608,7 +609,7 @@ class _PeriodSummaryState extends State<PeriodSummary> {
       cumulativeSum += tempPeriodIncomeAmountMaps[i]['total'];
       cumulativeSum = cumulativeSum - tempPeriodExpenseAmountMaps[i]['total'];
 
-      Map<String, dynamic> tempPeriodBalanceAmountMap = {"x_date": xDate, "total": cumulativeSum};
+      Map<String, dynamic> tempPeriodBalanceAmountMap = {"x_date": xDate, "total": cumulativeSum < 0 ? 0 : cumulativeSum};
       tempPeriodBalanceAmountMaps.add(tempPeriodBalanceAmountMap);
     }
 
@@ -621,7 +622,11 @@ class _PeriodSummaryState extends State<PeriodSummary> {
       periodBalanceAmountMaps = tempPeriodBalanceAmountMaps;
       maxAmount = tempMaxAmount.toDouble();
       bottomTitlesInterval = tempPeriodIncomeAmountMaps.length > 12 ? 15 : 1;
+      leftTitlesInterval = getLeftTitlesInterval(maxAmount);
     });
+
+    print(leftTitlesInterval);
+    
   }
 
   String compactWithOneDecimal(double value) {
@@ -641,14 +646,14 @@ class _PeriodSummaryState extends State<PeriodSummary> {
   }
 
   double getLeftTitlesInterval(double maxAmount) {
-    int length = maxAmount.toString().length;
+    int length = maxAmount.toInt().toString().length;
 
     if (length <= 3) {
       return 300;
     }
 
     else {
-      return pow(10, length).toDouble();
+      return pow(10, length - 1).toDouble();
     }
   }
 
@@ -690,8 +695,8 @@ class _PeriodSummaryState extends State<PeriodSummary> {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: getLeftTitlesInterval(maxAmount),
-                    reservedSize: 22,
+                    interval: leftTitlesInterval,
+                    reservedSize: 30,
                     getTitlesWidget: (value, meta) {
                       return Text(compactWithOneDecimal(value), style: const TextStyle(fontSize: 11));
                     },
