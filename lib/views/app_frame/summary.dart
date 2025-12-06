@@ -623,10 +623,7 @@ class _PeriodSummaryState extends State<PeriodSummary> {
       maxAmount = tempMaxAmount.toDouble();
       bottomTitlesInterval = tempPeriodIncomeAmountMaps.length > 12 ? 15 : 1;
       leftTitlesInterval = getLeftTitlesInterval(maxAmount);
-    });
-
-    print(leftTitlesInterval);
-    
+    });    
   }
 
   String compactWithOneDecimal(double value) {
