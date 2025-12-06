@@ -1,4 +1,4 @@
-import 'dart:nativewrappers/_internal/vm/lib/math_patch.dart';
+import 'dart:math';
 
 import 'package:coin_log/constants/MonthMap.dart';
 import 'package:coin_log/main.dart';
@@ -691,7 +691,7 @@ class _PeriodSummaryState extends State<PeriodSummary> {
                   sideTitles: SideTitles(
                     showTitles: true,
                     interval: getLeftTitlesInterval(maxAmount),
-                    reservedSize: 35,
+                    reservedSize: 22,
                     getTitlesWidget: (value, meta) {
                       return Text(compactWithOneDecimal(value), style: const TextStyle(fontSize: 11));
                     },
