@@ -152,6 +152,7 @@ class _RecordCalendarState extends State<RecordCalendar> {
                                 widget.selectedDateTime = selectedDate;
                                 datesInMonth = tempDateInMonth;
                               });
+                              load();
                             }
                           },
                           child: Padding(
