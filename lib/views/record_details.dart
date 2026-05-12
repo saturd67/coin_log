@@ -522,12 +522,11 @@ class _RecordDetailsState extends State<RecordDetails> {
                         else {
                           int? identifier = await _recordService.updateTransfer(record);
                           _log.info("Updated ${record.toMap()}");
-
-                          if (widget.returnTo == "AppFrame") {
+                          if (widget.returnTo == AppFrame.classNameValue) {
                             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => AppFrame()), (Route<dynamic> route) => false);
                           }
 
-                          else if (widget.returnTo == "RecordDayView") {
+                          else if (widget.returnTo == RecordDayView.classNameValue) {
                             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => RecordDayView(date: record.date)), (Route<dynamic> route) => false);
                           }
                         }
