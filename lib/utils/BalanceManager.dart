@@ -87,8 +87,12 @@ class BalanceManager {
     Account oriRecordDestinationAccount = (await _accountService.findById(oriRecord.destinationAccountId!))!;
     double oldOriRecordDestinationBalance = oriRecordDestinationAccount.balance;
 
+    print("oriRecord.amount: "+ oriRecord.amount.toString());
+    print("oriRecordSourceAccount.balance: " +oriRecordSourceAccount.balance.toString());
     oriRecordSourceAccount.balance += oriRecord.amount;
+    print("oriRecordDestinationAccount.balance" + oriRecord.amount.toString());
     oriRecordDestinationAccount.balance -= oriRecord.amount;
+
 
     await _accountService.logUpdateBalance(oriRecordSourceAccount.identifier!, newRecord.identifier!, newRecord.date, RecordAction.update, oldOriRecordSourceBalance, oriRecordSourceAccount.balance);
     await _accountService.logUpdateBalance(oriRecordDestinationAccount.identifier!, newRecord.identifier!, newRecord.date,RecordAction.update, oldOriRecordDestinationBalance, oriRecordDestinationAccount.balance);
@@ -107,15 +111,17 @@ class BalanceManager {
   }
 
   static Future<void> updateBalanceOnDeleteTransferRecord(Record_ record) async {
-    Account sourceAccount = (await _accountService.findById(record.sourceAccountId!))!;
+    Record_ oriRecord = (await _recordService.findById(record.identifier!))!;
+
+    Account sourceAccount = (await _accountService.findById(oriRecord.sourceAccountId!))!;
     double oldSourceBalance = sourceAccount.balance;
-    Account destinationAccount = (await _accountService.findById(record.destinationAccountId!))!;
+    Account destinationAccount = (await _accountService.findById(oriRecord.destinationAccountId!))!;
     double oldDestinationBalance = destinationAccount.balance;
 
-    sourceAccount.balance += record.amount;
-    destinationAccount.balance -= record.amount;
+    sourceAccount.balance += oriRecord.amount;
+    destinationAccount.balance -= oriRecord.amount;
 
-    await _accountService.logUpdateBalance(sourceAccount.identifier!, record.identifier!, record.date, RecordAction.delete, oldSourceBalance, sourceAccount.balance);
-    await _accountService.logUpdateBalance(destinationAccount.identifier!, record.identifier!, record.date, RecordAction.delete, oldDestinationBalance, destinationAccount.balance);
+    await _accountService.logUpdateBalance(sourceAccount.identifier!, oriRecord.identifier!, oriRecord.date, RecordAction.delete, oldSourceBalance, sourceAccount.balance);
+    await _accountService.logUpdateBalance(destinationAccount.identifier!, oriRecord.identifier!, oriRecord.date, RecordAction.delete, oldDestinationBalance, destinationAccount.balance);
   }
 }
