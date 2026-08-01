@@ -8,6 +8,7 @@ import 'package:coin_log/shared_widgets/switch_button.dart';
 import 'package:coin_log/shared_widgets/themedShowMonthPicker.dart';
 import 'package:coin_log/shared_widgets/themedShowYearPicker.dart';
 import 'package:coin_log/views/budget_balance.dart';
+import 'package:coin_log/models/Budget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
@@ -313,7 +314,7 @@ class _BalanceSummaryState extends State<BalanceSummary> {
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Row(
               mainAxisSize: MainAxisSize.max,
-              children: [
+              children: [ 
                 BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error], label: "Expenses: ", balance: expenseAmount,),
                 BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.error, Theme.of(context).colorScheme.success], label: "Income: ", balance: incomeAmount,),
                 BalanceSummaryRemark(colors: [Theme.of(context).colorScheme.success], label: "Balance: ", balance: incomeAmount - expenseAmount),
@@ -329,7 +330,10 @@ class _BalanceSummaryState extends State<BalanceSummary> {
                   child: TextButton(
                       onPressed: () {
                         Navigator.of(context).push(RouterUtils.createRoute(
-                            BudgetBalance()
+                            BudgetBalance(
+                              initialPeriod: widget.sharedSelectedSummaryType.value == 'Monthly' ? Period.monthly : Period.yearly,
+                              initialDateTime: widget.sharedSelectedDateTime.value,
+                            )
                         ));
                       },
                       child: Row(
