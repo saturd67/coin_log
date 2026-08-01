@@ -216,6 +216,16 @@ class AccountLogDay extends StatefulWidget {
 class _AccountLogDayState extends State<AccountLogDay> {
   @override
   Widget build(BuildContext context) {
+    Map<int, List<AccountLog>> groupedByRecord = {};
+    List<int> recordOrder = [];
+    for (AccountLog accountLog in widget.accountLogs) {
+      if (!groupedByRecord.containsKey(accountLog.recordId)) {
+        groupedByRecord[accountLog.recordId] = [];
+        recordOrder.add(accountLog.recordId);
+      }
+      groupedByRecord[accountLog.recordId]!.add(accountLog);
+    }
+
     return Container(
       child: Card(
         elevation: 2,
@@ -230,11 +240,134 @@ class _AccountLogDayState extends State<AccountLogDay> {
               ),
               Column(
                 children: [
-                  for (AccountLog accountLog in widget.accountLogs) ... {
-                    AccountLogItem(accountLog: accountLog)
+                  for (int recordId in recordOrder) ... {
+                    AccountLogRecordGroup(accountLogs: groupedByRecord[recordId]!)
                   }
                 ],
               )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AccountLogRecordGroup extends StatefulWidget {
+
+  final List<AccountLog> accountLogs;
+
+  AccountLogRecordGroup({
+    super.key,
+    required this.accountLogs
+  });
+
+  @override
+  State<AccountLogRecordGroup> createState() => _AccountLogRecordGroupState();
+}
+
+class _AccountLogRecordGroupState extends State<AccountLogRecordGroup> {
+
+  bool _expanded = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AccountLogRecordHeader(
+            accountLog: widget.accountLogs.first,
+            expanded: _expanded,
+            onTap: () {
+              setState(() {
+                _expanded = !_expanded;
+              });
+            },
+          ),
+          if (_expanded)
+            for (AccountLog accountLog in widget.accountLogs) ... {
+              AccountLogItem(accountLog: accountLog)
+            }
+        ],
+      ),
+    );
+  }
+}
+
+class AccountLogRecordHeader extends StatelessWidget {
+
+  final AccountLog accountLog;
+  final bool expanded;
+  final VoidCallback onTap;
+
+  AccountLogRecordHeader({
+    super.key,
+    required this.accountLog,
+    required this.expanded,
+    required this.onTap
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              accountLog.record == null
+              ? Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+                    child: Icon(
+                      Icons.delete_forever,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  Text("Deleted", style: TextStyle(color: Theme.of(context).colorScheme.error),)
+                ],
+              )
+              : [RecordType.income.name, RecordType.expense.name].contains(accountLog.record!.type)
+              ? Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+                    child: Icon(
+                        getTransactionCategoryIconData(accountLog.record!.transactionCategory!.icon),
+                    ),
+                  ),
+                  Text(accountLog.record!.transactionCategory!.name)
+                ],
+              )
+              : [RecordType.transfer.name].contains(accountLog.record!.type)
+              ? Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+                    child: Icon(
+                        getAccountIconData(accountLog.record!.sourceAccount!.icon),
+                    ),
+                  ),
+                  Text(accountLog.record!.sourceAccount!.name),
+                  Icon(Icons.arrow_forward),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+                    child: Icon(
+                        getAccountIconData(accountLog.record!.destinationAccount!.icon),
+                    ),
+                  ),
+                  Text(accountLog.record!.destinationAccount!.name)
+                ],
+              )
+              : Text("Error"),
+              Icon(expanded ? Icons.expand_less : Icons.expand_more, 
+              color: Theme.of(context).textTheme.bodyMedium!.color)
             ],
           ),
         ),
@@ -283,63 +416,13 @@ class _AccountLogItemState extends State<AccountLogItem> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 50,
+      height: 36,
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            widget.accountLog.record == null
-            ? Row(
-              children: [
-                Padding(
+            Row(children: [
+              Padding(
                   padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
-                  child: Icon(
-                    Icons.delete_forever,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                ),
-                Text("Deleted", style: TextStyle(color: Theme.of(context).colorScheme.error),)
-              ],
-            )
-            : [RecordType.income.name, RecordType.expense.name].contains(widget.accountLog.record!.type)
-            ? Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
-                  child: Icon(
-                      getTransactionCategoryIconData(widget.accountLog.record!.transactionCategory!.icon),
-                  ),
-                ),
-                Text(widget.accountLog.record!.transactionCategory!.name)
-              ],
-            )
-            : [RecordType.transfer.name].contains(widget.accountLog.record!.type)
-            ? Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
-                  child: Icon(
-                      getAccountIconData(widget.accountLog.record!.sourceAccount!.icon),
-                  ),
-                ),
-                Text(widget.accountLog.record!.sourceAccount!.name),
-                Icon(Icons.arrow_forward),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
-                  child: Icon(
-                      getAccountIconData(widget.accountLog.record!.destinationAccount!.icon),
-                  ),
-                ),
-                Text(widget.accountLog.record!.destinationAccount!.name)
-              ],
-            )
-            : Text("Error"),
-            Row(
-              children: [
-                widget.accountLog.newBalance > widget.accountLog.oldBalance
-                ? Text("+${(widget.accountLog.newBalance - widget.accountLog.oldBalance).abs().toStringAsFixed(2)}", style: TextStyle(color: Theme.of(context).colorScheme.success))
-                : Text("-${(widget.accountLog.newBalance - widget.accountLog.oldBalance).abs().toStringAsFixed(2)}", style: TextStyle(color: Theme.of(context).colorScheme.error))
-                ,Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
                   child: widget.accountLog.recordAction == RecordAction.insert.name
                     ? Icon(Icons.add, size: 24)
                     : widget.accountLog.recordAction == RecordAction.update.name
@@ -348,8 +431,12 @@ class _AccountLogItemState extends State<AccountLogItem> {
                     ? Icon(Icons.close, size: 24, color: Theme.of(context).colorScheme.error,)
                     : Icon(Icons.question_mark, size: 24, color: Theme.of(context).colorScheme.error),
                 ),
-              ],
-            )
+                Text(DateTimeFormatter.toTime(widget.accountLog.createdOn)),
+              ]
+            ),
+            widget.accountLog.newBalance > widget.accountLog.oldBalance
+            ? Text("+${(widget.accountLog.newBalance - widget.accountLog.oldBalance).abs().toStringAsFixed(2)}", style: TextStyle(color: Theme.of(context).colorScheme.success))
+            : Text("-${(widget.accountLog.newBalance - widget.accountLog.oldBalance).abs().toStringAsFixed(2)}", style: TextStyle(color: Theme.of(context).colorScheme.error))
           ]
       ),
     );

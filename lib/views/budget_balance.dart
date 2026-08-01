@@ -37,6 +37,15 @@ class BudgetTransactionJoinRecordTotal {
 class BudgetBalance extends StatefulWidget implements BaseView {
   static const classNameValue = 'BudgetBalance';
 
+  final Period initialPeriod;
+  final DateTime? initialDateTime;
+
+  BudgetBalance({
+    super.key,
+    this.initialPeriod = Period.monthly,
+    this.initialDateTime
+  });
+
   @override
   String get className => classNameValue;
 
@@ -51,8 +60,8 @@ class _BudgetBalanceState extends State<BudgetBalance> {
 
   late VoidCallback listener;
 
-  final sharedSelectedPeriod = SharedSelectedPeriod(Period.monthly);
-  final sharedSelectedDateTime = SharedSelectedDateTime(DateTime.now());
+  late final sharedSelectedPeriod = SharedSelectedPeriod(widget.initialPeriod);
+  late final sharedSelectedDateTime = SharedSelectedDateTime(widget.initialDateTime ?? DateTime.now());
 
   List<BudgetTransaction> budgetTransactions = [];
   List<BudgetTransactionJoinRecordTotal> budgetTransactionJoinRecordTotals = [];
