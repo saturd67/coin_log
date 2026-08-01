@@ -59,7 +59,7 @@ class _RecordDetailsState extends State<RecordDetails> {
   int? _selectedDestinationAccountId;
   String _amount = "0";
 
-  bool _isFirstAmountUpdate = true;
+  bool _isInitialInput = true;
   bool _isKeyboardVisible = false;
   late final KeyboardVisibilityController keyboardVisibilityController;
   late final StreamSubscription<bool> _keyboardSubscription;
@@ -373,16 +373,11 @@ class _RecordDetailsState extends State<RecordDetails> {
                     date: _recordFormModel.date,
                     onValueButtonPressed: (String input) {
                       String tempAmount = "";
-                      if (_isFirstAmountUpdate) {
-                        tempAmount +=  input != "Del" ? input : "0";
-                      }
 
-                      else {
-                        Calculator calculator = Calculator(_amount);
-                        tempAmount = calculator.onInput(input);
-                      }
+                      Calculator calculator = Calculator(_amount);
+                      tempAmount = calculator.onInput(_isInitialInput, input);
 
-                      _isFirstAmountUpdate = false;
+                      _isInitialInput = false;
 
                       setState(() {
                         _amount = tempAmount;
@@ -615,36 +610,36 @@ class _RecordDetailsKeyboardState extends State<RecordDetailsKeyboard> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        RecordDetailsKeyboardButton(buttonText: "7", onValueButtonPressed: widget.onValueButtonPressed),
-                        RecordDetailsKeyboardButton(buttonText: "8", onValueButtonPressed: widget.onValueButtonPressed),
-                        RecordDetailsKeyboardButton(buttonText: "9", onValueButtonPressed: widget.onValueButtonPressed),
+                        RecordDetailsKeyboardButton(buttonText: Calculator.seven, onValueButtonPressed: widget.onValueButtonPressed),
+                        RecordDetailsKeyboardButton(buttonText: Calculator.eight, onValueButtonPressed: widget.onValueButtonPressed),
+                        RecordDetailsKeyboardButton(buttonText: Calculator.nine, onValueButtonPressed: widget.onValueButtonPressed),
                         RecordDetailsKeyboardButton(buttonText: widget.date != null ? "${widget.date!.day}/${widget.date!.month} ${weekMap[widget.date!.weekday.toString()]}" : "", color: Theme.of(context).colorScheme.primary, onDateButtonPressed: widget.onDateButtonPressed),
                       ],
                     ),
                      Row(
                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                        children: [
-                         RecordDetailsKeyboardButton(buttonText: "4", onValueButtonPressed: widget.onValueButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "5", onValueButtonPressed: widget.onValueButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "6", onValueButtonPressed: widget.onValueButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "+", onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: Calculator.four, onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: Calculator.five, onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: Calculator.six, onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: Calculator.plus, onValueButtonPressed: widget.onValueButtonPressed),
                        ],
                      ),
                      Row(
                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                        children: [
-                         RecordDetailsKeyboardButton(buttonText: "1", onValueButtonPressed: widget.onValueButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "2", onValueButtonPressed: widget.onValueButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "3", onValueButtonPressed: widget.onValueButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "-", onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: Calculator.one, onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: Calculator.two, onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: Calculator.three, onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: Calculator.minus, onValueButtonPressed: widget.onValueButtonPressed),
                        ],
                      ),
                      Row(
                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                        children: [
-                         RecordDetailsKeyboardButton(buttonText: ".", onValueButtonPressed: widget.onValueButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "0", onValueButtonPressed: widget.onValueButtonPressed),
-                         RecordDetailsKeyboardButton(buttonText: "Del", onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: Calculator.dot, onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: Calculator.zero, onValueButtonPressed: widget.onValueButtonPressed),
+                         RecordDetailsKeyboardButton(buttonText: Calculator.delete, onValueButtonPressed: widget.onValueButtonPressed),
                          RecordDetailsKeyboardButton(buttonIcon: Icons.check, color: Theme.of(context).colorScheme.onPrimary, backgroundColor: Theme.of(context).colorScheme.primary, onSaveButtonPressed: widget.onSaveButtonPressed),
                        ],
                      ),

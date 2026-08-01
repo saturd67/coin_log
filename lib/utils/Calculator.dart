@@ -1,22 +1,68 @@
 import 'package:math_expressions/math_expressions.dart';
 
 class Calculator {
+  static const String zero = "0";
+  static const String one = "1";
+  static const String two = "2";
+  static const String three = "3";
+  static const String four = "4";
+  static const String five = "5";
+  static const String six = "6";
+  static const String seven = "7";
+  static const String eight = "8";
+  static const String nine = "9";
+
+  static const String plus = "+";
+  static const String minus = "-";
+  static const String dot = ".";
+
+  static const String delete = "Del";
+
+  static const List<String> numbers = [
+    zero,
+    one,
+    two,
+    three,
+    four,
+    five,
+    six,
+    seven,
+    eight,
+    nine
+  ];
+
+  static const List<String> operators = [
+    plus,
+    minus
+  ];
+
   String amount;
 
   Calculator(this.amount);
-
-  String onInput(String input) {
-    List<String> amountParts = amount.split(' ');
+  
+  String onInput(bool isInitialInput, String input) {
     String firstOperand = _getFirstOperand(amount);
     String operator = _getOperator(amount);
     String lastOperand = _getLastOperand(amount);
 
-    if (input == ".") {
-      if (lastOperand == ""){
-        lastOperand = "0$input";
+    if (isInitialInput) {
+      if (input == delete) {
+        return zero;
       }
 
-      else if (!lastOperand.contains(".")) {
+      else if (operators.contains(input)) {
+        return "$amount $input";
+      }
+
+      return input;
+    }
+
+    if (input == dot) {
+      if (lastOperand == ""){
+        lastOperand = "$zero$input";
+      }
+
+      else if (!lastOperand.contains(dot)) {
         lastOperand += input;
       }
 
@@ -24,18 +70,18 @@ class Calculator {
     }
 
     else if (num.tryParse(input) != null) {
-      if (!lastOperand.contains(".") && num.tryParse(input) != null) {
+      if (!lastOperand.contains(dot) && num.tryParse(input) != null) {
         lastOperand = _addValue(lastOperand, input);
       }
 
-      else if (lastOperand.contains(".") && num.tryParse(input) != null && lastOperand.substring(lastOperand.indexOf(".")).length <= 2) {
+      else if (lastOperand.contains(dot) && num.tryParse(input) != null && lastOperand.substring(lastOperand.indexOf(dot)).length <= 2) {
         lastOperand = _addValue(lastOperand, input);
       }
 
       return firstOperand + operator + lastOperand;
     }
 
-    else if (["+", "-"].contains(input) && lastOperand != "") {
+    else if (operators.contains(input) && lastOperand != "") {
       input = " $input ";
 
       // Exp: 100
@@ -55,13 +101,13 @@ class Calculator {
       }
     }
 
-    else if (input == "Del") {
+    else if (input == delete) {
 
       // Exp: 100 or 100 + 200
       if ((firstOperand == "" && operator == "")
           || (firstOperand != "" && operator != "" && lastOperand != "")
       ) {
-        amount = amount.length > 1 ? amount.substring(0, amount.length - 1) : "0";
+        amount = amount.length > 1 ? amount.substring(0, amount.length - 1) : zero;
         return amount;
       }
 
@@ -102,7 +148,7 @@ class Calculator {
   }
 
   String _addValue(String lastOperand, String input) {
-    if (lastOperand == "0" && input != ".") {
+    if (lastOperand == zero && input != dot) {
       return input;
     }
 
@@ -112,8 +158,8 @@ class Calculator {
   }
 
   String _calculate(String firstOperand, String operator, String lastOperand) {
-    firstOperand = firstOperand.endsWith(".") ? firstOperand.substring(0, firstOperand.length - 1) : firstOperand;
-    lastOperand = lastOperand.endsWith(".") ? lastOperand.substring(0, lastOperand.length - 1) : lastOperand;
+    firstOperand = firstOperand.endsWith(dot) ? firstOperand.substring(0, firstOperand.length - 1) : firstOperand;
+    lastOperand = lastOperand.endsWith(dot) ? lastOperand.substring(0, lastOperand.length - 1) : lastOperand;
     String expressionString = firstOperand + operator + lastOperand;
     ExpressionParser parser = GrammarParser();
     Expression expression = parser.parse(expressionString);
