@@ -72,15 +72,13 @@ class RecordService {
   Future<int?> deleteTransfer(Record_ record) async {
     final db = await DatabaseService().database;
 
-    int effectedRowCount = await db.delete(
+    await BalanceManager.updateBalanceOnDeleteTransferRecord(record);
+
+    return await db.delete(
         TABLE_NAME,
         where: 'identifier = ?',
         whereArgs: [record.identifier]
     );
-
-    await BalanceManager.updateBalanceOnDeleteTransferRecord(record);
-
-    return effectedRowCount;
   }
 
   Future<Record_?> findById(int identifier) async {

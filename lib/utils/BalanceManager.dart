@@ -87,10 +87,9 @@ class BalanceManager {
     Account oriRecordDestinationAccount = (await _accountService.findById(oriRecord.destinationAccountId!))!;
     double oldOriRecordDestinationBalance = oriRecordDestinationAccount.balance;
 
-    print("oriRecord.amount: "+ oriRecord.amount.toString());
-    print("oriRecordSourceAccount.balance: " +oriRecordSourceAccount.balance.toString());
+
     oriRecordSourceAccount.balance += oriRecord.amount;
-    print("oriRecordDestinationAccount.balance" + oriRecord.amount.toString());
+    
     oriRecordDestinationAccount.balance -= oriRecord.amount;
 
 
