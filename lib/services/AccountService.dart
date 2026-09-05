@@ -54,24 +54,19 @@ class AccountService {
     });
   }
 
-  Future<int?> logUpdateBalance(int accountId, int recordId, DateTime recordDate, RecordAction recordAction, double oldBalance, double newBalance) async {
-    final db = await DatabaseService().database;
+  Future<void> logUpdateBalance(DatabaseExecutor executor, int accountId, int recordId, DateTime recordDate, RecordAction recordAction, double oldBalance, double newBalance) async {
+    await executor.rawUpdate(
+        "UPDATE $TABLE_NAME SET BALANCE = ? WHERE IDENTIFIER = ? ",
+        [newBalance, accountId]
+    );
 
-    await db.transaction((transaction) async {
-      await transaction.rawUpdate(
-          "UPDATE $TABLE_NAME SET BALANCE = ? WHERE IDENTIFIER = ? ",
-          [newBalance, accountId]
-      );
-
-      await transaction.rawInsert(
-          """
-        INSERT INTO CL_ACCOUNT_LOG (ACCOUNT_ID, RECORD_ID, RECORD_DATE, RECORD_ACTION, OLD_BALANCE, NEW_BALANCE, CREATED_ON) VALUES 
-        (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
-        """,
-          [accountId, recordId, recordDate.toIso8601String(), recordAction.name, oldBalance, newBalance]
-      );
-    });
-    return null;
+    await executor.rawInsert(
+        """
+      INSERT INTO CL_ACCOUNT_LOG (ACCOUNT_ID, RECORD_ID, RECORD_DATE, RECORD_ACTION, OLD_BALANCE, NEW_BALANCE, CREATED_ON) VALUES
+      (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
+      """,
+        [accountId, recordId, recordDate.toIso8601String(), recordAction.name, oldBalance, newBalance]
+    );
   }
 
   Future<int?> delete(int identifier) async {
@@ -86,7 +81,11 @@ class AccountService {
 
   Future<Account?> findById(int identifier) async {
     final db = await DatabaseService().database;
-    List<Map<String, dynamic>> maps = await db.query(
+    return await findByIdWithExecutor(db, identifier);
+  }
+
+  Future<Account?> findByIdWithExecutor(DatabaseExecutor executor, int identifier) async {
+    List<Map<String, dynamic>> maps = await executor.query(
         TABLE_NAME,
         where: 'identifier = ?',
         limit: 1,

@@ -458,14 +458,28 @@ class _RecordDetailsState extends State<RecordDetails> {
                         }
 
                         if (widget.identifier == null) {
-                          int? identifier = await _recordService.saveTransaction(record);
+                          try {
+                            await _recordService.saveTransaction(record);
+                          }
+                          catch (e) {
+                            _log.severe("Failed to save ${record.toMap()}", e);
+                            ThemedToast.showToast("Failed to save record. No changes were made.");
+                            return;
+                          }
                           _log.info("Saved ${record.toMap()}");
 
                           Navigator.of(context).pop(["reload", record.date]);
                         }
 
                         else {
-                          int? identifier = await _recordService.updateTransaction(record);
+                          try {
+                            await _recordService.updateTransaction(record);
+                          }
+                          catch (e) {
+                            _log.severe("Failed to update ${record.toMap()}", e);
+                            ThemedToast.showToast("Failed to update record. No changes were made.");
+                            return;
+                          }
                           _log.info("Updated ${record.toMap()}");
 
                           if (!context.mounted) return;
@@ -508,14 +522,28 @@ class _RecordDetailsState extends State<RecordDetails> {
                         }
 
                         if (widget.identifier == null) {
-                          int? identifier = await _recordService.saveTransfer(record);
+                          try {
+                            await _recordService.saveTransfer(record);
+                          }
+                          catch (e) {
+                            _log.severe("Failed to save ${record.toMap()}", e);
+                            ThemedToast.showToast("Failed to save transfer. No changes were made.");
+                            return;
+                          }
                           _log.info("Saved ${record.toMap()}");
 
                           Navigator.of(context).pop(["reload", record.date]);
                         }
 
                         else {
-                          int? identifier = await _recordService.updateTransfer(record);
+                          try {
+                            await _recordService.updateTransfer(record);
+                          }
+                          catch (e) {
+                            _log.severe("Failed to update ${record.toMap()}", e);
+                            ThemedToast.showToast("Failed to update transfer. No changes were made.");
+                            return;
+                          }
                           _log.info("Updated ${record.toMap()}");
                           if (widget.returnTo == AppFrame.classNameValue) {
                             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => AppFrame()), (Route<dynamic> route) => false);
