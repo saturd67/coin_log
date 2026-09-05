@@ -2,6 +2,7 @@ import 'package:coin_log/models/Record.dart';
 import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/services/DatabaseService.dart';
 import 'package:coin_log/utils/BalanceManager.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../models/TransactionCategory.dart';
 
@@ -13,10 +14,19 @@ class RecordService {
 
   Future<int?> saveTransaction(Record_ record) async {
     final db = await DatabaseService().database;
+    final int? oriIdentifier = record.identifier;
 
-    record.identifier = await db.insert(TABLE_NAME, record.toMap());
+    try {
+      await db.transaction((transaction) async {
+        record.identifier = await transaction.insert(TABLE_NAME, record.toMap());
 
-    await BalanceManager.updateBalanceOnSaveTransactionRecord(record);
+        await BalanceManager.updateBalanceOnSaveTransactionRecord(transaction, record);
+      });
+    }
+    catch (e) {
+      record.identifier = oriIdentifier;
+      rethrow;
+    }
 
     return record.identifier;
   }
@@ -24,35 +34,48 @@ class RecordService {
   Future<int?> updateTransaction(Record_ record) async {
     final db = await DatabaseService().database;
 
-    await BalanceManager.updateBalanceOnUpdateTransactionRecord(record);
+    return await db.transaction((transaction) async {
+      await BalanceManager.updateBalanceOnUpdateTransactionRecord(transaction, record);
 
-    return await db.update(
-        TABLE_NAME,
-        record.toMap(),
-        where: 'identifier = ?',
-        whereArgs: [record.identifier]);
+      return await transaction.update(
+          TABLE_NAME,
+          record.toMap(),
+          where: 'identifier = ?',
+          whereArgs: [record.identifier]);
+    });
   }
 
   Future<int?> deleteTransaction(Record_ record) async {
     final db = await DatabaseService().database;
 
-    int effectedRowCount = await db.delete(
-        TABLE_NAME,
-        where: 'identifier = ?',
-        whereArgs: [record.identifier]
-    );
+    return await db.transaction((transaction) async {
+      int effectedRowCount = await transaction.delete(
+          TABLE_NAME,
+          where: 'identifier = ?',
+          whereArgs: [record.identifier]
+      );
 
-    await BalanceManager.updateBalanceOnDeleteTransactionRecord(record);
+      await BalanceManager.updateBalanceOnDeleteTransactionRecord(transaction, record);
 
-    return effectedRowCount;
+      return effectedRowCount;
+    });
   }
 
   Future<int?> saveTransfer(Record_ record) async {
     final db = await DatabaseService().database;
+    final int? oriIdentifier = record.identifier;
 
-    record.identifier = await db.insert(TABLE_NAME, record.toMap());
+    try {
+      await db.transaction((transaction) async {
+        record.identifier = await transaction.insert(TABLE_NAME, record.toMap());
 
-    await BalanceManager.updateBalanceOnSaveTransferRecord(record);
+        await BalanceManager.updateBalanceOnSaveTransferRecord(transaction, record);
+      });
+    }
+    catch (e) {
+      record.identifier = oriIdentifier;
+      rethrow;
+    }
 
     return record.identifier;
   }
@@ -60,30 +83,38 @@ class RecordService {
   Future<int?> updateTransfer(Record_ record) async {
     final db = await DatabaseService().database;
 
-    await BalanceManager.updateBalanceOnUpdateTransferRecord(record);
+    return await db.transaction((transaction) async {
+      await BalanceManager.updateBalanceOnUpdateTransferRecord(transaction, record);
 
-    return await db.update(
-        TABLE_NAME,
-        record.toMap(),
-        where: 'identifier = ?',
-        whereArgs: [record.identifier]);
+      return await transaction.update(
+          TABLE_NAME,
+          record.toMap(),
+          where: 'identifier = ?',
+          whereArgs: [record.identifier]);
+    });
   }
 
   Future<int?> deleteTransfer(Record_ record) async {
     final db = await DatabaseService().database;
 
-    await BalanceManager.updateBalanceOnDeleteTransferRecord(record);
+    return await db.transaction((transaction) async {
+      await BalanceManager.updateBalanceOnDeleteTransferRecord(transaction, record);
 
-    return await db.delete(
-        TABLE_NAME,
-        where: 'identifier = ?',
-        whereArgs: [record.identifier]
-    );
+      return await transaction.delete(
+          TABLE_NAME,
+          where: 'identifier = ?',
+          whereArgs: [record.identifier]
+      );
+    });
   }
 
   Future<Record_?> findById(int identifier) async {
     final db = await DatabaseService().database;
-    List<Map<String, dynamic>> maps = await db.query(
+    return await findByIdWithExecutor(db, identifier);
+  }
+
+  Future<Record_?> findByIdWithExecutor(DatabaseExecutor executor, int identifier) async {
+    List<Map<String, dynamic>> maps = await executor.query(
       TABLE_NAME,
       where: 'identifier = ?',
       limit: 1,

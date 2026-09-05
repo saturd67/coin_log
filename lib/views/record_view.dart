@@ -13,6 +13,7 @@ import 'package:coin_log/models/Record.dart';
 
 import '../router/RouterUtils.dart';
 import '../shared_widgets/showConfirmationDialog.dart';
+import '../shared_widgets/themed_toast.dart';
 import 'record_details.dart';
 
 class RecordView extends StatefulWidget implements BaseView {
@@ -220,12 +221,18 @@ class _RecordViewState extends State<RecordView> {
                           context,
                           "Are you sure you want to delete?",
                               () async {
-                            if ([RecordType.expense.name, RecordType.income.name].contains(_record.type)) {
-                              await _recordService.deleteTransaction(_record);
-                            }
+                            try {
+                              if ([RecordType.expense.name, RecordType.income.name].contains(_record.type)) {
+                                await _recordService.deleteTransaction(_record);
+                              }
 
-                            else if (_record.type == RecordType.transfer.name) {
-                              await _recordService.deleteTransfer(_record);
+                              else if (_record.type == RecordType.transfer.name) {
+                                await _recordService.deleteTransfer(_record);
+                              }
+                            }
+                            catch (e) {
+                              ThemedToast.showToast("Failed to delete record. No changes were made.");
+                              return;
                             }
 
                             Navigator.of(context).pop("reload");
