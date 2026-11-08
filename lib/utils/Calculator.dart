@@ -165,7 +165,7 @@ class Calculator {
     Expression expression = parser.parse(expressionString);
     ContextModel contextModel = ContextModel();
 
-    double result = expression.evaluate(EvaluationType.REAL, contextModel);
+    double result = RealEvaluator(contextModel).evaluate(expression).toDouble();
 
     if (result * 100 % 100 == 0) {
       return result.toStringAsFixed(0);

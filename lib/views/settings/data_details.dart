@@ -2,7 +2,7 @@ import 'package:coin_log/services/DatabaseService.dart';
 import 'package:coin_log/shared_widgets/showConfirmationDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:coin_log/shared_widgets/themed_toast.dart';
 
 import '../base_view.dart';
 
@@ -63,7 +63,7 @@ class _ExportDataState extends State<ExportData> {
   String filePath = "";
 
   Future<void> pickDirectory() async {
-    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+    String? selectedDirectory = await FilePicker.getDirectoryPath();
 
     setState(() {
       exportDirectory = selectedDirectory ?? "";
@@ -106,11 +106,11 @@ class _ExportDataState extends State<ExportData> {
                   onPressed: () async {
                     if (exportDirectory != "" && exportedFilename != "") {
                       String output = await _databaseService.exportDatabase(exportDirectory, exportedFilename);
-                      Fluttertoast.showToast(msg: output);
+                      ThemedToast.showToast(output);
                     }
 
                     else {
-                      Fluttertoast.showToast(msg: "Export path is empty.");
+                      ThemedToast.showToast("Export path is empty.");
                     }
                   },
                   child: Text("Export")
@@ -135,11 +135,11 @@ class _ImportDataState extends State<ImportData> {
   String importFile = "";
 
   Future<void> pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    PlatformFile? result = await FilePicker.pickFile();
 
     setState(() {
       if (result != null) {
-        importFile = result.files.single.path ?? "";
+        importFile = result.path ?? "";
       }
       else {
         importFile = "";
@@ -188,13 +188,13 @@ class _ImportDataState extends State<ImportData> {
                             "After importing you original data will be replaced.",
                             () async {
                               String output = await _databaseService.importDatabase(importFile);
-                              Fluttertoast.showToast(msg: output);
+                              ThemedToast.showToast(output);
                             },
                             () {}
                         );
                       }
                       else {
-                        Fluttertoast.showToast(msg: "Export path is empty.");
+                        ThemedToast.showToast("Export path is empty.");
                       }
                     },
                     child: Text("Import")

@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class ThemedToast {
 
+  static final GlobalKey<ScaffoldMessengerState> messengerKey = GlobalKey<ScaffoldMessengerState>();
+
   static void showToast(String message) {
-    Fluttertoast.showToast(
-        msg: message,
-        toastLength: Toast.LENGTH_SHORT,
-        backgroundColor: Color(0xff666666),
-        textColor: Color(0xffffffff),
-        fontSize: 16.0
-    );
+    final messenger = messengerKey.currentState;
+    if (messenger == null) return;
+
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
+            style: TextStyle(color: Color(0xffffffff), fontSize: 16.0),
+          ),
+          backgroundColor: Color(0xff666666),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 
 }
