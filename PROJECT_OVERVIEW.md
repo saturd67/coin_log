@@ -12,10 +12,9 @@ per-category budgets, and view spending summaries (charts) by day/month/year.
 - **Charts:** `fl_chart`, `pie_chart`
 - **Other notable packages:** `file_picker` & `path_provider` (DB export/import),
   `permission_handler` (storage permission for backup), `month_picker_dialog`,
-  `math_expressions` (calculator-style amount input), `fluttertoast`, `reorderables`
+  `math_expressions` (calculator-style amount input), `reorderables`
   (drag-to-reorder lists), `intl` (date/number formatting)
-- **Platforms:** Android, iOS, Windows, Linux, macOS, Web (standard Flutter multi-platform
-  scaffolding is present, though the app is primarily mobile-oriented)
+- **Platforms:** Android (primary), iOS (scaffolding with app icon/name configured)
 
 ## Architecture
 

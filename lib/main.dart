@@ -1,4 +1,5 @@
 import 'package:coin_log/services/DatabaseService.dart';
+import 'package:coin_log/shared_widgets/themed_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/views/app_frame/app_frame.dart';
 import 'package:logging/logging.dart';
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        scaffoldMessengerKey: ThemedToast.messengerKey,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
             colorScheme: ColorScheme(
