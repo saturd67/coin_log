@@ -32,11 +32,17 @@ class RecordDetails extends StatefulWidget implements BaseView {
   int? identifier;
   DateTime? defaultDateTime;
 
+  /// When set, the page edits this unsaved record instead of the database:
+  /// the form is prefilled from it and Save pops with the edited [Record_]
+  /// without persisting anything.
+  Record_? draftRecord;
+
   RecordDetails({
     super.key,
     required this.returnTo,
     this.identifier,
-    this.defaultDateTime
+    this.defaultDateTime,
+    this.draftRecord
   });
 
   @override
@@ -86,6 +92,13 @@ class _RecordDetailsState extends State<RecordDetails> {
     }
 
     else {
+      if (widget.draftRecord != null) {
+        _recordFormModel = widget.draftRecord!.toFormModel();
+        _amount = widget.draftRecord!.amount.toStringAsFixed(2);
+        _selectedTransactionCategoryId = widget.draftRecord!.transactionCategoryId;
+        _selectedAccountId = widget.draftRecord!.sourceAccountId;
+      }
+
       loadTransactionCategories();
       loadAccounts();
     }
@@ -133,7 +146,7 @@ class _RecordDetailsState extends State<RecordDetails> {
   Future<void> loadAccounts() async {
     final accounts = await _accountService.listByIsClosed(false);
 
-    if (widget.identifier == null) {
+    if (widget.identifier == null && _selectedAccountId == null) {
       Account defaultAccount = accounts.where((account) => account.isDefault == true).toList().first;
       _selectedAccountId = defaultAccount.identifier;
     }
@@ -186,7 +199,7 @@ class _RecordDetailsState extends State<RecordDetails> {
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0), 
                           child: SwitchButton(
-                            labels: widget.identifier == null ? [RecordType.expense.name, RecordType.income.name, RecordType.transfer.name] : [RecordType.expense.name, RecordType.income.name].contains(_recordFormModel.type) ? [RecordType.expense.name, RecordType.income.name] : [RecordType.transfer.name],
+                            labels: widget.draftRecord != null ? [RecordType.expense.name, RecordType.income.name] : widget.identifier == null ? [RecordType.expense.name, RecordType.income.name, RecordType.transfer.name] : [RecordType.expense.name, RecordType.income.name].contains(_recordFormModel.type) ? [RecordType.expense.name, RecordType.income.name] : [RecordType.transfer.name],
                             selectedValue: _recordFormModel.type!,
                             onChanged: (String value) {
                               setState(() {
@@ -454,6 +467,11 @@ class _RecordDetailsState extends State<RecordDetails> {
                         }
                         catch(e) {
                           ThemedToast.showToast(e.toString());
+                          return;
+                        }
+
+                        if (widget.draftRecord != null) {
+                          Navigator.of(context).pop(record);
                           return;
                         }
 

@@ -4,6 +4,7 @@ import 'package:coin_log/router/RouterUtils.dart';
 import 'package:coin_log/services/AccountService.dart';
 import 'package:coin_log/services/TransactionCategoryService.dart';
 import 'package:coin_log/views/record_calendar.dart';
+import 'package:coin_log/views/record_image_import.dart';
 import 'package:coin_log/views/record_view.dart';
 import 'package:coin_log/shared_widgets/themedShowMonthPicker.dart';
 import 'package:flutter/material.dart';
@@ -172,16 +173,32 @@ class _RecordsAppBarState extends State<RecordsAppBar> {
                     fontSize: 20,
                     color: Theme.of(context).colorScheme.onPrimary),
               ),
-              InkWell(
-                onTap: () async {
-                  final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordCalendar(selectedDateTime: widget.selectedDateTime,)));
-                  if (result == "reload") {
-                    widget.load(widget.selectedDateTime);
-                  }
-                },
-                child: Icon(
-                  Icons.calendar_month,
-                  color: Theme.of(context).colorScheme.onPrimary,)
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () async {
+                      final result = await Navigator.of(context).push(RouterUtils.createRoute(const RecordImageImport()));
+                      if (result is List && result.length > 1 && result[0] == "reload") {
+                        widget.load(result[1]);
+                      }
+                    },
+                    child: Icon(
+                      Icons.document_scanner_outlined,
+                      color: Theme.of(context).colorScheme.onPrimary,)
+                  ),
+                  const SizedBox(width: 14),
+                  InkWell(
+                    onTap: () async {
+                      final result = await Navigator.of(context).push(RouterUtils.createRoute(RecordCalendar(selectedDateTime: widget.selectedDateTime,)));
+                      if (result == "reload") {
+                        widget.load(widget.selectedDateTime);
+                      }
+                    },
+                    child: Icon(
+                      Icons.calendar_month,
+                      color: Theme.of(context).colorScheme.onPrimary,)
+                  ),
+                ],
               )
             ],
           ),

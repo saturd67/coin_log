@@ -1,5 +1,6 @@
 import 'package:coin_log/views/settings/budget_list.dart';
 import 'package:coin_log/views/settings/data_details.dart';
+import 'package:coin_log/views/settings/mapping_rule_list.dart';
 import 'package:flutter/material.dart';
 import 'package:coin_log/router/RouterUtils.dart';
 import 'package:coin_log/views/settings/transaction_list.dart';
@@ -31,6 +32,7 @@ class _SettingsState extends State<Settings> {
           SettingItem(icon: Icons.category, name: "Transactions", page: TransactionList()),
           SettingItem(icon: Icons.monetization_on, name: "Accounts", page: AccountList()),
           SettingItem(icon: Icons.align_horizontal_left, name: "Budgets", page: BudgetList()),
+          SettingItem(icon: Icons.document_scanner_outlined, name: "Image Import Rules", page: MappingRuleList()),
           SettingItem(icon: Icons.dataset_outlined, name: "Data", page: DataDetail())
         ],
       ),
